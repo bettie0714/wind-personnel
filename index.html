@@ -30,6 +30,27 @@
 .admin-choice{background:#fbfdff}
 @media(max-width:720px){.login-choice-grid{grid-template-columns:1fr}.login-card-wide{width:min(460px,100%)}}
 
+
+.quick-filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.quick-filter{border:1px solid #dbe3ef;background:#fff;color:#475569;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer}
+.quick-filter:hover{background:#f8fafc}
+.quick-filter.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.group-overview-grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px}
+.group-overview-card{border:1px solid #e5eaf1;background:#fff;border-radius:14px;padding:15px;text-align:left;cursor:pointer;transition:.15s;box-shadow:0 3px 12px rgba(15,23,42,.04)}
+.group-overview-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(15,23,42,.08);border-color:#bfdbfe}
+.group-overview-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.group-name{font-weight:800;color:#1e293b}
+.group-total{font-size:26px;font-weight:900;color:#2563eb}
+.group-total small{font-size:11px;color:#64748b;font-weight:600}
+.group-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.group-mini{background:#f8fafc;border-radius:9px;padding:7px 5px;text-align:center;font-size:11px;color:#64748b}
+.group-mini b{display:block;font-size:14px;color:#1e293b;margin-bottom:1px}
+.identity-z b{color:#6d3fc2}.identity-w b{color:#ea7a12}
+.kpi-click{cursor:pointer;transition:.15s}.kpi-click:hover{transform:translateY(-2px);border-color:#bfdbfe}
+@media(max-width:1150px){.group-overview-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:800px){.group-overview-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.group-overview-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -80,7 +101,7 @@
   <button data-page="changes">↗　人員變動</button>
   <button class="admin-only" data-page="admin">⚙　管理後台</button>
   <button data-page="overseas">🌏　海外事業部</button>
-  <button data-page="contracts" class="admin-only">📅　外籍合約到期名單</button>
+  <button data-page="contracts" class="admin-only">📅　外籍合約到期</button>
  </nav>
 </aside>
 <main class="content">
@@ -92,7 +113,7 @@
 <section id="dashboard" class="page active">
  <div id="kpis" class="grid4"></div>
  <div class="chartgrid">
-  <div class="section"><div class="sectionhead"><div><h2>組別人力分布</h2><div class="mini">點擊長條查看名單</div></div></div><div id="groupChart"></div></div>
+  <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">每組同時顯示總人數與 Z／W 分布，點卡片即可查看名單</div></div></div><div id="groupChart"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>班別分布</h2><div class="mini">本部在職</div></div></div><div id="shiftChart" class="donutwrap"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>人員結構</h2><div class="mini">台籍／W／Z／建教生</div></div></div><div id="typeChart"></div></div>
  </div>
@@ -101,7 +122,15 @@
 
 <section id="people" class="page">
  <div class="section"><div class="toolbar"><div><b>在職人員</b><div id="peopleCount" class="mini"></div></div><div><button id="clearFilters" class="btn">清除篩選</button><button id="addBtn" class="btn primary admin-only">＋ 新增人員</button></div></div>
-  <div class="filters"><div class="field"><label>組別</label><select id="fGroup"><option value="">全部</option></select></div><div class="field"><label>班別</label><select id="fShift"><option value="">全部</option></select></div><div class="field"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field"><label>職級</label><select id="fLevel"><option value="">全部</option><option>主管</option></select></div><div class="field search"><label>搜尋</label><input id="fSearch" placeholder="工號／姓名／職別"></div></div>
+  <div class="filters"><div class="field"><label>組別</label><select id="fGroup"><option value="">全部</option></select></div><div class="field"><label>班別</label><select id="fShift"><option value="">全部</option></select></div><div class="field"><label>職別</label><select id="fJob"><option value="">全部</option></select></div><div class="field"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field"><label>職級</label><select id="fLevel"><option value="">全部</option><option>主管</option></select></div><div class="field search"><label>搜尋</label><input id="fSearch" placeholder="工號／姓名／職別"></div></div>
+  <div class="quick-filter-row">
+    <span class="mini">快速篩選：</span>
+    <button class="quick-filter active" data-type="">全部</button>
+    <button class="quick-filter" data-type="台籍">台籍</button>
+    <button class="quick-filter" data-type="Z">Z</button>
+    <button class="quick-filter" data-type="W">W</button>
+    <button class="quick-filter" data-type="建教生">建教生</button>
+  </div>
  </div>
  <div class="section"><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>區域</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div></div>
 </section>
@@ -126,7 +155,7 @@
 </section>
 <section id="contracts" class="page admin-only">
  <div class="section">
-  <div class="sectionhead"><div><h2>外籍合約到期名單</h2><div class="mini">只有管理員可以查看。</div></div></div>
+  <div class="sectionhead"><div><h2>外籍合約到期</h2><div class="mini">只有管理員可以查看。</div></div></div>
   <div class="grid4" id="contractKpis"></div>
  </div>
  <div class="section">
@@ -149,7 +178,7 @@
  <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option value="">一般</option><option>主管</option></select></div>
  <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field"><label>區域</label><select id="mArea"><option>本部</option><option>海外事業部</option></select></div>
- <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>外籍合約到期日</label><input id="mContractEnd" type="date"><div class="mini">只供管理員查看，W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
+ <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">只供管理員查看，W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
  </div><div class="modalfoot"><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
 
@@ -161,9 +190,9 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const GROUPS=["捲板","手焊","電焊","清根","研磨","主管","Z","W","文管","廠務","建教生"];
+const GROUPS=["捲板","手焊","電焊","清根","研磨","主管","文管","廠務","建教生","未分類"];
 const cfg=window.APP_CONFIG||{};
-let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],editNo=null,resignNo=null,importRows=[];
+let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],editNo=null,resignNo=null,importRows=[],activeTypeFilter='';
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -173,7 +202,29 @@ function isAdmin(){return role==='admin'}
 function normalizeNo(v){return String(v||'').trim().toUpperCase()}
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
 function deriveLevel(job){job=String(job||'');return /(組長|課長|廠長|副廠長|工程師)/.test(job)?'主管':''}
-function deriveGroup(no,job,existing){no=normalizeNo(no);let t=String(job||'').replace(/\s+/g,'');if(no.startsWith('Z'))return'Z';if(no.startsWith('W'))return'W';if(no.startsWith('X')||t.includes('建教生'))return'建教生';if(t.includes('廠務'))return'廠務';if(t.includes('文管'))return'文管';if(t.includes('廠長')||t.includes('副廠長')||t.includes('銲接工程師')||t.includes('焊接工程師'))return'主管';if(t.includes('設備焊接')||t.includes('設備銲接')||t.includes('電銲')||t.includes('電焊'))return'電焊';if(t.includes('6GR焊工')||t.includes('手焊')||t.includes('焊工'))return'手焊';if(t.includes('捲板'))return'捲板';if(t.includes('清根'))return'清根';if(t.includes('研磨'))return'研磨';return existing||'未分類'}
+function deriveGroup(no,job,existing){
+ no=normalizeNo(no);let t=String(job||'').replace(/\s+/g,'');
+ if(no.startsWith('X')||t.includes('建教生'))return'建教生';
+ if(t.includes('廠務'))return'廠務';
+ if(t.includes('文管'))return'文管';
+ if(t.includes('設備焊接')||t.includes('設備銲接')||t.includes('電銲')||t.includes('電焊'))return'電焊';
+ if(t.includes('6GR焊工')||t.includes('手焊')||t.includes('焊工'))return'手焊';
+ if(t.includes('捲板'))return'捲板';
+ if(t.includes('清根'))return'清根';
+ if(t.includes('研磨'))return'研磨';
+ if(t.includes('廠長')||t.includes('副廠長')||t.includes('銲接工程師')||t.includes('焊接工程師'))return'主管';
+ // 舊資料若組別曾被存成 Z / W，不再把它當真正組別。
+ if(existing==='Z'||existing==='W'||!existing)return'未分類';
+ return existing;
+}
+function personGroup(p){return deriveGroup(p.employee_no,p.job_title,p.group_name)}
+function personType(p){
+ let no=normalizeNo(p.employee_no);
+ if(no.startsWith('Z'))return'Z';
+ if(no.startsWith('W'))return'W';
+ if(no.startsWith('X'))return'建教生';
+ return'台籍';
+}
 function tenure(date){if(!date)return'-';let d=new Date(date+'T00:00:00'),now=new Date();if(isNaN(d))return'-';let months=(now.getFullYear()-d.getFullYear())*12+now.getMonth()-d.getMonth();if(now.getDate()<d.getDate())months--;if(months<0)return'-';let y=Math.floor(months/12),m=months%12;return y?`${y}年${m?m+'個月':''}`:`${m}個月`}
 function badge(v){return `<span class="badge ${v==='主管'?'orange':'blue'}">${esc(v)}</span>`}
 
@@ -252,21 +303,92 @@ $('logoutBtn').onclick=()=>db.auth.signOut();
 async function enter(u){user=u;let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
 function leave(){user=null;role='viewer';employees=[];changes=[];contracts=[];$('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('viewerPassword').value='';$('loginPassword').value=''}
 async function loadAll(){let [e,c]=await Promise.all([db.from('employees').select('*').order('employee_no'),db.from('personnel_changes').select('*').order('change_date',{ascending:false}).order('id',{ascending:false})]);if(e.error)alert('讀取人員資料失敗：'+e.error.message);else employees=e.data||[];if(c.error)console.error(c.error);else changes=c.data||[];contracts=[];if(isAdmin()){let fc=await db.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});if(fc.error)console.error(fc.error);else contracts=fc.data||[]}populateFilters();renderAll()}
-function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','新增、修改、調組與離職紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期名單','僅管理員可查看的 W／Z 合約到期資料']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
+function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','新增、修改、調組與離職紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','僅管理員可查看的 W／Z 合約到期資料']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(['admin','contracts'].includes(b.dataset.page)&&!isAdmin())return;showPage(b.dataset.page)});
-function populateFilters(){let gs=[...new Set([...GROUPS,...employees.map(x=>x.group_name).filter(Boolean)])];$('fGroup').innerHTML='<option value="">全部</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');let ss=['日','中','夜'];$('fShift').innerHTML='<option value="">全部</option>'+ss.map(x=>`<option>${esc(x)}</option>`).join('');$('mGroup').innerHTML=gs.map(x=>`<option>${esc(x)}</option>`).join('')}
+function populateFilters(){
+ let gs=[...new Set([...GROUPS,...employees.map(personGroup).filter(Boolean)])].filter(x=>x!=='Z'&&x!=='W');
+ $('fGroup').innerHTML='<option value="">全部</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');
+ let ss=['日','中','夜'];
+ $('fShift').innerHTML='<option value="">全部</option>'+ss.map(x=>`<option>${esc(x)}</option>`).join('');
+ let jobs=[...new Set(employees.map(x=>x.job_title).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'zh-Hant'));
+ $('fJob').innerHTML='<option value="">全部</option>'+jobs.map(x=>`<option>${esc(x)}</option>`).join('');
+ $('mGroup').innerHTML=gs.map(x=>`<option>${esc(x)}</option>`).join('');
+}
 function renderAll(){renderDash();renderPeople();renderChanges();renderOverseas();renderContracts()}
-function renderDash(){let a=mainCurrent();let k=[['總人數',a.length],['台籍',a.filter(x=>x.nationality==='台籍').length],['Z',a.filter(x=>x.employee_no.startsWith('Z')).length],['W',a.filter(x=>x.employee_no.startsWith('W')).length]];$('kpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b;font-weight:500">人</span></div></div>`).join('');let gc={};a.forEach(x=>gc[x.group_name]=(gc[x.group_name]||0)+1);let groups=[...new Set([...GROUPS,...Object.keys(gc)])],max=Math.max(1,...groups.map(g=>gc[g]||0));$('groupChart').innerHTML='<div class="barlist">'+groups.map(g=>`<button class="barrow" data-g="${esc(g)}" style="border:0;background:none;padding:0;text-align:left;width:100%"><span>${esc(g)}</span><span class="bartrack"><span class="barfill" style="width:${Math.round((gc[g]||0)/max*100)}%"></span></span><b>${gc[g]||0}</b></button>`).join('')+'</div>';$('groupChart').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{showPage('people');$('fGroup').value=b.dataset.g;renderPeople()});let sc={};a.forEach(x=>sc[x.shift||'未設定']=(sc[x.shift||'未設定']||0)+1);let entries=Object.entries(sc),total=entries.reduce((n,x)=>n+x[1],0)||1,colors=['#2f80ed','#43b05c','#f2992e','#7650c7','#2cb4b3','#94a3b8'],deg=0,parts=[];entries.forEach((x,i)=>{let d=x[1]/total*360;parts.push(`${colors[i%colors.length]} ${deg}deg ${deg+d}deg`);deg+=d});$('shiftChart').innerHTML=`<div class="donut" style="background:conic-gradient(${parts.join(',')})"></div><div class="legend">${entries.map((x,i)=>`<div class="legendrow"><span class="dot" style="background:${colors[i%colors.length]}"></span>${esc(x[0])}班 <b>${x[1]}</b></div>`).join('')}</div>`;let types=[['台籍',a.filter(x=>x.nationality==='台籍').length,'#2f80ed'],['Z',a.filter(x=>x.employee_no.startsWith('Z')).length,'#7650c7'],['W',a.filter(x=>x.employee_no.startsWith('W')).length,'#f2992e'],['建教生',a.filter(x=>x.employee_no.startsWith('X')).length,'#43b05c']],sum=types.reduce((n,x)=>n+x[1],0)||1;$('typeChart').innerHTML=`<div style="display:flex;height:25px;border-radius:4px;overflow:hidden;margin:25px 0">${types.map(x=>`<span style="width:${x[1]/sum*100}%;background:${x[2]}"></span>`).join('')}</div>${types.map(x=>`<div style="display:grid;grid-template-columns:14px 1fr 50px 55px;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px"><span class="dot" style="background:${x[2]}"></span><span>${x[0]}</span><b>${x[1]}人</b><span class="mini">${(x[1]/sum*100).toFixed(1)}%</span></div>`).join('')}`;$('recentBody').innerHTML=changes.slice(0,6).map(c=>`<tr><td>${changeBadge(c.change_type)}</td><td>${esc(c.employee_name)}</td><td>${esc(c.employee_no)}</td><td>${esc(c.new_group||c.old_group||'-')}</td><td>${esc(c.detail||'-')}</td><td>${esc(c.change_date)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">目前沒有異動紀錄</td></tr>'}
-function filtered(){let q=$('fSearch').value.trim().toLowerCase();return mainCurrent().filter(x=>(!$('fGroup').value||x.group_name===$('fGroup').value)&&(!$('fShift').value||x.shift===$('fShift').value)&&(!$('fNat').value||x.nationality===$('fNat').value)&&(!$('fLevel').value||x.level===$('fLevel').value)&&(!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')).toLowerCase().includes(q)))}
+function renderDash(){
+ let a=mainCurrent();
+ let k=[
+   ['總人數',a.length,''],
+   ['台籍',a.filter(x=>personType(x)==='台籍').length,'台籍'],
+   ['Z',a.filter(x=>personType(x)==='Z').length,'Z'],
+   ['W',a.filter(x=>personType(x)==='W').length,'W']
+ ];
+ $('kpis').innerHTML=k.map(x=>`<div class="stat ${x[2]?'kpi-click':''}" ${x[2]?`data-type="${x[2]}"`:''}><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b;font-weight:500">人</span></div>${x[2]?'<div class="mini">點擊查看名單</div>':''}</div>`).join('');
+ $('kpis').querySelectorAll('[data-type]').forEach(card=>card.onclick=()=>openTypeList(card.dataset.type));
+
+ // 組別卡片：真正組別 + 該組的 Z/W 人數
+ let gc={};
+ a.forEach(x=>{
+   let g=personGroup(x);
+   if(!gc[g])gc[g]={total:0,z:0,w:0,local:0};
+   gc[g].total++;
+   let t=personType(x);
+   if(t==='Z')gc[g].z++;
+   else if(t==='W')gc[g].w++;
+   else gc[g].local++;
+ });
+ let groups=Object.entries(gc).sort((a,b)=>b[1].total-a[1].total);
+ $('groupChart').innerHTML='<div class="group-overview-grid">'+groups.map(([g,c])=>`
+   <button class="group-overview-card" data-g="${esc(g)}">
+     <div class="group-overview-top"><span class="group-name">${esc(g)}</span><span class="group-total">${c.total}<small> 人</small></span></div>
+     <div class="group-breakdown">
+       <div class="group-mini"><b>${c.local}</b>台籍／其他</div>
+       <div class="group-mini identity-z"><b>${c.z}</b>Z</div>
+       <div class="group-mini identity-w"><b>${c.w}</b>W</div>
+     </div>
+   </button>`).join('')+'</div>';
+ $('groupChart').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{showPage('people');activeTypeFilter='';syncTypeButtons();$('fGroup').value=b.dataset.g;renderPeople()});
+
+ let sc={};a.forEach(x=>sc[x.shift||'未設定']=(sc[x.shift||'未設定']||0)+1);
+ let entries=Object.entries(sc),total=entries.reduce((n,x)=>n+x[1],0)||1,colors=['#2f80ed','#43b05c','#f2992e','#7650c7','#2cb4b3','#94a3b8'],deg=0,parts=[];
+ entries.forEach((x,i)=>{let d=x[1]/total*360;parts.push(`${colors[i%colors.length]} ${deg}deg ${deg+d}deg`);deg+=d});
+ $('shiftChart').innerHTML=`<div class="donut" style="background:conic-gradient(${parts.join(',')})"></div><div class="legend">${entries.map((x,i)=>`<div class="legendrow"><span class="dot" style="background:${colors[i%colors.length]}"></span>${esc(x[0])}班 <b>${x[1]}</b></div>`).join('')}</div>`;
+
+ let types=[['台籍',a.filter(x=>personType(x)==='台籍').length,'#2f80ed'],['Z',a.filter(x=>personType(x)==='Z').length,'#7650c7'],['W',a.filter(x=>personType(x)==='W').length,'#f2992e'],['建教生',a.filter(x=>personType(x)==='建教生').length,'#43b05c']],sum=types.reduce((n,x)=>n+x[1],0)||1;
+ $('typeChart').innerHTML=`<div style="display:flex;height:25px;border-radius:4px;overflow:hidden;margin:25px 0">${types.map(x=>`<span style="width:${x[1]/sum*100}%;background:${x[2]}"></span>`).join('')}</div>${types.map(x=>`<button data-type="${x[0]}" style="display:grid;grid-template-columns:14px 1fr 50px 55px;gap:8px;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:transparent;width:100%;text-align:left;cursor:pointer;font-size:13px"><span class="dot" style="background:${x[2]}"></span><span>${x[0]}</span><b>${x[1]}人</b><span class="mini">${(x[1]/sum*100).toFixed(1)}%</span></button>`).join('')}`;
+ $('typeChart').querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>openTypeList(b.dataset.type));
+
+ $('recentBody').innerHTML=changes.slice(0,6).map(c=>`<tr><td>${changeBadge(c.change_type)}</td><td>${esc(c.employee_name)}</td><td>${esc(c.employee_no)}</td><td>${esc(c.new_group||c.old_group||'-')}</td><td>${esc(c.detail||'-')}</td><td>${esc(c.change_date)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">目前沒有異動紀錄</td></tr>';
+}
+function openTypeList(type){
+ showPage('people');
+ activeTypeFilter=type;
+ ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>$(id).value='');
+ syncTypeButtons();
+ renderPeople();
+}
+function syncTypeButtons(){document.querySelectorAll('.quick-filter').forEach(b=>b.classList.toggle('active',b.dataset.type===activeTypeFilter))}
+function filtered(){
+ let q=$('fSearch').value.trim().toLowerCase();
+ return mainCurrent().filter(x=>
+   (!$('fGroup').value||personGroup(x)===$('fGroup').value)&&
+   (!$('fShift').value||x.shift===$('fShift').value)&&
+   (!$('fJob').value||x.job_title===$('fJob').value)&&
+   (!$('fNat').value||x.nationality===$('fNat').value)&&
+   (!$('fLevel').value||x.level===$('fLevel').value)&&
+   (!activeTypeFilter||personType(x)===activeTypeFilter)&&
+   (!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')).toLowerCase().includes(q))
+ )
+}
 function renderPeople(){let a=filtered();$('peopleCount').textContent=`共 ${a.length} 人`;$('peopleBody').innerHTML=a.map(x=>`<tr><td><b>${esc(x.employee_no)}</b></td><td>${esc(x.name)}</td><td>${esc(x.shift||'-')}</td><td>${badge(x.group_name||'-')}</td><td>${esc(x.job_title||'-')}</td><td>${x.level?'<span class="badge orange">主管</span>':'-'}</td><td>${esc(x.nationality||'-')}</td><td>${esc(x.area||'-')}</td><td>${esc(x.hire_date||'-')}</td><td>${tenure(x.hire_date)}</td>${isAdmin()?`<td><button class="btn" onclick="editPerson('${esc(x.employee_no)}')">編輯</button> <button class="btn danger" onclick="openResign('${esc(x.employee_no)}')">離職</button></td>`:''}</tr>`).join('')||`<tr><td colspan="${isAdmin()?11:10}" class="empty">沒有符合條件的人員</td></tr>`}
 function changeBadge(t){let cls=t.includes('離職')?'red':t.includes('新增')||t.includes('匯入')?'green':'blue';return `<span class="badge ${cls}">${esc(t)}</span>`}
 function renderChanges(){$('changesBody').innerHTML=changes.map(c=>`<tr><td>${esc(c.change_date)}</td><td>${changeBadge(c.change_type)}</td><td>${esc(c.employee_no||'-')}</td><td>${esc(c.employee_name||'-')}</td><td>${esc(c.old_group||'-')}</td><td>${esc(c.new_group||'-')}</td><td>${esc(c.detail||'-')}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">目前沒有變動紀錄</td></tr>'}
 
 function contractDays(dateStr){if(!dateStr)return null;let today=new Date();today.setHours(0,0,0,0);let d=new Date(dateStr+'T00:00:00');return Math.ceil((d-today)/86400000)}
-function renderContracts(){if(!isAdmin()||!$('contractBody'))return;let cmap=new Map(contracts.map(c=>[c.employee_no,c])),q=($('cSearch').value||'').trim().toLowerCase(),range=$('cRange').value||'',typ=$('cType').value||'';let all=employees.filter(e=>e.status!=='離職'&&/^[WZ]/.test(e.employee_no)&&cmap.has(e.employee_no)).map(e=>({...e,contract_end_date:cmap.get(e.employee_no).contract_end_date}));let a=all.filter(e=>{let d=contractDays(e.contract_end_date);if(typ&&!e.employee_no.startsWith(typ))return false;if(q&&!(e.employee_no+' '+e.name).toLowerCase().includes(q))return false;if(range==='expired'&&!(d<0))return false;if(range&&range!=='expired'&&!(d>=0&&d<=Number(range)))return false;return true}).sort((a,b)=>a.contract_end_date.localeCompare(b.contract_end_date));let ds=all.map(e=>contractDays(e.contract_end_date));let k=[['外籍合約',all.length],['30天內',ds.filter(d=>d>=0&&d<=30).length],['90天內',ds.filter(d=>d>=0&&d<=90).length],['已到期',ds.filter(d=>d<0).length]];$('contractKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');$('contractCount').textContent=`共 ${a.length} 人`;$('contractBody').innerHTML=a.map(e=>{let d=contractDays(e.contract_end_date),txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`,cls=d<0?'red':d<=30?'orange':'green';return `<tr><td><b>${esc(e.employee_no)}</b></td><td>${esc(e.name)}</td><td>${e.employee_no[0]}</td><td>${badge(e.group_name||'-')}</td><td>${esc(e.shift||'-')}</td><td>${esc(e.hire_date||'-')}</td><td><b>${esc(e.contract_end_date)}</b></td><td><span class="badge ${cls}">${txt}</span></td><td><button class="btn" onclick="editPerson('${esc(e.employee_no)}')">編輯</button></td></tr>`}).join('')||'<tr><td colspan="9" class="empty">目前沒有符合條件的合約資料</td></tr>'}
+function renderContracts(){if(!isAdmin()||!$('contractBody'))return;let cmap=new Map(contracts.map(c=>[c.employee_no,c])),q=($('cSearch').value||'').trim().toLowerCase(),range=$('cRange').value||'',typ=$('cType').value||'';let all=employees.filter(e=>e.status!=='離職'&&/^[WZ]/.test(e.employee_no)&&cmap.has(e.employee_no)).map(e=>({...e,contract_end_date:cmap.get(e.employee_no).contract_end_date}));let a=all.filter(e=>{let d=contractDays(e.contract_end_date);if(typ&&!e.employee_no.startsWith(typ))return false;if(q&&!(e.employee_no+' '+e.name).toLowerCase().includes(q))return false;if(range==='expired'&&!(d<0))return false;if(range&&range!=='expired'&&!(d>=0&&d<=Number(range)))return false;return true}).sort((a,b)=>a.contract_end_date.localeCompare(b.contract_end_date));let ds=all.map(e=>contractDays(e.contract_end_date));let k=[['外籍合約',all.length],['30天內',ds.filter(d=>d>=0&&d<=30).length],['90天內',ds.filter(d=>d>=0&&d<=90).length],['已到期',ds.filter(d=>d<0).length]];$('contractKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');$('contractCount').textContent=`共 ${a.length} 人`;$('contractBody').innerHTML=a.map(e=>{let d=contractDays(e.contract_end_date),txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`,cls=d<0?'red':d<=30?'orange':'green';return `<tr><td><b>${esc(e.employee_no)}</b></td><td>${esc(e.name)}</td><td>${e.employee_no[0]}</td><td>${badge(personGroup(e)||'-')}</td><td>${esc(e.shift||'-')}</td><td>${esc(e.hire_date||'-')}</td><td><b>${esc(e.contract_end_date)}</b></td><td><span class="badge ${cls}">${txt}</span></td><td><button class="btn" onclick="editPerson('${esc(e.employee_no)}')">編輯</button></td></tr>`}).join('')||'<tr><td colspan="9" class="empty">目前沒有符合條件的合約資料</td></tr>'}
 
 function renderOverseas(){let a=overseasCurrent();let k=[['海外總人數',a.length],['台籍',a.filter(x=>x.nationality==='台籍').length],['Z',a.filter(x=>x.employee_no.startsWith('Z')).length],['W',a.filter(x=>x.employee_no.startsWith('W')).length]];$('overseasKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');$('overseasCount').textContent=`共 ${a.length} 人`;$('overseasBody').innerHTML=a.map(x=>`<tr><td><b>${esc(x.employee_no)}</b></td><td>${esc(x.name)}</td><td>${esc(x.shift||'-')}</td><td>${badge(x.group_name||'-')}</td><td>${esc(x.job_title||'-')}</td><td>${x.level?'<span class="badge orange">主管</span>':'-'}</td><td>${esc(x.nationality||'-')}</td><td>${esc(x.hire_date||'-')}</td>${isAdmin()?`<td><button class="btn" onclick="editPerson('${esc(x.employee_no)}')">編輯</button> <button class="btn danger" onclick="openResign('${esc(x.employee_no)}')">離職</button></td>`:''}</tr>`).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有海外事業部人員</td></tr>`}
-['fGroup','fShift','fNat','fLevel','fSearch'].forEach(id=>$(id).addEventListener('input',renderPeople));['cRange','cType','cSearch'].forEach(id=>$(id)?.addEventListener('input',renderContracts));$('clearFilters').onclick=()=>{['fGroup','fShift','fNat','fLevel','fSearch'].forEach(id=>$(id).value='');renderPeople()};
+['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>$(id).addEventListener('input',renderPeople));document.querySelectorAll('.quick-filter').forEach(b=>b.onclick=()=>{activeTypeFilter=b.dataset.type;syncTypeButtons();renderPeople()});['cRange','cType','cSearch'].forEach(id=>$(id)?.addEventListener('input',renderContracts));$('clearFilters').onclick=()=>{['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>$(id).value='');activeTypeFilter='';syncTypeButtons();renderPeople()};
 
 function openPerson(p=null,area=null){if(!isAdmin())return;editNo=p?.employee_no||null;$('personModalTitle').textContent=p?'編輯人員':'新增人員';$('mNo').value=p?.employee_no||'';$('mNo').disabled=!!p;$('mName').value=p?.name||'';$('mShift').value=['日','中','夜'].includes(p?.shift)?p.shift:'日';$('mGroup').value=p?.group_name||'捲板';$('mJob').value=p?.job_title||'';$('mLevel').value=p?.level||'';$('mNat').value=p?.nationality||'台籍';$('mArea').value=area||p?.area||'本部';let fc=contracts.find(c=>c.employee_no===p?.employee_no);$('mHire').value=p?.hire_date||'';$('mContractEnd').value=fc?.contract_end_date||'';$('mStatus').value=p?.status==='留停'?'留停':'在職';$('mNote').value=p?.note||'';$('personModal').classList.add('show')}
 window.editPerson=no=>openPerson(employees.find(x=>x.employee_no===no));$('addBtn').onclick=$('adminAddBtn').onclick=()=>openPerson();$('overseasAddBtn').onclick=()=>openPerson(null,'海外事業部');$('personClose').onclick=$('personCancel').onclick=()=>$('personModal').classList.remove('show');

@@ -15,33 +15,56 @@
 .modalback{display:none;position:fixed;inset:0;background:rgba(15,23,42,.48);z-index:30;align-items:center;justify-content:center;padding:20px}.modalback.show{display:flex}.modal{width:min(760px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:16px;padding:22px}.modal h2{margin:0 0 4px}.modal p{margin:0 0 18px;color:var(--muted);font-size:13px}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.close{float:right;border:0;background:transparent;font-size:22px;color:#64748b}
 @media(max-width:1100px){.chartgrid{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:repeat(3,1fr)}.search{grid-column:span 3}}
 @media(max-width:760px){.side{width:72px}.brand{font-size:0}.brand small{display:none}.nav button{font-size:0;text-align:center}.nav button::first-letter{font-size:18px}.content{margin-left:72px;width:calc(100% - 72px);padding:14px}.grid4{grid-template-columns:1fr 1fr}.filters,.formgrid{grid-template-columns:1fr}.search{grid-column:auto}.top{align-items:flex-start}.donutwrap{flex-direction:column}}
+
+.login-card-wide{width:min(900px,100%)}
+.login-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.version-badge{background:#eef2ff;color:#3730a3;font-size:11px;font-weight:800;padding:6px 9px;border-radius:999px;white-space:nowrap}
+.connection-status{padding:10px 12px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:13px;margin:4px 0 18px}
+.connection-status.ok{background:#ecfdf5;color:#047857}
+.connection-status.bad{background:#fef2f2;color:#b91c1c}
+.login-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.login-choice{border:1px solid #e5e7eb;border-radius:16px;padding:20px;background:#fff}
+.login-choice h2{font-size:18px;margin:4px 0 5px}
+.login-choice p{font-size:13px;line-height:1.55;margin:0 0 14px}
+.choice-icon{font-size:24px}
+.admin-choice{background:#fbfdff}
+@media(max-width:720px){.login-choice-grid{grid-template-columns:1fr}.login-card-wide{width:min(460px,100%)}}
+
 </style>
 </head>
 <body>
 <div id="loginView" class="login-shell">
-  <div class="login-card">
-    <h1>風力人員統計系統</h1>
-    <p>同事使用公司共用檢視密碼；管理員使用自己的帳號登入。</p>
-
-    <div class="login-tabs">
-      <button id="viewerTab" class="login-tab active" type="button">同事檢視</button>
-      <button id="adminTab" class="login-tab" type="button">管理員登入</button>
+  <div class="login-card login-card-wide">
+    <div class="login-head">
+      <div>
+        <h1>風力人員統計系統</h1>
+        <p>請依身分選擇登入方式。</p>
+      </div>
+      <span class="version-badge">登入修正版 V4</span>
     </div>
 
-    <div id="viewerLoginPanel">
-      <label>公司檢視密碼</label>
-      <input id="viewerPassword" type="password" autocomplete="current-password" placeholder="請輸入公司共用密碼">
-      <button id="viewerLoginBtn" class="btn primary">進入檢視系統</button>
-      <div class="login-note">登入後只能查看，不能新增、修改、刪除或匯入資料。</div>
-    </div>
+    <div id="connectionStatus" class="connection-status">正在連接 Supabase…</div>
 
-    <div id="adminLoginPanel" class="hidden">
-      <label>管理員電子郵件</label>
-      <input id="loginEmail" type="email" autocomplete="username" placeholder="你的管理員 Email">
-      <label>管理員密碼</label>
-      <input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••">
-      <button id="loginBtn" class="btn primary">管理員登入</button>
-      <div class="login-note">管理員可新增、編輯、Excel 匯入、人員變動與查看外籍合約到期名單。</div>
+    <div class="login-choice-grid">
+      <section class="login-choice">
+        <div class="choice-icon">👀</div>
+        <h2>我要看人員表</h2>
+        <p>只需要公司共用檢視密碼，登入後只能查看資料。</p>
+        <label>公司檢視密碼</label>
+        <input id="viewerPassword" type="password" autocomplete="current-password" placeholder="請輸入公司共用密碼">
+        <button id="viewerLoginBtn" class="btn primary" type="button">進入檢視系統</button>
+      </section>
+
+      <section class="login-choice admin-choice">
+        <div class="choice-icon">🔑</div>
+        <h2>管理員登入</h2>
+        <p>使用你的管理員 Email 與密碼，可新增、修改及匯入資料。</p>
+        <label>管理員 Email</label>
+        <input id="loginEmail" type="email" autocomplete="username" placeholder="你的管理員 Email">
+        <label>管理員密碼</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••">
+        <button id="loginBtn" class="btn primary" type="button">管理員登入</button>
+      </section>
     </div>
 
     <div id="loginError" class="error hidden"></div>
@@ -133,7 +156,8 @@
 <div id="resignModal" class="modalback"><div class="modal"><button id="resignClose" class="close">×</button><h2>登記離職</h2><p id="resignWho"></p><div class="formgrid"><div class="field"><label>離職日期 *</label><input id="rDate" type="date"></div><div class="field"><label>原因</label><select id="rReason"><option>個人生涯規劃</option><option>合約到期</option><option>公司調整</option><option>其他</option></select></div><div class="field full"><label>備註</label><textarea id="rNote" rows="3"></textarea></div></div><div class="modalfoot"><button id="resignCancel" class="btn">取消</button><button id="resignSave" class="btn danger">確認離職</button></div></div></div>
 
 <script src="./config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+      onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
@@ -154,30 +178,53 @@ function tenure(date){if(!date)return'-';let d=new Date(date+'T00:00:00'),now=ne
 function badge(v){return `<span class="badge ${v==='主管'?'orange':'blue'}">${esc(v)}</span>`}
 
 async function init(){
- if(!configured()){$('loginError').classList.remove('hidden');$('loginError').innerHTML='尚未設定 Supabase。請先編輯 <b>config.js</b>，再重新整理。';return}
- db=supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
- const {data:{session}}=await db.auth.getSession();if(session)await enter(session.user);
- db.auth.onAuthStateChange(async(_,session)=>{if(session&&!user)await enter(session.user);if(!session&&user)leave()});
+ const status=$('connectionStatus');
+ try{
+   if(!configured()) throw new Error('網站尚未填入 Supabase 設定');
+   if(!window.supabase || typeof window.supabase.createClient!=='function')
+     throw new Error('Supabase 程式庫載入失敗，請重新整理頁面');
+   db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+   const {data:{session},error}=await db.auth.getSession();
+   if(error) throw error;
+   status.textContent='✓ Supabase 已連線，可以登入';
+   status.classList.add('ok');
+   if(session) await enter(session.user);
+   db.auth.onAuthStateChange(async(_,session)=>{
+     if(session&&!user) await enter(session.user);
+     if(!session&&user) leave();
+   });
+ }catch(e){
+   console.error(e);
+   db=null;
+   status.textContent='⚠ 系統連線失敗：'+(e?.message||e);
+   status.classList.add('bad');
+   $('loginError').textContent='目前無法連接登入服務。請重新整理頁面；若仍失敗，把這段紅字截圖給我。';
+   $('loginError').classList.remove('hidden');
+ }
 }
-function setLoginMode(mode){
-  let viewer=mode==='viewer';
-  $('viewerTab').classList.toggle('active',viewer);
-  $('adminTab').classList.toggle('active',!viewer);
-  $('viewerLoginPanel').classList.toggle('hidden',!viewer);
-  $('adminLoginPanel').classList.toggle('hidden',viewer);
-  $('loginError').classList.add('hidden');
-}
-$('viewerTab').onclick=()=>setLoginMode('viewer');
-$('adminTab').onclick=()=>setLoginMode('admin');
 
 async function doLogin(email,password){
   $('loginError').classList.add('hidden');
+  if(!db){
+    await init();
+    if(!db){
+      $('loginError').textContent='登入服務尚未連線，請看上方「系統連線狀態」。';
+      $('loginError').classList.remove('hidden');
+      return;
+    }
+  }
+  $('connectionStatus').textContent='登入驗證中…';
+  $('connectionStatus').classList.remove('bad');
   const {data,error}=await db.auth.signInWithPassword({email,password});
   if(error){
-    $('loginError').textContent='登入失敗，請確認密碼或管理員帳號。';
+    $('connectionStatus').textContent='Supabase 已連線，但登入驗證失敗';
+    $('connectionStatus').classList.add('bad');
+    $('loginError').textContent='登入失敗：'+(error.message||'請確認帳號與密碼');
     $('loginError').classList.remove('hidden');
     return;
   }
+  $('connectionStatus').textContent='✓ 登入成功，正在載入資料…';
+  $('connectionStatus').classList.add('ok');
   await enter(data.user);
 }
 
@@ -203,7 +250,7 @@ $('loginBtn').onclick=async()=>{
 };
 $('logoutBtn').onclick=()=>db.auth.signOut();
 async function enter(u){user=u;let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
-function leave(){user=null;role='viewer';employees=[];changes=[];contracts=[];$('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('viewerPassword').value='';$('loginPassword').value='';setLoginMode('viewer')}
+function leave(){user=null;role='viewer';employees=[];changes=[];contracts=[];$('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('viewerPassword').value='';$('loginPassword').value=''}
 async function loadAll(){let [e,c]=await Promise.all([db.from('employees').select('*').order('employee_no'),db.from('personnel_changes').select('*').order('change_date',{ascending:false}).order('id',{ascending:false})]);if(e.error)alert('讀取人員資料失敗：'+e.error.message);else employees=e.data||[];if(c.error)console.error(c.error);else changes=c.data||[];contracts=[];if(isAdmin()){let fc=await db.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});if(fc.error)console.error(fc.error);else contracts=fc.data||[]}populateFilters();renderAll()}
 function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','新增、修改、調組與離職紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期名單','僅管理員可查看的 W／Z 合約到期資料']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(['admin','contracts'].includes(b.dataset.page)&&!isAdmin())return;showPage(b.dataset.page)});
@@ -235,9 +282,95 @@ function pick(row,keys){for(let k of keys)if(Object.prototype.hasOwnProperty.cal
 function excelDate(v){if(!v)return null;if(typeof v==='number'){let d=XLSX.SSF.parse_date_code(v);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}let d=new Date(v);if(!isNaN(d))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return null}
 function normalizeShift(v){v=String(v||'').trim();if(v==='中'||v.includes('中'))return'中';if(v==='夜'||v==='晚'||v.includes('夜')||v.includes('晚'))return'夜';return'日'}
 function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(job),nationality:deriveNationality(no),area:String(pick(row,HEADER_MAP.area)||'').trim()||'本部',hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
-async function parseFile(file){try{let buf=await file.arrayBuffer(),wb=XLSX.read(buf,{type:'array',cellDates:true}),ws=wb.Sheets[wb.SheetNames[0]],raw=XLSX.utils.sheet_to_json(ws,{defval:''});importRows=raw.map(mapExcelRow).filter(x=>x.employee_no&&x.name);let invalid=raw.length-importRows.length;$('uploadStatus').textContent=`讀取 ${raw.length} 列，可匯入 ${importRows.length} 人${invalid?`，略過 ${invalid} 列（缺工號或姓名）`:''}。`;$('previewWrap').classList.remove('hidden');$('importBtn').classList.toggle('hidden',!importRows.length);let cols=['employee_no','name','shift','group_name','job_title','level','nationality','area','hire_date','_contract_end_date'];$('previewHead').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';$('previewBody').innerHTML=importRows.slice(0,10).map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c]||'-')}</td>`).join('')+'</tr>').join('')}catch(e){$('uploadStatus').textContent='Excel 讀取失敗：'+e.message;importRows=[]}}
+async function parseFile(file){try{
+ let buf=await file.arrayBuffer(),
+     wb=XLSX.read(buf,{type:'array',cellDates:true}),
+     ws=wb.Sheets[wb.SheetNames[0]],
+     raw=XLSX.utils.sheet_to_json(ws,{defval:''});
+ let valid=raw.map(mapExcelRow).filter(x=>x.employee_no&&x.name);
+ let invalid=raw.length-valid.length;
+
+ // 同一個工號在 Excel 出現多次時，只保留最後一筆，避免 PostgreSQL upsert 同批更新同一列兩次。
+ let dedup=new Map(),duplicateCount=0;
+ valid.forEach(r=>{
+   if(dedup.has(r.employee_no)) duplicateCount++;
+   dedup.set(r.employee_no,r);
+ });
+ importRows=[...dedup.values()];
+
+ $('uploadStatus').textContent=
+   `讀取 ${raw.length} 列，可匯入 ${importRows.length} 人`+
+   `${invalid?`，略過 ${invalid} 列（缺工號或姓名）`:''}`+
+   `${duplicateCount?`，發現 ${duplicateCount} 筆重複工號，已自動合併（以最後一筆為準）`:''}。`;
+
+ $('previewWrap').classList.remove('hidden');
+ $('importBtn').classList.toggle('hidden',!importRows.length);
+ let cols=['employee_no','name','shift','group_name','job_title','level','nationality','area','hire_date','_contract_end_date'];
+ $('previewHead').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+ $('previewBody').innerHTML=importRows.slice(0,10).map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c]||'-')}</td>`).join('')+'</tr>').join('')
+}catch(e){
+ $('uploadStatus').textContent='Excel 讀取失敗：'+e.message;
+ importRows=[];
+}}
 $('dropZone').onclick=()=>$('excelFile').click();$('excelFile').onchange=e=>e.target.files[0]&&parseFile(e.target.files[0]);['dragenter','dragover'].forEach(ev=>$('dropZone').addEventListener(ev,e=>{e.preventDefault();$('dropZone').classList.add('drag')}));['dragleave','drop'].forEach(ev=>$('dropZone').addEventListener(ev,e=>{e.preventDefault();$('dropZone').classList.remove('drag')}));$('dropZone').addEventListener('drop',e=>e.dataTransfer.files[0]&&parseFile(e.dataTransfer.files[0]));
-$('importBtn').onclick=async()=>{if(!isAdmin()||!importRows.length)return;if(!confirm(`確定匯入 ${importRows.length} 人？相同工號會更新現有資料。`))return;$('importBtn').disabled=true;$('uploadStatus').textContent='匯入中…';try{for(let i=0;i<importRows.length;i+=200){let batch=importRows.slice(i,i+200).map(({_contract_end_date,...r})=>r),{error}=await db.from('employees').upsert(batch,{onConflict:'employee_no'});if(error)throw error}let contractRows=importRows.filter(r=>/^[WZ]/.test(r.employee_no)&&r._contract_end_date).map(r=>({employee_no:r.employee_no,contract_end_date:r._contract_end_date,updated_by:user.id,updated_at:new Date().toISOString()}));for(let i=0;i<contractRows.length;i+=200){let {error}=await db.from('foreign_contracts').upsert(contractRows.slice(i,i+200),{onConflict:'employee_no'});if(error)throw error}let logRows=importRows.map(r=>({employee_no:r.employee_no,employee_name:r.name,change_type:'Excel匯入',new_group:r.group_name,detail:'舊資料批次匯入',created_by:user.id}));for(let i=0;i<logRows.length;i+=200){let {error}=await db.from('personnel_changes').insert(logRows.slice(i,i+200));if(error)throw error}$('uploadStatus').textContent=`完成：已匯入／更新 ${importRows.length} 人。`;importRows=[];$('importBtn').classList.add('hidden');$('previewWrap').classList.add('hidden');await loadAll()}catch(e){$('uploadStatus').textContent='匯入失敗：'+e.message}finally{$('importBtn').disabled=false}};
+$('importBtn').onclick=async()=>{
+ if(!isAdmin()||!importRows.length)return;
+
+ // 匯入前再防呆一次：同工號只能在同一批 upsert 出現一次。
+ let uniqueRows=[...new Map(importRows.map(r=>[r.employee_no,r])).values()];
+ if(!confirm(`確定匯入 ${uniqueRows.length} 人？相同工號會更新現有資料。`))return;
+
+ $('importBtn').disabled=true;
+ $('uploadStatus').textContent='匯入中…';
+
+ try{
+   for(let i=0;i<uniqueRows.length;i+=200){
+     let batch=uniqueRows.slice(i,i+200).map(({_contract_end_date,...r})=>r);
+     let {error}=await db.from('employees').upsert(batch,{onConflict:'employee_no'});
+     if(error)throw error;
+   }
+
+   // 外籍合約也先依工號去重複。
+   let contractMap=new Map();
+   uniqueRows
+     .filter(r=>/^[WZ]/.test(r.employee_no)&&r._contract_end_date)
+     .forEach(r=>contractMap.set(r.employee_no,{
+       employee_no:r.employee_no,
+       contract_end_date:r._contract_end_date,
+       updated_by:user.id,
+       updated_at:new Date().toISOString()
+     }));
+   let contractRows=[...contractMap.values()];
+
+   for(let i=0;i<contractRows.length;i+=200){
+     let {error}=await db.from('foreign_contracts').upsert(contractRows.slice(i,i+200),{onConflict:'employee_no'});
+     if(error)throw error;
+   }
+
+   let logRows=uniqueRows.map(r=>({
+     employee_no:r.employee_no,
+     employee_name:r.name,
+     change_type:'Excel匯入',
+     new_group:r.group_name,
+     detail:'舊資料批次匯入',
+     created_by:user.id
+   }));
+   for(let i=0;i<logRows.length;i+=200){
+     let {error}=await db.from('personnel_changes').insert(logRows.slice(i,i+200));
+     if(error)throw error;
+   }
+
+   $('uploadStatus').textContent=`完成：已匯入／更新 ${uniqueRows.length} 人。`;
+   importRows=[];
+   $('importBtn').classList.add('hidden');
+   $('previewWrap').classList.add('hidden');
+   await loadAll();
+ }catch(e){
+   $('uploadStatus').textContent='匯入失敗：'+e.message;
+ }finally{
+   $('importBtn').disabled=false;
+ }
+};
 
 init();
 </script>

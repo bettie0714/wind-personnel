@@ -18,7 +18,7 @@
 
 .login-card-wide{width:min(900px,100%)}
 .login-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.version-badge{background:#eef2ff;color:#3730a3;font-size:11px;font-weight:800;padding:6px 9px;border-radius:999px;white-space:nowrap}
+
 .connection-status{padding:10px 12px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:13px;margin:4px 0 18px}
 .connection-status.ok{background:#ecfdf5;color:#047857}
 .connection-status.bad{background:#fef2f2;color:#b91c1c}
@@ -51,6 +51,16 @@
 @media(max-width:800px){.group-overview-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.group-overview-grid{grid-template-columns:1fr}}
 
+
+.import-mode-box{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 14px}
+.import-mode{display:flex;gap:10px;align-items:flex-start;border:1px solid #dbe3ef;border-radius:12px;padding:13px;background:#fff;cursor:pointer}
+.import-mode input{width:auto;margin-top:3px}.import-mode span{display:block}
+.import-mode b{display:block;font-size:14px;color:#1e293b}
+.import-mode small{display:block;font-size:12px;line-height:1.55;color:#64748b;margin-top:3px}
+.import-mode:has(input:checked){border-color:#93c5fd;background:#eff6ff}
+.import-mode.danger-mode:has(input:checked){border-color:#fca5a5;background:#fff7f7}
+.replace-warning{padding:10px 12px;border-radius:10px;background:#fff7ed;color:#9a3412;font-size:13px;margin-bottom:12px}
+@media(max-width:720px){.import-mode-box{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -61,7 +71,7 @@
         <h1>風力人員統計系統</h1>
         <p>請依身分選擇登入方式。</p>
       </div>
-      <span class="version-badge">登入修正版 V4</span>
+      
     </div>
 
     <div id="connectionStatus" class="connection-status">正在連接 Supabase…</div>
@@ -113,7 +123,7 @@
 <section id="dashboard" class="page active">
  <div id="kpis" class="grid4"></div>
  <div class="chartgrid">
-  <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">每組同時顯示總人數與 Z／W 分布，點卡片即可查看名單</div></div></div><div id="groupChart"></div></div>
+  <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">點擊組別即可查看該組人員</div></div></div><div id="groupChart"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>班別分布</h2><div class="mini">本部在職</div></div></div><div id="shiftChart" class="donutwrap"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>人員結構</h2><div class="mini">台籍／W／Z／建教生</div></div></div><div id="typeChart"></div></div>
  </div>
@@ -140,7 +150,12 @@
 </section>
 
 <section id="admin" class="page admin-only">
- <div class="section"><div class="sectionhead"><div><h2>Excel 舊資料匯入</h2><div class="mini">第一次建置時，把原本 Excel 人員資料批次匯入。之後直接用網站維護。</div></div></div>
+ <div class="section"><div class="sectionhead"><div><h2>Excel 人員資料匯入</h2><div class="mini">第一次正式上線可用「取代目前資料」清掉測試資料；之後日常更新使用「合併更新」。</div></div></div>
+  <div class="import-mode-box">
+   <label class="import-mode"><input type="radio" name="importMode" value="merge" checked><span><b>合併更新</b><small>相同工號更新、新工號新增；不刪除其他人員。</small></span></label>
+   <label class="import-mode danger-mode"><input type="radio" name="importMode" value="replace"><span><b>取代目前資料</b><small>把測試資料換成正式名單；Excel 沒有的人員會從目前名單移除。</small></span></label>
+  </div>
+  <div id="replaceWarning" class="replace-warning hidden">⚠ 請確認這份 Excel 是完整正式名單，包含你要保留的海外事業部人員。</div>
   <div id="dropZone" class="upload-zone"><b>拖曳 Excel 到這裡，或點擊選擇檔案</b><span class="mini">支援 .xlsx / .xls / .csv；第一列需為欄位名稱</span><input id="excelFile" type="file" accept=".xlsx,.xls,.csv"></div>
   <div id="uploadStatus" class="upload-status">尚未選擇檔案。</div>
   <div id="previewWrap" class="preview hidden"><div class="tablewrap"><table><thead id="previewHead"></thead><tbody id="previewBody"></tbody></table></div></div>
@@ -190,7 +205,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const GROUPS=["捲板","手焊","電焊","清根","研磨","主管","文管","廠務","建教生","未分類"];
+const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","建教生","未分類"];
 const cfg=window.APP_CONFIG||{};
 let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],editNo=null,resignNo=null,importRows=[],activeTypeFilter='';
 
@@ -206,7 +221,7 @@ function deriveGroup(no,job,existing){
  no=normalizeNo(no);let t=String(job||'').replace(/\s+/g,'');
  if(no.startsWith('X')||t.includes('建教生'))return'建教生';
  if(t.includes('廠務'))return'廠務';
- if(t.includes('文管'))return'文管';
+ if(t.includes('文管'))return'文管';if(t.includes('焊接協調')||t.includes('銲接協調'))return'焊接協調';
  if(t.includes('設備焊接')||t.includes('設備銲接')||t.includes('電銲')||t.includes('電焊'))return'電焊';
  if(t.includes('6GR焊工')||t.includes('手焊')||t.includes('焊工'))return'手焊';
  if(t.includes('捲板'))return'捲板';
@@ -330,22 +345,12 @@ function renderDash(){
  let gc={};
  a.forEach(x=>{
    let g=personGroup(x);
-   if(!gc[g])gc[g]={total:0,z:0,w:0,local:0};
-   gc[g].total++;
-   let t=personType(x);
-   if(t==='Z')gc[g].z++;
-   else if(t==='W')gc[g].w++;
-   else gc[g].local++;
+   gc[g]=(gc[g]||0)+1;
  });
- let groups=Object.entries(gc).sort((a,b)=>b[1].total-a[1].total);
- $('groupChart').innerHTML='<div class="group-overview-grid">'+groups.map(([g,c])=>`
+ let groups=Object.entries(gc).sort((a,b)=>b[1]-a[1]);
+ $('groupChart').innerHTML='<div class="group-overview-grid">'+groups.map(([g,total])=>`
    <button class="group-overview-card" data-g="${esc(g)}">
-     <div class="group-overview-top"><span class="group-name">${esc(g)}</span><span class="group-total">${c.total}<small> 人</small></span></div>
-     <div class="group-breakdown">
-       <div class="group-mini"><b>${c.local}</b>台籍／其他</div>
-       <div class="group-mini identity-z"><b>${c.z}</b>Z</div>
-       <div class="group-mini identity-w"><b>${c.w}</b>W</div>
-     </div>
+     <div class="group-overview-top"><span class="group-name">${esc(g)}</span><span class="group-total">${total}<small> 人</small></span></div>
    </button>`).join('')+'</div>';
  $('groupChart').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{showPage('people');activeTypeFilter='';syncTypeButtons();$('fGroup').value=b.dataset.g;renderPeople()});
 
@@ -435,24 +440,57 @@ async function parseFile(file){try{
  importRows=[];
 }}
 $('dropZone').onclick=()=>$('excelFile').click();$('excelFile').onchange=e=>e.target.files[0]&&parseFile(e.target.files[0]);['dragenter','dragover'].forEach(ev=>$('dropZone').addEventListener(ev,e=>{e.preventDefault();$('dropZone').classList.add('drag')}));['dragleave','drop'].forEach(ev=>$('dropZone').addEventListener(ev,e=>{e.preventDefault();$('dropZone').classList.remove('drag')}));$('dropZone').addEventListener('drop',e=>e.dataTransfer.files[0]&&parseFile(e.dataTransfer.files[0]));
+document.querySelectorAll('input[name="importMode"]').forEach(r=>r.addEventListener('change',()=>{
+ let replacing=document.querySelector('input[name="importMode"]:checked')?.value==='replace';
+ $('replaceWarning').classList.toggle('hidden',!replacing);
+}));
 $('importBtn').onclick=async()=>{
  if(!isAdmin()||!importRows.length)return;
 
- // 匯入前再防呆一次：同工號只能在同一批 upsert 出現一次。
  let uniqueRows=[...new Map(importRows.map(r=>[r.employee_no,r])).values()];
- if(!confirm(`確定匯入 ${uniqueRows.length} 人？相同工號會更新現有資料。`))return;
+ let mode=document.querySelector('input[name="importMode"]:checked')?.value||'merge';
+ let replacing=mode==='replace';
+
+ if(replacing){
+   if(!confirm(
+     `你選擇「取代目前資料」。\n\n`+
+     `這份 Excel 共 ${uniqueRows.length} 人。\n`+
+     `Excel 裡沒有的人員會從目前名單移除，測試的人員變動紀錄也會清除。\n\n`+
+     `確定這份 Excel 是完整正式名單嗎？`
+   ))return;
+ }else{
+   if(!confirm(`確定匯入 ${uniqueRows.length} 人？相同工號會更新現有資料。`))return;
+ }
 
  $('importBtn').disabled=true;
- $('uploadStatus').textContent='匯入中…';
+ $('uploadStatus').textContent=replacing?'正在取代目前資料…':'匯入中…';
 
  try{
+   // 先寫入新名單，成功後才清理測試資料。
    for(let i=0;i<uniqueRows.length;i+=200){
      let batch=uniqueRows.slice(i,i+200).map(({_contract_end_date,...r})=>r);
      let {error}=await db.from('employees').upsert(batch,{onConflict:'employee_no'});
      if(error)throw error;
    }
 
-   // 外籍合約也先依工號去重複。
+   if(replacing){
+     // 清掉測試異動紀錄。
+     let {error:changeError}=await db.from('personnel_changes').delete().neq('employee_no','');
+     if(changeError)throw changeError;
+
+     // 清掉舊合約，等等按照新 Excel 重建。
+     let {error:contractDeleteError}=await db.from('foreign_contracts').delete().neq('employee_no','');
+     if(contractDeleteError)throw contractDeleteError;
+
+     // 刪除新 Excel 中不存在的舊測試人員。
+     let keep=new Set(uniqueRows.map(r=>r.employee_no));
+     let removeNos=employees.map(e=>e.employee_no).filter(no=>!keep.has(no));
+     for(let i=0;i<removeNos.length;i+=100){
+       let {error}=await db.from('employees').delete().in('employee_no',removeNos.slice(i,i+100));
+       if(error)throw error;
+     }
+   }
+
    let contractMap=new Map();
    uniqueRows
      .filter(r=>/^[WZ]/.test(r.employee_no)&&r._contract_end_date)
@@ -469,23 +507,30 @@ $('importBtn').onclick=async()=>{
      if(error)throw error;
    }
 
-   let logRows=uniqueRows.map(r=>({
-     employee_no:r.employee_no,
-     employee_name:r.name,
-     change_type:'Excel匯入',
-     new_group:r.group_name,
-     detail:'舊資料批次匯入',
-     created_by:user.id
-   }));
-   for(let i=0;i<logRows.length;i+=200){
-     let {error}=await db.from('personnel_changes').insert(logRows.slice(i,i+200));
-     if(error)throw error;
+   // 正式取代視為基準資料，不把每個人都列為「人員變動」。
+   if(!replacing){
+     let logRows=uniqueRows.map(r=>({
+       employee_no:r.employee_no,
+       employee_name:r.name,
+       change_type:'Excel匯入',
+       new_group:r.group_name,
+       detail:'Excel 批次匯入／更新',
+       created_by:user.id
+     }));
+     for(let i=0;i<logRows.length;i+=200){
+       let {error}=await db.from('personnel_changes').insert(logRows.slice(i,i+200));
+       if(error)throw error;
+     }
    }
 
-   $('uploadStatus').textContent=`完成：已匯入／更新 ${uniqueRows.length} 人。`;
+   $('uploadStatus').textContent=replacing
+     ?`完成：已用正式 Excel 取代目前資料，共 ${uniqueRows.length} 人。`
+     :`完成：已匯入／更新 ${uniqueRows.length} 人。`;
+
    importRows=[];
    $('importBtn').classList.add('hidden');
    $('previewWrap').classList.add('hidden');
+   $('excelFile').value='';
    await loadAll();
  }catch(e){
    $('uploadStatus').textContent='匯入失敗：'+e.message;

@@ -333,6 +333,184 @@
 .pdf-diff-net.neg{color:#b91c1c}
 .pdf-diff-net.zero{color:#64748b}
 
+
+/* V20 PDF capture fix — keep report at a real positive coordinate */
+.pdf-export-wrap{
+  position:absolute !important;
+  left:0 !important;
+  top:0 !important;
+  width:794px !important;
+  z-index:-2147483000 !important;
+  pointer-events:none !important;
+  background:#fff !important;
+  transform:none !important;
+}
+.pdf-page{
+  width:794px !important;
+  height:1123px !important;
+  min-height:1123px !important;
+  max-width:794px !important;
+  margin:0 !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+.pdf-page > *{
+  max-width:100%;
+  box-sizing:border-box;
+}
+.pdf-roster-page .pdf-table,
+.pdf-detail-box,
+.pdf-diff-item{
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+.pdf-roster-page .pdf-table{
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+
+.pdf-roster-page{
+  padding-left:40px !important;
+  padding-right:40px !important;
+}
+.pdf-roster-page .pdf-header,
+.pdf-roster-page .pdf-section-band,
+.pdf-roster-page .pdf-table,
+.pdf-roster-page .pdf-detail-grid,
+.pdf-roster-page > .pdf-detail-box,
+.pdf-roster-page .pdf-diff-compact,
+.pdf-roster-page .pdf-note{
+  width:100% !important;
+  max-width:714px !important;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+
+/* V21 - fixed 3-page A4 portrait report */
+.pdf-roster-3{
+  width:794px !important;
+  height:1123px !important;
+  min-height:1123px !important;
+  padding:30px 42px 48px !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+}
+.pdf-roster-3 .pdf-safe{
+  width:100%;
+  max-width:710px;
+  margin:0 auto;
+  box-sizing:border-box;
+}
+.pdf-roster-3 .pdf-header{
+  margin-bottom:10px;
+  padding-bottom:9px;
+}
+.pdf-roster-3 .pdf-title{
+  font-size:20px;
+}
+.pdf-roster-3 .roster-columns{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+.pdf-roster-3 .roster-column{
+  min-width:0;
+}
+.pdf-roster-3 .roster-group{
+  border:1px solid #d9e3ef;
+  border-radius:8px;
+  overflow:hidden;
+  margin-bottom:8px;
+  break-inside:avoid;
+  background:#fff;
+}
+.pdf-roster-3 .roster-group-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:6px;
+  padding:5px 7px;
+  background:#eaf2ff;
+  color:#173a6b;
+  font-size:10px;
+  font-weight:900;
+  line-height:1.25;
+}
+.pdf-roster-3 .roster-group-head .sup{
+  color:#475569;
+  font-size:8px;
+  font-weight:700;
+  text-align:right;
+  max-width:60%;
+}
+.pdf-roster-3 .compact-roster{
+  width:100%;
+  table-layout:fixed;
+  border-collapse:collapse;
+  font-size:7.6px;
+  line-height:1.15;
+}
+.pdf-roster-3 .compact-roster th,
+.pdf-roster-3 .compact-roster td{
+  border-top:1px solid #e7edf4;
+  border-right:1px solid #edf1f6;
+  padding:2.5px 3px;
+  box-sizing:border-box;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  height:14px;
+}
+.pdf-roster-3 .compact-roster th:last-child,
+.pdf-roster-3 .compact-roster td:last-child{border-right:0}
+.pdf-roster-3 .compact-roster th{
+  background:#f7faff;
+  color:#355174;
+  text-align:center;
+  font-weight:900;
+}
+.pdf-roster-3 .compact-roster tbody tr:nth-child(even) td{
+  background:#fcfdff;
+}
+.pdf-roster-3 .compact-roster .c{text-align:center}
+.pdf-roster-3 .foreign-compact th:nth-child(1){width:9%}
+.pdf-roster-3 .foreign-compact th:nth-child(2){width:11%}
+.pdf-roster-3 .foreign-compact th:nth-child(3){width:36%}
+.pdf-roster-3 .foreign-compact th:nth-child(4){width:20%}
+.pdf-roster-3 .foreign-compact th:nth-child(5){width:24%}
+
+.pdf-roster-3 .taiwan-compact th:nth-child(1){width:10%}
+.pdf-roster-3 .taiwan-compact th:nth-child(2){width:34%}
+.pdf-roster-3 .taiwan-compact th:nth-child(3){width:40%}
+.pdf-roster-3 .taiwan-compact th:nth-child(4){width:16%}
+
+.pdf-roster-3.dense .compact-roster{
+  font-size:6.9px;
+}
+.pdf-roster-3.dense .compact-roster th,
+.pdf-roster-3.dense .compact-roster td{
+  padding:2px 2.5px;
+  height:12.5px;
+}
+.pdf-roster-3.dense .roster-group{
+  margin-bottom:6px;
+}
+.pdf-roster-3.dense .roster-group-head{
+  padding:4px 6px;
+  font-size:9px;
+}
+.pdf-roster-3.dense .roster-group-head .sup{
+  font-size:7.3px;
+}
+.pdf-roster-note{
+  margin-top:6px;
+  font-size:7.5px;
+  color:#94a3b8;
+  text-align:right;
+}
+
 </style>
 </head>
 <body>
@@ -1636,6 +1814,144 @@ function buildExcelReferencePdfPages(data){
    ...buildDiffPdfPages(data)
  ];
 }
+
+function balanceRosterBlocks(blocks){
+ let cols=[[],[]],loads=[0,0];
+ blocks.forEach(block=>{
+   let cost=(block.people?.length||0)+2.2;
+   let target=loads[0]<=loads[1]?0:1;
+   cols[target].push(block);
+   loads[target]+=cost;
+ });
+ return cols;
+}
+function foreignRosterBlocks(data){
+ let order=['捲板','清根','研磨','手焊','電焊'];
+ let extra=[...new Set(data.foreign.map(personGroup).filter(g=>g&&!order.includes(g)))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+ let groups=[...order,...extra];
+ return groups.map(g=>{
+   let people=data.foreign.filter(p=>personGroup(p)===g).sort((a,b)=>
+     String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||
+     a.employee_no.localeCompare(b.employee_no)
+   );
+   if(!people.length)return null;
+   let supervisors=activeRows(data.toRows).filter(p=>
+     personType(p)==='台籍'&&!isOverseas(p)&&p.level==='主管'&&supervisorGroupsOf(p).includes(g)
+   ).map(p=>p.name);
+   return{
+     title:g,
+     people,
+     supervisor:[...new Set(supervisors)].join('、')
+   };
+ }).filter(Boolean);
+}
+function foreignRosterBlockHtml(block){
+ let rows=block.people.map((p,i)=>`<tr>
+   <td class="c">${i+1}</td>
+   <td class="c">${esc(p.shift||'')}</td>
+   <td>${esc(p.job_title||'')}</td>
+   <td class="c">${esc(p.name)}</td>
+   <td class="c">${esc(p.employee_no)}</td>
+ </tr>`).join('');
+ return `<div class="roster-group">
+   <div class="roster-group-head">
+    <span>${esc(block.title)}｜${block.people.length} 人</span>
+    <span class="sup">台籍主管：${esc(block.supervisor||'—')}</span>
+   </div>
+   <table class="compact-roster foreign-compact">
+    <thead><tr><th>NO.</th><th>班</th><th>職別</th><th>姓名</th><th>工號</th></tr></thead>
+    <tbody>${rows}</tbody>
+   </table>
+ </div>`;
+}
+function buildForeignRosterOnePage(data){
+ let blocks=foreignRosterBlocks(data),cols=balanceRosterBlocks(blocks);
+ let count=data.foreign.length,dense=count>72?' dense':'';
+ let body=blocks.length
+   ?`<div class="roster-columns">
+       <div class="roster-column">${cols[0].map(foreignRosterBlockHtml).join('')}</div>
+       <div class="roster-column">${cols[1].map(foreignRosterBlockHtml).join('')}</div>
+     </div>`
+   :'<div class="empty">本月份沒有外籍員工</div>';
+ return `<div class="pdf-page pdf-roster-3${dense}">
+   <div class="pdf-safe">
+    ${pdfReportHeader(`${monthLabel(data.tm)} 外籍員工`)}
+    ${body}
+    <div class="pdf-roster-note">組別排序：捲板、清根、研磨、手焊、電焊｜台籍主管依負責組別自動帶入</div>
+   </div>
+   ${pdfFooter()}
+ </div>`;
+}
+
+function taiwanDeptBlocks(data){
+ const windOrder=['廠長','副廠長','廠務','清根','電焊','手焊','焊接協調','文管'];
+ const overseasOrder=['總經理','副廠長','財務','行政'];
+ let wind=windSorted(data),overseas=overseasSorted(data);
+ let blocks=[];
+ windOrder.forEach(dept=>{
+   let people=wind.filter(p=>exportWindDept(p)===dept);
+   if(people.length)blocks.push({title:dept,section:'風力事業部',people,deptFn:exportWindDept});
+ });
+ let windExtra=[...new Set(wind.map(exportWindDept).filter(d=>!windOrder.includes(d)))];
+ windExtra.forEach(dept=>{
+   let people=wind.filter(p=>exportWindDept(p)===dept);
+   if(people.length)blocks.push({title:dept,section:'風力事業部',people,deptFn:exportWindDept});
+ });
+ overseasOrder.forEach(dept=>{
+   let people=overseas.filter(p=>exportOverseasDept(p)===dept);
+   if(people.length)blocks.push({title:dept,section:'海外事業部',people,deptFn:exportOverseasDept});
+ });
+ let overseasExtra=[...new Set(overseas.map(exportOverseasDept).filter(d=>!overseasOrder.includes(d)))];
+ overseasExtra.forEach(dept=>{
+   let people=overseas.filter(p=>exportOverseasDept(p)===dept);
+   if(people.length)blocks.push({title:dept,section:'海外事業部',people,deptFn:exportOverseasDept});
+ });
+ return blocks;
+}
+function taiwanRosterBlockHtml(block){
+ let rows=block.people.map((p,i)=>`<tr>
+   <td class="c">${i+1}</td>
+   <td>${esc(block.title)}</td>
+   <td>${esc(p.name)}</td>
+   <td class="c">${esc(p.shift||'')}</td>
+ </tr>`).join('');
+ return `<div class="roster-group">
+   <div class="roster-group-head">
+    <span>${esc(block.section)}｜${esc(block.title)}</span>
+    <span class="sup">${block.people.length} 人</span>
+   </div>
+   <table class="compact-roster taiwan-compact">
+    <thead><tr><th>NO.</th><th>部門</th><th>員工</th><th>班</th></tr></thead>
+    <tbody>${rows}</tbody>
+   </table>
+ </div>`;
+}
+function buildTaiwanRosterOnePage(data){
+ let blocks=taiwanDeptBlocks(data),cols=balanceRosterBlocks(blocks);
+ let count=data.local.length+data.overseas.length,dense=count>72?' dense':'';
+ let body=blocks.length
+   ?`<div class="roster-columns">
+       <div class="roster-column">${cols[0].map(taiwanRosterBlockHtml).join('')}</div>
+       <div class="roster-column">${cols[1].map(taiwanRosterBlockHtml).join('')}</div>
+     </div>`
+   :'<div class="empty">本月份沒有台籍員工</div>';
+ return `<div class="pdf-page pdf-roster-3${dense}">
+   <div class="pdf-safe">
+    ${pdfReportHeader(`${monthLabel(data.tm)} 台籍員工`)}
+    ${body}
+    <div class="pdf-roster-note">風力事業部：廠長、副廠長、廠務、清根、電焊、手焊、焊接協調、文管｜海外事業部：總經理、副廠長、財務、行政</div>
+   </div>
+   ${pdfFooter()}
+ </div>`;
+}
+function buildThreePageReport(data){
+ return [
+   buildSummaryPdfPage(data),
+   buildForeignRosterOnePage(data),
+   buildTaiwanRosterOnePage(data)
+ ];
+}
+
 function buildSummaryPdfPage(data){
  let totalFrom=mainRows(data.fromRows).length,totalTo=data.mainTo.length;
  let kpis=[
@@ -1703,7 +2019,7 @@ async function exportMonthPdfReport(){
 
  let wrap=document.createElement('div');
  wrap.className='pdf-export-wrap';
- wrap.innerHTML=buildSummaryPdfPage(data)+buildExcelReferencePdfPages(data).join('');
+ wrap.innerHTML=buildThreePageReport(data).join('');
  document.body.appendChild(wrap);
 
  try{
@@ -1720,13 +2036,41 @@ async function exportMonthPdfReport(){
    });
 
    for(let i=0;i<pages.length;i++){
-     let canvas=await html2canvas(pages[i],{
+     // V20: 報表元素本身就在 (0,0) 的正常座標，
+     // 直接以元素實際尺寸擷取，避免負座標造成左側被裁掉。
+     let pageEl=pages[i];
+     let canvas=await html2canvas(pageEl,{
        scale:2,
        backgroundColor:'#ffffff',
        useCORS:true,
-       windowWidth:794,
-       width:794,
-       height:1123
+       logging:false,
+       width:pageEl.offsetWidth,
+       height:pageEl.offsetHeight,
+       windowWidth:Math.max(900,pageEl.offsetWidth),
+       scrollX:0,
+       scrollY:0,
+       onclone:(doc)=>{
+         let clonedWrap=doc.querySelector('.pdf-export-wrap');
+         if(clonedWrap){
+           clonedWrap.style.position='absolute';
+           clonedWrap.style.left='0';
+           clonedWrap.style.top='0';
+           clonedWrap.style.transform='none';
+         }
+         doc.querySelectorAll('.pdf-page').forEach(el=>{
+           el.style.width='794px';
+           el.style.height='1123px';
+           el.style.maxWidth='794px';
+           el.style.overflow='hidden';
+           el.style.margin='0';
+           el.style.boxSizing='border-box';
+         });
+         doc.querySelectorAll('.pdf-roster-3 .pdf-safe').forEach(el=>{
+           el.style.width='690px';
+           el.style.maxWidth='690px';
+           el.style.margin='0 auto';
+         });
+       }
      });
      let img=canvas.toDataURL('image/jpeg',0.95);
      if(i>0)pdf.addPage('a4','portrait');

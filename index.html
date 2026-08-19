@@ -511,6 +511,296 @@
   text-align:right;
 }
 
+
+/* V22 roster readability */
+.pdf-roster-3 .compact-roster{
+  font-size:7.8px;
+}
+.pdf-roster-3 .compact-roster .name-cell{
+  font-weight:900;
+  color:#0f172a;
+  font-size:8.2px;
+}
+.pdf-roster-3 .compact-roster .id-cell{
+  font-weight:800;
+  color:#334155;
+}
+
+/* 外籍：NO | 姓名 | 工號 | 班 | 職別 */
+.pdf-roster-3 .foreign-compact th:nth-child(1){width:8%}
+.pdf-roster-3 .foreign-compact th:nth-child(2){width:24%}
+.pdf-roster-3 .foreign-compact th:nth-child(3){width:24%}
+.pdf-roster-3 .foreign-compact th:nth-child(4){width:9%}
+.pdf-roster-3 .foreign-compact th:nth-child(5){width:35%}
+
+/* 台籍：NO | 姓名 | 部門 | 班 */
+.pdf-roster-3 .taiwan-compact th:nth-child(1){width:9%}
+.pdf-roster-3 .taiwan-compact th:nth-child(2){width:37%}
+.pdf-roster-3 .taiwan-compact th:nth-child(3){width:39%}
+.pdf-roster-3 .taiwan-compact th:nth-child(4){width:15%}
+
+
+/* V23 - executive-quality 3-page PDF roster */
+.pdf-roster-3{
+  width:794px !important;
+  height:1123px !important;
+  min-height:1123px !important;
+  padding:34px 42px 50px !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  background:#fff !important;
+}
+.pdf-roster-3 .pdf-safe{
+  width:100%;
+  max-width:710px;
+  margin:0 auto;
+}
+.pdf-roster-3 .pdf-header{
+  margin-bottom:10px;
+  padding-bottom:10px;
+}
+.pdf-roster-3 .pdf-title{
+  font-size:21px;
+}
+
+/* 第 2 頁：外籍員工 — 三欄卡片，姓名永遠完整顯示 */
+.pdf-foreign-summary{
+  display:flex;
+  gap:7px;
+  margin-bottom:8px;
+}
+.pdf-foreign-summary span{
+  display:inline-flex;
+  align-items:baseline;
+  gap:5px;
+  padding:5px 9px;
+  border:1px solid #dce7f2;
+  background:#f7faff;
+  border-radius:7px;
+  color:#64748b;
+  font-size:9px;
+}
+.pdf-foreign-summary b{
+  color:#17365d;
+  font-size:12px;
+}
+.pdf-foreign-group{
+  margin-top:7px;
+}
+.pdf-foreign-group:first-of-type{margin-top:0}
+.pdf-foreign-group-head{
+  height:23px;
+  display:grid;
+  grid-template-columns:78px 48px 1fr;
+  align-items:center;
+  padding:0 8px;
+  background:#e8f1fc;
+  border-left:4px solid #2f6fb7;
+  color:#17365d;
+}
+.pdf-foreign-group-head b{
+  font-size:11px;
+}
+.pdf-foreign-group-head .count{
+  font-size:8px;
+  font-weight:900;
+  color:#45627f;
+}
+.pdf-foreign-group-head .supervisor{
+  justify-self:end;
+  font-size:8px;
+  font-weight:700;
+  color:#667b92;
+}
+.pdf-foreign-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  border-left:1px solid #e2e8f0;
+}
+.pdf-foreign-card{
+  min-width:0;
+  height:25px;
+  padding:3px 6px 2px;
+  border-right:1px solid #e2e8f0;
+  border-bottom:1px solid #e2e8f0;
+  background:#fff;
+}
+.pdf-foreign-card:nth-child(6n+4),
+.pdf-foreign-card:nth-child(6n+5),
+.pdf-foreign-card:nth-child(6n+6){
+  background:#fcfdff;
+}
+.pdf-foreign-card .name-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  line-height:1.05;
+  white-space:nowrap;
+}
+.pdf-foreign-card .name-line b{
+  min-width:0;
+  color:#102d4b;
+  font-size:9.2px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.pdf-foreign-card .name-line span{
+  flex:none;
+  color:#4f667d;
+  font-size:7.8px;
+  font-weight:900;
+}
+.pdf-foreign-card .detail-line{
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr);
+  gap:5px;
+  align-items:center;
+  margin-top:2px;
+  line-height:1;
+}
+.pdf-foreign-card .shift{
+  padding:2px 0;
+  text-align:center;
+  border-radius:4px;
+  background:#eef4fb;
+  color:#17365d;
+  font-size:7px;
+  font-weight:800;
+}
+.pdf-foreign-card .job{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#697d92;
+  font-size:7.4px;
+}
+
+/* 第 3 頁：台籍員工 — 單一正式表格，平均使用整頁高度 */
+.pdf-taiwan-table{
+  width:100%;
+  table-layout:fixed;
+  border-collapse:collapse;
+}
+.pdf-taiwan-table th,
+.pdf-taiwan-table td{
+  border:1px solid #dfe7f0;
+  box-sizing:border-box;
+}
+.pdf-taiwan-table th{
+  height:28px;
+  padding:5px 8px;
+  background:#e8f1fc;
+  color:#17365d;
+  font-size:10px;
+  font-weight:900;
+  text-align:center;
+}
+.pdf-taiwan-table td{
+  height:29px;
+  padding:5px 10px;
+  color:#31465d;
+  font-size:10.2px;
+  line-height:1.2;
+}
+.pdf-taiwan-table tbody tr:nth-child(even):not(.section-row) td{
+  background:#fcfdff;
+}
+.pdf-taiwan-table th:nth-child(1){width:9%}
+.pdf-taiwan-table th:nth-child(2){width:29%}
+.pdf-taiwan-table th:nth-child(3){width:46%}
+.pdf-taiwan-table th:nth-child(4){width:16%}
+.pdf-taiwan-table .center{text-align:center}
+.pdf-taiwan-table .person-name{
+  color:#102d4b;
+  font-size:10.7px;
+  font-weight:900;
+}
+.pdf-taiwan-table .section-row td{
+  height:31px;
+  padding:6px 10px;
+  background:#dceaff !important;
+  color:#17365d;
+  font-size:10.5px;
+  font-weight:900;
+}
+.pdf-roster-quality-note{
+  margin-top:7px;
+  color:#94a3b8;
+  font-size:7.5px;
+  text-align:right;
+}
+
+
+/* V24 - 4-page A4 portrait executive report */
+.pdf-roster-4{width:794px!important;height:1123px!important;min-height:1123px!important;padding:32px 40px 48px!important;box-sizing:border-box!important;overflow:hidden!important;background:#fff!important}
+.pdf-roster-4 .pdf-safe{width:100%;max-width:714px;margin:0 auto}
+.pdf-roster-4 .pdf-header{margin-bottom:10px;padding-bottom:9px}
+.pdf-roster-4 .pdf-title{font-size:21px}
+.pdf-foreign-table-v24{width:100%;table-layout:fixed;border-collapse:collapse}
+.pdf-foreign-table-v24 th,.pdf-foreign-table-v24 td{border:1px solid #dbe4ee;box-sizing:border-box;vertical-align:middle}
+.pdf-foreign-table-v24 th{height:27px;padding:4px 5px;background:#eaf2ff;color:#17365d;text-align:center;font-size:9.8px;font-weight:900}
+.pdf-foreign-table-v24 td{height:17px;padding:2px 5px;color:#30455b;font-size:8.55px;line-height:1.1;white-space:nowrap}
+.pdf-foreign-table-v24 tbody tr:nth-child(even):not(.foreign-group-row) td{background:#fcfdff}
+.pdf-foreign-table-v24 th:nth-child(1){width:5%}
+.pdf-foreign-table-v24 th:nth-child(2){width:7%}
+.pdf-foreign-table-v24 th:nth-child(3){width:22%}
+.pdf-foreign-table-v24 th:nth-child(4){width:37%}
+.pdf-foreign-table-v24 th:nth-child(5){width:11%}
+.pdf-foreign-table-v24 th:nth-child(6){width:18%}
+.pdf-foreign-table-v24 .center{text-align:center}
+.pdf-foreign-table-v24 .person-name{color:#102d4b;font-size:8.9px;font-weight:900;overflow:visible}
+.pdf-foreign-table-v24 .employee-no{color:#455b72;font-weight:900;text-align:center}
+.pdf-foreign-table-v24 .supervisor-cell{text-align:center;color:#17365d;font-weight:900;background:#f5f8fd!important;white-space:normal}
+.pdf-foreign-table-v24 .foreign-group-row td{height:22px;padding:4px 7px;background:#dceaff!important;color:#17365d;font-size:10px;font-weight:900}
+.pdf-taiwan-table-v24{width:100%;table-layout:fixed;border-collapse:collapse}
+.pdf-taiwan-table-v24 th,.pdf-taiwan-table-v24 td{border:1px solid #dbe4ee;box-sizing:border-box}
+.pdf-taiwan-table-v24 th{height:29px;padding:5px 7px;background:#eaf2ff;color:#17365d;font-size:10px;font-weight:900;text-align:center}
+.pdf-taiwan-table-v24 td{height:23px;padding:4px 9px;color:#30465d;font-size:10px;line-height:1.15}
+.pdf-taiwan-table-v24 tbody tr:nth-child(even):not(.section-row) td{background:#fcfdff}
+.pdf-taiwan-table-v24 th:nth-child(1){width:9%}
+.pdf-taiwan-table-v24 th:nth-child(2){width:29%}
+.pdf-taiwan-table-v24 th:nth-child(3){width:46%}
+.pdf-taiwan-table-v24 th:nth-child(4){width:16%}
+.pdf-taiwan-table-v24 .center{text-align:center}
+.pdf-taiwan-table-v24 .person-name{color:#102d4b;font-size:10.5px;font-weight:900}
+.pdf-taiwan-table-v24 .section-row td{height:27px;padding:5px 9px;background:#dceaff!important;color:#17365d;font-size:10.5px;font-weight:900}
+
+
+/* V25 - Taiwan roster refinement */
+.pdf-taiwan-summary-v25{
+  display:flex;
+  gap:7px;
+  margin-bottom:9px;
+}
+.pdf-taiwan-summary-v25 span{
+  display:inline-flex;
+  align-items:baseline;
+  gap:5px;
+  padding:5px 9px;
+  border:1px solid #dce7f2;
+  background:#f7faff;
+  border-radius:7px;
+  color:#64748b;
+  font-size:9px;
+}
+.pdf-taiwan-summary-v25 b{
+  color:#17365d;
+  font-size:12px;
+}
+.pdf-taiwan-table-v24 th:nth-child(1){width:8%}
+.pdf-taiwan-table-v24 th:nth-child(2){width:25%}
+.pdf-taiwan-table-v24 th:nth-child(3){width:34%}
+.pdf-taiwan-table-v24 th:nth-child(4){width:19%}
+.pdf-taiwan-table-v24 th:nth-child(5){width:14%}
+.pdf-taiwan-table-v24 .employee-no{
+  text-align:center;
+  color:#455b72;
+  font-weight:900;
+  letter-spacing:.2px;
+}
+
 </style>
 </head>
 <body>
@@ -1815,141 +2105,135 @@ function buildExcelReferencePdfPages(data){
  ];
 }
 
-function balanceRosterBlocks(blocks){
- let cols=[[],[]],loads=[0,0];
- blocks.forEach(block=>{
-   let cost=(block.people?.length||0)+2.2;
-   let target=loads[0]<=loads[1]?0:1;
-   cols[target].push(block);
-   loads[target]+=cost;
- });
- return cols;
+function reportWindDept(p){
+ let j=String(p.job_title||'').replace(/\s+/g,''),g=personGroup(p);
+ if(j.includes('副廠長'))return'副廠長';
+ if(j.includes('廠長'))return'廠長';
+ if(g==='廠務'||j.includes('廠務'))return'廠務';
+ if(g==='捲板'||j.includes('捲板'))return'捲板';
+ if(g==='清根'||j.includes('清根'))return'清根';
+ if(g==='電焊'||j.includes('電焊')||j.includes('電銲')||j.includes('設備焊接'))return'電焊';
+ if(g==='手焊'||j.includes('手焊')||j.includes('6GR')||(j.includes('焊工')&&!j.includes('設備')))return'手焊';
+ if(g==='焊接協調'||j.includes('焊接協調')||j.includes('銲接協調'))return'焊接協調';
+ if(g==='文管'||j.includes('文管'))return'文管';
+ return String(p.job_title||'').trim()||'未設定';
+}
+function reportOverseasDept(p){
+ let j=String(p.job_title||'').replace(/\s+/g,'');
+ if(j.includes('總經理'))return'總經理';
+ if(j.includes('副廠長'))return'副廠長';
+ if(j==='廠長')return'總經理';
+ if(j.includes('財務'))return'財務';
+ if(j.includes('行政'))return'行政';
+ return String(p.job_title||'').trim()||'未設定';
 }
 function foreignRosterBlocks(data){
  let order=['捲板','清根','研磨','手焊','電焊'];
- let extra=[...new Set(data.foreign.map(personGroup).filter(g=>g&&!order.includes(g)))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
- let groups=[...order,...extra];
- return groups.map(g=>{
-   let people=data.foreign.filter(p=>personGroup(p)===g).sort((a,b)=>
-     String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||
-     a.employee_no.localeCompare(b.employee_no)
-   );
+ return order.map(g=>{
+   let people=data.foreign.filter(p=>personGroup(p)===g).sort((a,b)=>String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||a.employee_no.localeCompare(b.employee_no));
    if(!people.length)return null;
-   let supervisors=activeRows(data.toRows).filter(p=>
-     personType(p)==='台籍'&&!isOverseas(p)&&p.level==='主管'&&supervisorGroupsOf(p).includes(g)
-   ).map(p=>p.name);
-   return{
-     title:g,
-     people,
-     supervisor:[...new Set(supervisors)].join('、')
-   };
+   let supervisors=activeRows(data.toRows).filter(p=>personType(p)==='台籍'&&!isOverseas(p)&&p.level==='主管'&&supervisorGroupsOf(p).includes(g)).map(p=>p.name);
+   return{title:g,people,supervisor:[...new Set(supervisors)].join('、')};
  }).filter(Boolean);
 }
-function foreignRosterBlockHtml(block){
- let rows=block.people.map((p,i)=>`<tr>
-   <td class="c">${i+1}</td>
-   <td class="c">${esc(p.shift||'')}</td>
-   <td>${esc(p.job_title||'')}</td>
-   <td class="c">${esc(p.name)}</td>
-   <td class="c">${esc(p.employee_no)}</td>
+function splitForeignBlocksForTwoPages(blocks){
+ let first=[],second=[],target=45,count=0;
+ blocks.forEach(block=>{
+   if(count>=target){second.push(block);return}
+   let room=target-count;
+   if(block.people.length<=room){first.push(block);count+=block.people.length}
+   else{
+     let a=block.people.slice(0,room),b=block.people.slice(room);
+     if(a.length)first.push({...block,people:a});
+     if(b.length)second.push({...block,title:block.title+'（續）',people:b});
+     count=target;
+   }
+ });
+ return[first,second];
+}
+function foreignTableRows(block){
+ let rowspan=block.people.length;
+ return `<tr class="foreign-group-row"><td colspan="6">${esc(block.title)}　${block.people.length} 人</td></tr>`+
+ block.people.map((p,i)=>`<tr>
+  <td class="center">${i+1}</td><td class="center">${esc(p.shift||'-')}</td><td>${esc(p.job_title||'-')}</td>
+  <td class="person-name">${esc(p.name)}</td><td class="employee-no">${esc(p.employee_no)}</td>
+  ${i===0?`<td class="supervisor-cell" rowspan="${rowspan}">${esc(block.supervisor||'—')}</td>`:''}
  </tr>`).join('');
- return `<div class="roster-group">
-   <div class="roster-group-head">
-    <span>${esc(block.title)}｜${block.people.length} 人</span>
-    <span class="sup">台籍主管：${esc(block.supervisor||'—')}</span>
-   </div>
-   <table class="compact-roster foreign-compact">
-    <thead><tr><th>NO.</th><th>班</th><th>職別</th><th>姓名</th><th>工號</th></tr></thead>
-    <tbody>${rows}</tbody>
-   </table>
- </div>`;
 }
-function buildForeignRosterOnePage(data){
- let blocks=foreignRosterBlocks(data),cols=balanceRosterBlocks(blocks);
- let count=data.foreign.length,dense=count>72?' dense':'';
- let body=blocks.length
-   ?`<div class="roster-columns">
-       <div class="roster-column">${cols[0].map(foreignRosterBlockHtml).join('')}</div>
-       <div class="roster-column">${cols[1].map(foreignRosterBlockHtml).join('')}</div>
-     </div>`
-   :'<div class="empty">本月份沒有外籍員工</div>';
- return `<div class="pdf-page pdf-roster-3${dense}">
-   <div class="pdf-safe">
-    ${pdfReportHeader(`${monthLabel(data.tm)} 外籍員工`)}
-    ${body}
-    <div class="pdf-roster-note">組別排序：捲板、清根、研磨、手焊、電焊｜台籍主管依負責組別自動帶入</div>
-   </div>
-   ${pdfFooter()}
- </div>`;
+function buildForeignRosterPage(data,blocks){
+ return `<div class="pdf-page pdf-roster-4"><div class="pdf-safe">
+  ${pdfReportHeader(`${monthLabel(data.tm)} 外籍員工`)}
+  <table class="pdf-foreign-table-v24"><thead><tr><th>NO.</th><th>班別</th><th>職別</th><th>姓名</th><th>工號</th><th>台籍主管</th></tr></thead>
+  <tbody>${blocks.map(foreignTableRows).join('')}</tbody></table>
+ </div>${pdfFooter()}</div>`;
 }
-
-function taiwanDeptBlocks(data){
- const windOrder=['廠長','副廠長','廠務','清根','電焊','手焊','焊接協調','文管'];
- const overseasOrder=['總經理','副廠長','財務','行政'];
- let wind=windSorted(data),overseas=overseasSorted(data);
- let blocks=[];
- windOrder.forEach(dept=>{
-   let people=wind.filter(p=>exportWindDept(p)===dept);
-   if(people.length)blocks.push({title:dept,section:'風力事業部',people,deptFn:exportWindDept});
- });
- let windExtra=[...new Set(wind.map(exportWindDept).filter(d=>!windOrder.includes(d)))];
- windExtra.forEach(dept=>{
-   let people=wind.filter(p=>exportWindDept(p)===dept);
-   if(people.length)blocks.push({title:dept,section:'風力事業部',people,deptFn:exportWindDept});
- });
- overseasOrder.forEach(dept=>{
-   let people=overseas.filter(p=>exportOverseasDept(p)===dept);
-   if(people.length)blocks.push({title:dept,section:'海外事業部',people,deptFn:exportOverseasDept});
- });
- let overseasExtra=[...new Set(overseas.map(exportOverseasDept).filter(d=>!overseasOrder.includes(d)))];
- overseasExtra.forEach(dept=>{
-   let people=overseas.filter(p=>exportOverseasDept(p)===dept);
-   if(people.length)blocks.push({title:dept,section:'海外事業部',people,deptFn:exportOverseasDept});
- });
- return blocks;
-}
-function taiwanRosterBlockHtml(block){
- let rows=block.people.map((p,i)=>`<tr>
-   <td class="c">${i+1}</td>
-   <td>${esc(block.title)}</td>
-   <td>${esc(p.name)}</td>
-   <td class="c">${esc(p.shift||'')}</td>
- </tr>`).join('');
- return `<div class="roster-group">
-   <div class="roster-group-head">
-    <span>${esc(block.section)}｜${esc(block.title)}</span>
-    <span class="sup">${block.people.length} 人</span>
-   </div>
-   <table class="compact-roster taiwan-compact">
-    <thead><tr><th>NO.</th><th>部門</th><th>員工</th><th>班</th></tr></thead>
-    <tbody>${rows}</tbody>
-   </table>
- </div>`;
+function buildForeignRosterPages(data){
+ let [p2,p3]=splitForeignBlocksForTwoPages(foreignRosterBlocks(data));
+ return[buildForeignRosterPage(data,p2),buildForeignRosterPage(data,p3)];
 }
 function buildTaiwanRosterOnePage(data){
- let blocks=taiwanDeptBlocks(data),cols=balanceRosterBlocks(blocks);
- let count=data.local.length+data.overseas.length,dense=count>72?' dense':'';
- let body=blocks.length
-   ?`<div class="roster-columns">
-       <div class="roster-column">${cols[0].map(taiwanRosterBlockHtml).join('')}</div>
-       <div class="roster-column">${cols[1].map(taiwanRosterBlockHtml).join('')}</div>
-     </div>`
-   :'<div class="empty">本月份沒有台籍員工</div>';
- return `<div class="pdf-page pdf-roster-3${dense}">
+ const windOrder=['廠長','副廠長','廠務','捲板','清根','電焊','手焊','焊接協調','文管'];
+ const overseasOrder=['總經理','副廠長','財務','行政'];
+ const idx=(arr,v)=>{let i=arr.indexOf(v);return i<0?999:i};
+
+ let wind=[...data.local].sort((a,b)=>{
+   let da=reportWindDept(a),db=reportWindDept(b);
+   return idx(windOrder,da)-idx(windOrder,db)||
+    da.localeCompare(db,'zh-Hant')||
+    String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||
+    a.employee_no.localeCompare(b.employee_no);
+ });
+ let overseas=[...data.overseas].sort((a,b)=>{
+   let da=reportOverseasDept(a),db=reportOverseasDept(b);
+   return idx(overseasOrder,da)-idx(overseasOrder,db)||
+    da.localeCompare(db,'zh-Hant')||
+    String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||
+    a.employee_no.localeCompare(b.employee_no);
+ });
+
+ let no=0;
+ let windRows=wind.map(p=>`<tr>
+   <td class="center">${++no}</td>
+   <td>${esc(reportWindDept(p))}</td>
+   <td class="person-name">${esc(p.name)}</td>
+   <td class="employee-no">${esc(p.employee_no)}</td>
+   <td class="center">${esc(p.shift||'-')}</td>
+ </tr>`).join('');
+
+ no=0;
+ let overseasRows=overseas.map(p=>`<tr>
+   <td class="center">${++no}</td>
+   <td>${esc(reportOverseasDept(p))}</td>
+   <td class="person-name">${esc(p.name)}</td>
+   <td class="employee-no">${esc(p.employee_no)}</td>
+   <td class="center">${esc(p.shift||'-')}</td>
+ </tr>`).join('');
+
+ return `<div class="pdf-page pdf-roster-4">
    <div class="pdf-safe">
     ${pdfReportHeader(`${monthLabel(data.tm)} 台籍員工`)}
-    ${body}
-    <div class="pdf-roster-note">風力事業部：廠長、副廠長、廠務、清根、電焊、手焊、焊接協調、文管｜海外事業部：總經理、副廠長、財務、行政</div>
+    <div class="pdf-taiwan-summary-v25">
+      <span>風力事業部 <b>${wind.length}</b></span>
+      <span>海外事業部 <b>${overseas.length}</b></span>
+      <span>台籍合計 <b>${wind.length+overseas.length}</b></span>
+    </div>
+    <table class="pdf-taiwan-table-v24">
+     <thead>
+      <tr><th>NO.</th><th>部門</th><th>員工</th><th>工號</th><th>班別</th></tr>
+     </thead>
+     <tbody>
+      <tr class="section-row"><td colspan="5">第一區｜風力事業部</td></tr>
+      ${windRows||'<tr><td colspan="5" class="center">目前沒有資料</td></tr>'}
+      <tr class="section-row"><td colspan="5">第二區｜海外事業部</td></tr>
+      ${overseasRows||'<tr><td colspan="5" class="center">目前沒有資料</td></tr>'}
+     </tbody>
+    </table>
    </div>
    ${pdfFooter()}
  </div>`;
 }
-function buildThreePageReport(data){
- return [
-   buildSummaryPdfPage(data),
-   buildForeignRosterOnePage(data),
-   buildTaiwanRosterOnePage(data)
- ];
+function buildFourPageReport(data){
+ return[buildSummaryPdfPage(data),...buildForeignRosterPages(data),buildTaiwanRosterOnePage(data)];
 }
 
 function buildSummaryPdfPage(data){
@@ -2019,7 +2303,7 @@ async function exportMonthPdfReport(){
 
  let wrap=document.createElement('div');
  wrap.className='pdf-export-wrap';
- wrap.innerHTML=buildThreePageReport(data).join('');
+ wrap.innerHTML=buildFourPageReport(data).join('');
  document.body.appendChild(wrap);
 
  try{

@@ -801,6 +801,71 @@
   letter-spacing:.2px;
 }
 
+
+/* V26 - hard A4 width guard */
+.pdf-roster-4 .pdf-safe{
+  width:660px !important;
+  max-width:660px !important;
+  min-width:0 !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  overflow:visible !important;
+}
+.pdf-roster-4 .pdf-foreign-table-v24,
+.pdf-roster-4 .pdf-taiwan-table-v24{
+  width:660px !important;
+  max-width:660px !important;
+  min-width:660px !important;
+  table-layout:fixed !important;
+  margin:0 auto !important;
+  box-sizing:border-box !important;
+}
+
+/* 外籍表固定欄寬，總和 660px */
+.pdf-foreign-table-v24 th:nth-child(1){width:34px !important}
+.pdf-foreign-table-v24 th:nth-child(2){width:44px !important}
+.pdf-foreign-table-v24 th:nth-child(3){width:142px !important}
+.pdf-foreign-table-v24 th:nth-child(4){width:234px !important}
+.pdf-foreign-table-v24 th:nth-child(5){width:76px !important}
+.pdf-foreign-table-v24 th:nth-child(6){width:130px !important}
+
+/* 名字完整顯示：可以換行，但絕不把表格撐出 A4 */
+.pdf-foreign-table-v24 td{
+  white-space:normal !important;
+  overflow:hidden !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+}
+.pdf-foreign-table-v24 .person-name{
+  white-space:normal !important;
+  overflow:visible !important;
+  overflow-wrap:anywhere !important;
+  line-height:1.15 !important;
+}
+.pdf-foreign-table-v24 .employee-no{
+  white-space:nowrap !important;
+}
+.pdf-foreign-table-v24 .supervisor-cell{
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+}
+
+/* 台籍表固定欄寬，總和 660px */
+.pdf-taiwan-table-v24 th:nth-child(1){width:50px !important}
+.pdf-taiwan-table-v24 th:nth-child(2){width:155px !important}
+.pdf-taiwan-table-v24 th:nth-child(3){width:225px !important}
+.pdf-taiwan-table-v24 th:nth-child(4){width:145px !important}
+.pdf-taiwan-table-v24 th:nth-child(5){width:85px !important}
+.pdf-taiwan-table-v24 td{
+  white-space:normal !important;
+  overflow:hidden !important;
+  overflow-wrap:anywhere !important;
+}
+.pdf-taiwan-table-v24 .person-name{
+  white-space:normal !important;
+  overflow:visible !important;
+}
+
 </style>
 </head>
 <body>
@@ -2323,6 +2388,29 @@ async function exportMonthPdfReport(){
      // V20: 報表元素本身就在 (0,0) 的正常座標，
      // 直接以元素實際尺寸擷取，避免負座標造成左側被裁掉。
      let pageEl=pages[i];
+
+     // V26：真正擷取前先鎖定寬度，避免瀏覽器因長姓名或 rowspan
+     // 把 table 的 intrinsic width 撐出 A4。
+     if(pageEl.classList.contains('pdf-roster-4')){
+       let safe=pageEl.querySelector('.pdf-safe');
+       if(safe){
+         safe.style.width='660px';
+         safe.style.maxWidth='660px';
+         safe.style.minWidth='0';
+         safe.style.margin='0 auto';
+       }
+       pageEl.querySelectorAll('table').forEach(t=>{
+         t.style.width='660px';
+         t.style.maxWidth='660px';
+         t.style.minWidth='660px';
+         t.style.tableLayout='fixed';
+       });
+       pageEl.querySelectorAll('.person-name').forEach(cell=>{
+         cell.style.whiteSpace='normal';
+         cell.style.overflowWrap='anywhere';
+       });
+     }
+
      let canvas=await html2canvas(pageEl,{
        scale:2,
        backgroundColor:'#ffffff',
@@ -2349,10 +2437,35 @@ async function exportMonthPdfReport(){
            el.style.margin='0';
            el.style.boxSizing='border-box';
          });
-         doc.querySelectorAll('.pdf-roster-3 .pdf-safe').forEach(el=>{
-           el.style.width='690px';
-           el.style.maxWidth='690px';
-           el.style.margin='0 auto';
+         // V26：匯出時強制目前 roster-4 使用真正的 A4 安全寬度。
+         doc.querySelectorAll('.pdf-roster-4 .pdf-safe').forEach(el=>{
+           el.style.width='660px';
+           el.style.maxWidth='660px';
+           el.style.minWidth='0';
+           el.style.marginLeft='auto';
+           el.style.marginRight='auto';
+           el.style.transform='none';
+           el.style.boxSizing='border-box';
+         });
+         doc.querySelectorAll('.pdf-roster-4 table').forEach(el=>{
+           el.style.width='660px';
+           el.style.maxWidth='660px';
+           el.style.minWidth='660px';
+           el.style.tableLayout='fixed';
+           el.style.marginLeft='auto';
+           el.style.marginRight='auto';
+           el.style.boxSizing='border-box';
+         });
+         doc.querySelectorAll('.pdf-roster-4 td').forEach(el=>{
+           el.style.maxWidth='0';
+           el.style.overflow='hidden';
+           el.style.overflowWrap='anywhere';
+         });
+         doc.querySelectorAll('.pdf-roster-4 .person-name').forEach(el=>{
+           el.style.whiteSpace='normal';
+           el.style.maxWidth='none';
+           el.style.overflow='visible';
+           el.style.overflowWrap='anywhere';
          });
        }
      });

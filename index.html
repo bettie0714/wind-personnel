@@ -220,13 +220,13 @@
     <button class="quick-filter" data-type="建教生">建教生</button>
   </div>
  </div>
- <div class="section"><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div></div>
+ <div class="section"><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th class="admin-only">區域</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div></div>
 </section>
 
 <section id="changes" class="page">
  <div class="section">
   <div class="sectionhead">
-   <div><h2>月份人數／人員增減</h2><div class="mini">保留每月人員紀錄，可比較兩個月份並匯出 Excel 與專業 PDF 報表。</div></div>
+   <div><h2>月份人數／人員增減</h2><div class="mini">保留每月人員紀錄，可比較兩個月份並匯出 Excel 與專業 PDF 報表；第一次匯出若尚無月份紀錄，管理員可直接建立本月紀錄。</div></div>
    <div style="display:flex;gap:8px;flex-wrap:wrap">
     <button id="exportMonthBtn" class="btn success">匯出月份 Excel</button>
     <button id="exportMonthPdfBtn" class="btn">匯出圖表 PDF</button>
@@ -312,7 +312,7 @@
  <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
- <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><input id="mArea" type="hidden" value="本部">
+ <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field admin-only"><label>區域</label><select id="mArea"><option>本部</option><option>海外事業部</option></select></div>
  <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">只供管理員查看，W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
  </div><div class="modalfoot"><span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
@@ -340,8 +340,8 @@ let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapsho
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function mainCurrent(){return employees.filter(x=>x.status!=='離職'&&x.area!=='海外事業部')}
-function overseasCurrent(){return employees.filter(x=>x.status!=='離職'&&x.area==='海外事業部')}
+function mainCurrent(){return employees.filter(x=>x.status!=='離職'&&!isOverseas(x))}
+function overseasCurrent(){return employees.filter(x=>x.status!=='離職'&&isOverseas(x))}
 function isAdmin(){return role==='admin'}
 function normalizeNo(v){return String(v||'').trim().toUpperCase()}
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
@@ -390,6 +390,19 @@ function syncSupervisorGroupState(){
  $('mSupervisorGroups').querySelectorAll('.group-check').forEach(l=>l.classList.toggle('disabled',!enabled));
  $('mSupervisorGroups').querySelectorAll('input').forEach(i=>i.disabled=!enabled);
 }
+const LEGACY_OVERSEAS_NAMES=['楊天豪','黃銘彥','溫雁淑','蔡英金','莊翊'];
+function isOverseas(p){
+ if(!p)return false;
+ return isOverseas(p)||LEGACY_OVERSEAS_NAMES.includes(String(p.name||'').trim());
+}
+function inferArea(no,name,rawArea=''){
+ let raw=String(rawArea||'').trim();
+ if(raw.includes('海外'))return'海外事業部';
+ let existing=employees.find(x=>x.employee_no===normalizeNo(no));
+ if(existing&&isOverseas(existing))return'海外事業部';
+ if(LEGACY_OVERSEAS_NAMES.includes(String(name||'').trim()))return'海外事業部';
+ return'本部';
+}
 function personType(p){
  let no=normalizeNo(p.employee_no);
  if(no.startsWith('Z'))return'Z';
@@ -400,25 +413,39 @@ function personType(p){
 function tenure(date){if(!date)return'-';let d=new Date(date+'T00:00:00'),now=new Date();if(isNaN(d))return'-';let months=(now.getFullYear()-d.getFullYear())*12+now.getMonth()-d.getMonth();if(now.getDate()<d.getDate())months--;if(months<0)return'-';let y=Math.floor(months/12),m=months%12;return y?`${y}年${m?m+'個月':''}`:`${m}個月`}
 function badge(v){return `<span class="badge ${v==='主管'?'orange':'blue'}">${esc(v)}</span>`}
 
+async function ensureDbClient(){
+ if(db&&typeof db.from==='function')return db;
+ if(!configured())throw new Error('網站尚未填入 Supabase 設定');
+ if(!window.supabase||typeof window.supabase.createClient!=='function')
+   throw new Error('Supabase 程式庫尚未載入完成，請重新整理頁面');
+ db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+ return db;
+}
+
 async function init(){
  const status=$('connectionStatus');
  try{
-   if(!configured()) throw new Error('網站尚未填入 Supabase 設定');
-   if(!window.supabase || typeof window.supabase.createClient!=='function')
-     throw new Error('Supabase 程式庫載入失敗，請重新整理頁面');
-   db=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);
+   await ensureDbClient();
    const {data:{session},error}=await db.auth.getSession();
-   if(error) throw error;
+   if(error)throw error;
    status.textContent='✓ Supabase 已連線，可以登入';
+   status.classList.remove('bad');
    status.classList.add('ok');
-   if(session) await enter(session.user);
+   if(session){
+     try{await enter(session.user)}
+     catch(appErr){
+       console.error('載入系統資料失敗',appErr);
+       status.textContent='✓ 已登入，但部分資料載入失敗';
+     }
+   }
    db.auth.onAuthStateChange(async(_,session)=>{
-     if(session&&!user) await enter(session.user);
-     if(!session&&user) leave();
+     try{
+       if(session&&!user)await enter(session.user);
+       if(!session&&user)leave();
+     }catch(e){console.error('登入狀態更新失敗',e)}
    });
  }catch(e){
    console.error(e);
-   db=null;
    status.textContent='⚠ 系統連線失敗：'+(e?.message||e);
    status.classList.add('bad');
    $('loginError').textContent='目前無法連接登入服務。請重新整理頁面；若仍失敗，把這段紅字截圖給我。';
@@ -428,13 +455,10 @@ async function init(){
 
 async function doLogin(email,password){
   $('loginError').classList.add('hidden');
-  if(!db){
-    await init();
-    if(!db){
-      $('loginError').textContent='登入服務尚未連線，請看上方「系統連線狀態」。';
-      $('loginError').classList.remove('hidden');
-      return;
-    }
+  try{await ensureDbClient()}catch(e){
+    $('loginError').textContent='登入服務尚未連線：'+e.message;
+    $('loginError').classList.remove('hidden');
+    return;
   }
   $('connectionStatus').textContent='登入驗證中…';
   $('connectionStatus').classList.remove('bad');
@@ -472,13 +496,14 @@ $('loginBtn').onclick=async()=>{
   await doLogin(email,password);
 };
 $('logoutBtn').onclick=()=>db.auth.signOut();
-async function enter(u){user=u;let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
+async function enter(u){user=u;await ensureDbClient();let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
 function leave(){user=null;role='viewer';employees=[];changes=[];contracts=[];snapshots=[];snapshotReady=false;snapshotError='';$('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('viewerPassword').value='';$('loginPassword').value=''}
 async function loadAll(){
+ let client=await ensureDbClient();
  let [e,c,sm]=await Promise.all([
-   db.from('employees').select('*').order('employee_no'),
-   db.from('personnel_changes').select('*').order('change_date',{ascending:false}).order('id',{ascending:false}),
-   db.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true})
+   client.from('employees').select('*').order('employee_no'),
+   client.from('personnel_changes').select('*').order('change_date',{ascending:false}).order('id',{ascending:false}),
+   client.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true})
  ]);
  if(e.error)alert('讀取人員資料失敗：'+e.error.message);else employees=e.data||[];
  if(c.error)console.error(c.error);else changes=c.data||[];
@@ -489,7 +514,7 @@ async function loadAll(){
  }
  contracts=[];
  if(isAdmin()){
-   let fc=await db.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});
+   let fc=await client.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});
    if(fc.error)console.error(fc.error);else contracts=fc.data||[];
  }
  populateFilters();
@@ -584,10 +609,11 @@ function renderPeople(){
   <td>${esc(x.job_title||'-')}</td>
   <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
   <td>${esc(x.nationality||'-')}</td>
+  ${isAdmin()?`<td>${isOverseas(x)?'海外事業部':'本部'}</td>`:''}
   <td>${esc(x.hire_date||'-')}</td>
   <td>${tenure(x.hire_date)}</td>
   ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
- </tr>`).join('')||`<tr><td colspan="${isAdmin()?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
+ </tr>`).join('')||`<tr><td colspan="${isAdmin()?11:9}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -598,7 +624,7 @@ function monthLabel(m){if(!m)return'-';let [y,mo]=m.split('-');return `${y}/${Nu
 function snapshotMonthOf(r){return String(r.snapshot_month||'').slice(0,7)}
 function snapshotRows(m){return snapshots.filter(r=>snapshotMonthOf(r)===m)}
 function activeRows(rows){return rows.filter(x=>x.status!=='離職')}
-function mainRows(rows){return activeRows(rows).filter(x=>x.area!=='海外事業部')}
+function mainRows(rows){return activeRows(rows).filter(x=>!isOverseas(x))}
 function snapshotMonths(){return [...new Set(snapshots.map(snapshotMonthOf).filter(Boolean))].sort()}
 function previousMonth(m){let [y,mo]=m.split('-').map(Number),d=new Date(y,mo-2,1);return monthKey(d)}
 function signNum(n){return n>0?`+${n}`:`${n}`}
@@ -715,7 +741,7 @@ function openPerson(p=null,area=null){
  $('mJob').value=p?.job_title||'';
  $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);renderSupervisorGroupChecks(p?.supervisor_groups||'');
  $('mNat').value=p?.nationality||'台籍';
- $('mArea').value=p?.area||area||'本部';
+ $('mArea').value=p?(isOverseas(p)?'海外事業部':'本部'):(area||'本部');
  let fc=contracts.find(c=>c.employee_no===p?.employee_no);
  $('mHire').value=p?.hire_date||'';
  $('mContractEnd').value=fc?.contract_end_date||'';
@@ -766,7 +792,7 @@ function snapshotPayload(month,p){
    level:p.level||null,
    supervisor_groups:p.supervisor_groups||null,
    nationality:p.nationality||deriveNationality(p.employee_no),
-   area:p.area||'本部',
+   area:isOverseas(p)?'海外事業部':'本部',
    hire_date:p.hire_date||null,
    status:p.status||'在職',
    note:p.note||null,
@@ -775,16 +801,17 @@ function snapshotPayload(month,p){
 }
 async function saveSnapshotRows(month,rows,{quiet=false}={}){
  if(!isAdmin())return false;
+ let client=await ensureDbClient();
  if(!snapshotReady){if(!quiet)alert('請先執行 monthly_snapshot_migration.sql');return false}
  let valid=activeRows(rows).filter(p=>p.employee_no&&p.name);
- let {error:delError}=await db.from('monthly_personnel_snapshots').delete().eq('snapshot_month',monthDate(month));
+ let {error:delError}=await client.from('monthly_personnel_snapshots').delete().eq('snapshot_month',monthDate(month));
  if(delError)throw delError;
  for(let i=0;i<valid.length;i+=200){
    let batch=valid.slice(i,i+200).map(p=>snapshotPayload(month,p));
-   let {error}=await db.from('monthly_personnel_snapshots').insert(batch);
+   let {error}=await client.from('monthly_personnel_snapshots').insert(batch);
    if(error)throw error;
  }
- let sm=await db.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true});
+ let sm=await client.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true});
  if(sm.error)throw sm.error;
  snapshots=sm.data||[];
  if(!quiet)$('snapshotStatus').textContent=`已儲存 ${monthLabel(month)} 月份紀錄，共 ${valid.length} 人。`;
@@ -873,7 +900,7 @@ function createForeignSheet(rows,month){
    let start=aoa.length;
    let supervisors=activeRows(rows).filter(p=>
      personType(p)==='台籍'&&
-     p.area!=='海外事業部'&&
+     !isOverseas(p)&&
      p.level==='主管'&&
      supervisorGroupsOf(p).includes(g)
    ).map(p=>p.name);
@@ -892,8 +919,8 @@ function createTaiwaneseSheet(rows,month){
  aoa.push([]);
 
  let taiwan=activeRows(rows).filter(p=>personType(p)==='台籍');
- let wind=taiwan.filter(p=>p.area!=='海外事業部');
- let overseas=taiwan.filter(p=>p.area==='海外事業部');
+ let wind=taiwan.filter(p=>!isOverseas(p));
+ let overseas=taiwan.filter(p=>isOverseas(p));
  const windOrder=['廠長','副廠長','廠務','清根','電焊','手焊','焊接協調','文管'];
  const overseasOrder=['總經理','副廠長','財務','行政'];
  const idx=(arr,v)=>{let i=arr.indexOf(v);return i<0?999:i};
@@ -929,7 +956,7 @@ function createMonthCountSheet(rows,month){
  let aoa=[],merges=[];
  addMergedTitle(aoa,merges,`${monthLabel(month)} 月份人數`,2);
  aoa.push([]);
- let main=mainRows(rows),overseas=activeRows(rows).filter(p=>p.area==='海外事業部');
+ let main=mainRows(rows),overseas=activeRows(rows).filter(p=>isOverseas(p));
  aoa.push(['項目','人數']);
  aoa.push(['總人數',main.length]);
  aoa.push(['台籍',main.filter(p=>personType(p)==='台籍').length]);
@@ -976,8 +1003,8 @@ function collectMonthExportData(tm,fm){
  let toRows=snapshotRows(tm),fromRows=snapshotRows(fm);
  let activeTo=activeRows(toRows),mainTo=mainRows(toRows);
  let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p)));
- let local=activeTo.filter(p=>personType(p)==='台籍'&&p.area!=='海外事業部');
- let overseas=activeTo.filter(p=>personType(p)==='台籍'&&p.area==='海外事業部');
+ let local=activeTo.filter(p=>personType(p)==='台籍'&&!isOverseas(p));
+ let overseas=activeTo.filter(p=>personType(p)==='台籍'&&isOverseas(p));
  let groups={};mainTo.forEach(p=>groups[personGroup(p)]=(groups[personGroup(p)]||0)+1);
  let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
  let groupCounts=Object.entries(groups).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]);
@@ -1028,7 +1055,7 @@ function buildExcelForeignSheet(workbook,data){
    addStyledSection(ws,g,6);
    addStyledHeader(ws,['NO.','班別','職別','姓名','工號','台籍主管']);
    let supervisors=activeRows(data.toRows).filter(p=>
-     personType(p)==='台籍'&&p.area!=='海外事業部'&&p.level==='主管'&&supervisorGroupsOf(p).includes(g)
+     personType(p)==='台籍'&&!isOverseas(p)&&p.level==='主管'&&supervisorGroupsOf(p).includes(g)
    ).map(p=>p.name);
    let supervisorText=[...new Set(supervisors)].join('、');
    let startNo=ws.lastRow.number+1;
@@ -1150,9 +1177,48 @@ function buildExcelDiffSheet(workbook,data){
  groups.forEach(g=>{let row=ws.addRow(exportDiffRow(g,fr.filter(p=>personGroup(p)===g),tr.filter(p=>personGroup(p)===g)));styleRow(row,{})});
  return ws;
 }
+async function resolveExportMonth(){
+ let tm=$('compareTo').value;
+ if(tm)return tm;
+
+ if(!snapshotReady){
+   alert('月份紀錄功能尚未啟用，請先完成 Supabase 月份快照設定。');
+   return null;
+ }
+ if(!isAdmin()){
+   alert('目前尚無月份紀錄，請由管理員先建立月份紀錄。');
+   return null;
+ }
+ if(!employees.length){
+   alert('目前沒有可建立月份紀錄的人員資料。');
+   return null;
+ }
+
+ let current=monthKey();
+ let ok=confirm(`目前尚無月份紀錄。\n\n是否先把目前名單儲存成 ${monthLabel(current)}，再直接匯出？`);
+ if(!ok)return null;
+
+ $('snapshotStatus').textContent=`正在建立 ${monthLabel(current)} 月份紀錄…`;
+ try{
+   await saveSnapshotRows(current,employees,{quiet:true});
+   renderMonthSelectors();
+   $('compareTo').value=current;
+   let months=snapshotMonths(),prev=previousMonth(current);
+   $('compareFrom').value=months.includes(prev)?prev:current;
+   renderMonthComparison();
+   $('snapshotStatus').textContent=`已建立 ${monthLabel(current)} 月份紀錄。`;
+   return current;
+ }catch(e){
+   console.error(e);
+   $('snapshotStatus').textContent='建立月份紀錄失敗：'+e.message;
+   alert('建立月份紀錄失敗：'+e.message);
+   return null;
+ }
+}
+
 async function exportMonthExcelStyled(){
  if(!window.ExcelJS||!window.saveAs)return alert('Excel 匯出元件尚未載入完成，請稍後再試。');
- let tm=$('compareTo').value;if(!tm)return alert('目前沒有可匯出的月份紀錄');
+ let tm=await resolveExportMonth();if(!tm)return;
  let fm=$('compareFrom').value||previousMonth(tm);
  let data=collectMonthExportData(tm,fm);
  if(!data.toRows.length)return alert('這個月份沒有保存人員紀錄');
@@ -1276,7 +1342,7 @@ function buildSummaryPdfPage(data){
 }
 async function exportMonthPdfReport(){
  if(!window.html2canvas||!window.jspdf) return alert('PDF 匯出元件尚未載入完成，請稍後再試。');
- let tm=$('compareTo').value;if(!tm)return alert('目前沒有可匯出的月份紀錄');
+ let tm=await resolveExportMonth();if(!tm)return;
  let fm=$('compareFrom').value||previousMonth(tm);
  let data=collectMonthExportData(tm,fm);
  if(!data.toRows.length)return alert('這個月份沒有保存人員紀錄');
@@ -1304,8 +1370,8 @@ async function exportMonthPdfReport(){
    wrap.remove();
  }
 }
-$('exportMonthBtn').onclick=()=>{exportMonthExcelStyled()};
-$('exportMonthPdfBtn').onclick=()=>{exportMonthPdfReport()};
+$('exportMonthBtn').onclick=async()=>{await exportMonthExcelStyled()};
+$('exportMonthPdfBtn').onclick=async()=>{await exportMonthPdfReport()};
 
 
 // Excel 匯入
@@ -1313,7 +1379,7 @@ const HEADER_MAP={employee_no:['工號','員工編號','employee_no','工号'],n
 function pick(row,keys){for(let k of keys)if(Object.prototype.hasOwnProperty.call(row,k)&&row[k]!==''&&row[k]!=null)return row[k];return''}
 function excelDate(v){if(!v)return null;if(typeof v==='number'){let d=XLSX.SSF.parse_date_code(v);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}let d=new Date(v);if(!isNaN(d))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return null}
 function normalizeShift(v){v=String(v||'').trim();if(v==='中'||v.includes('中'))return'中';if(v==='夜'||v==='晚'||v.includes('夜')||v.includes('晚'))return'夜';return'日'}
-function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(no,job),supervisor_groups:parseSupervisorGroups(pick(row,HEADER_MAP.supervisor_groups)).join(',')||null,nationality:deriveNationality(no),area:String(pick(row,HEADER_MAP.area)||'').trim()||'本部',hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
+function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(no,job),supervisor_groups:parseSupervisorGroups(pick(row,HEADER_MAP.supervisor_groups)).join(',')||null,nationality:deriveNationality(no),area:inferArea(no,name,pick(row,HEADER_MAP.area)),hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
 async function parseFile(file){try{
  let buf=await file.arrayBuffer(),
      wb=XLSX.read(buf,{type:'array',cellDates:true}),

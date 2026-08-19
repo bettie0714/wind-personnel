@@ -84,6 +84,14 @@
 @media(max-width:1050px){.month-toolbar{grid-template-columns:1fr 34px 1fr}.month-actions{grid-column:1/-1}.month-toolbar>.field.admin-only{grid-column:1/2}.month-detail-grid{grid-template-columns:1fr}}
 @media(max-width:650px){.month-toolbar{grid-template-columns:1fr}.month-arrow{display:none}.month-toolbar>.field.admin-only{grid-column:auto}}
 
+
+.group-checks{display:flex;gap:8px;flex-wrap:wrap;padding:8px 0 4px}
+.group-check{position:relative}
+.group-check input{position:absolute;opacity:0;pointer-events:none}
+.group-check span{display:inline-block;border:1px solid #dbe3ef;background:#fff;color:#475569;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer}
+.group-check input:checked+span{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
+.group-check.disabled span{opacity:.45;cursor:not-allowed}
+
 </style>
 </head>
 <body>
@@ -205,7 +213,7 @@
  </div>
 
  <div class="section">
-  <div class="sectionhead"><div><h2>人員變動紀錄</h2><div class="mini">新增、修改、調組與離職紀錄</div></div></div>
+  <div class="sectionhead"><div><h2>人員變動紀錄</h2><div class="mini">新增、修改、調組與離職紀錄</div></div><button id="openResignPickerBtn" class="btn danger admin-only">辦理離職</button></div>
   <div class="tablewrap"><table><thead><tr><th>日期</th><th>類型</th><th>工號</th><th>姓名</th><th>原組別</th><th>新組別</th><th>內容</th></tr></thead><tbody id="changesBody"></tbody></table></div>
  </div>
 </section>
@@ -253,10 +261,16 @@
  <div class="field"><label>工號 *</label><input id="mNo"></div><div class="field"><label>姓名 *</label><input id="mName"></div>
  <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
+ <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
  <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field"><label>區域</label><select id="mArea"><option>本部</option><option>海外事業部</option></select></div>
  <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">只供管理員查看，W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
- </div><div class="modalfoot"><button id="personResign" class="btn danger hidden">登記離職</button><span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
+ </div><div class="modalfoot"><span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
+
+<div id="resignPickerModal" class="modalback"><div class="modal"><button id="resignPickerClose" class="close">×</button><h2>辦理離職</h2><p>請先選擇要辦理離職的人員，下一步才會進入確認畫面。</p><div class="formgrid">
+ <div class="field full"><label>搜尋人員</label><input id="resignPickerSearch" placeholder="輸入工號、姓名或組別"></div>
+ <div class="field full"><label>選擇人員</label><select id="resignPickerSelect" size="8" style="min-height:220px"></select></div>
+ </div><div class="modalfoot"><button id="resignPickerCancel" class="btn">取消</button><button id="resignPickerNext" class="btn danger">下一步：確認離職</button></div></div></div>
 
 <div id="resignModal" class="modalback"><div class="modal"><button id="resignClose" class="close">×</button><h2>登記離職</h2><p id="resignWho"></p><div class="formgrid"><div class="field"><label>離職日期 *</label><input id="rDate" type="date"></div><div class="field"><label>原因</label><select id="rReason"><option>個人生涯規劃</option><option>合約到期</option><option>公司調整</option><option>其他</option></select></div><div class="field full"><label>備註</label><textarea id="rNote" rows="3"></textarea></div></div><div class="modalfoot"><button id="resignCancel" class="btn">取消</button><button id="resignSave" class="btn danger">確認離職</button></div></div></div>
 
@@ -294,6 +308,34 @@ function deriveGroup(no,job,existing){
  return existing;
 }
 function personGroup(p){return deriveGroup(p.employee_no,p.job_title,p.group_name)}
+const SUPERVISOR_GROUPS=['捲板','清根','研磨','手焊','電焊','焊接協調','文管','廠務'];
+function parseSupervisorGroups(v){
+ if(Array.isArray(v))return [...new Set(v.map(x=>String(x).trim()).filter(Boolean))];
+ return [...new Set(String(v||'').split(/[、,，;；+＋/|]/).map(x=>x.trim()).filter(Boolean))];
+}
+function supervisorGroupsOf(p){
+ let explicit=parseSupervisorGroups(p?.supervisor_groups);
+ if(explicit.length)return explicit;
+ // 舊資料尚未設定時，主管仍以自己的主要組別作為相容性 fallback。
+ if(p?.level==='主管'){
+   let g=personGroup(p);
+   if(g&&g!=='主管'&&g!=='未分類')return[g];
+ }
+ return[];
+}
+function renderSupervisorGroupChecks(selected=[]){
+ let set=new Set(parseSupervisorGroups(selected));
+ $('mSupervisorGroups').innerHTML=SUPERVISOR_GROUPS.map(g=>`<label class="group-check"><input type="checkbox" value="${esc(g)}" ${set.has(g)?'checked':''}><span>${esc(g)}</span></label>`).join('');
+ syncSupervisorGroupState();
+}
+function selectedSupervisorGroups(){
+ return [...$('mSupervisorGroups').querySelectorAll('input:checked')].map(x=>x.value);
+}
+function syncSupervisorGroupState(){
+ let enabled=$('mLevel').value==='主管';
+ $('mSupervisorGroups').querySelectorAll('.group-check').forEach(l=>l.classList.toggle('disabled',!enabled));
+ $('mSupervisorGroups').querySelectorAll('input').forEach(i=>i.disabled=!enabled);
+}
 function personType(p){
  let no=normalizeNo(p.employee_no);
  if(no.startsWith('Z'))return'Z';
@@ -592,7 +634,7 @@ function openPerson(p=null,area=null){
  $('mShift').value=['日','中','夜'].includes(p?.shift)?p.shift:'日';
  $('mGroup').value=personGroup(p||{})||'捲板';
  $('mJob').value=p?.job_title||'';
- $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);
+ $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);renderSupervisorGroupChecks(p?.supervisor_groups||'');
  $('mNat').value=p?.nationality||'台籍';
  $('mArea').value=area||p?.area||'本部';
  let fc=contracts.find(c=>c.employee_no===p?.employee_no);
@@ -600,15 +642,36 @@ function openPerson(p=null,area=null){
  $('mContractEnd').value=fc?.contract_end_date||'';
  $('mStatus').value=p?.status==='留停'?'留停':'在職';
  $('mNote').value=p?.note||'';
- $('personResign').classList.toggle('hidden',!p);
  $('personModal').classList.add('show');
 }
+$('mLevel').addEventListener('change',syncSupervisorGroupState);
 window.editPerson=no=>openPerson(employees.find(x=>x.employee_no===no));$('addBtn').onclick=$('adminAddBtn').onclick=()=>openPerson();$('overseasAddBtn').onclick=()=>openPerson(null,'海外事業部');$('personClose').onclick=$('personCancel').onclick=()=>$('personModal').classList.remove('show');
-$('personSave').onclick=async()=>{let no=normalizeNo($('mNo').value),name=$('mName').value.trim();if(!no||!name){alert('請輸入工號與姓名');return}let old=employees.find(x=>x.employee_no===editNo);let job=$('mJob').value.trim(),payload={employee_no:no,name,shift:$('mShift').value,job_title:job,group_name:deriveGroup(no,job,$('mGroup').value),level:$('mLevel').value||deriveLevel(no,job),nationality:deriveNationality(no),area:$('mArea').value,hire_date:$('mHire').value||null,status:$('mStatus').value,note:$('mNote').value.trim()||null,updated_by:user.id,updated_at:new Date().toISOString()};if(!old)payload.created_by=user.id;let q=old?db.from('employees').update(payload).eq('employee_no',editNo):db.from('employees').insert(payload);let {error}=await q;if(error){alert(error.message);return}
+$('personSave').onclick=async()=>{let no=normalizeNo($('mNo').value),name=$('mName').value.trim();if(!no||!name){alert('請輸入工號與姓名');return}let old=employees.find(x=>x.employee_no===editNo);let job=$('mJob').value.trim(),payload={employee_no:no,name,shift:$('mShift').value,job_title:job,group_name:deriveGroup(no,job,$('mGroup').value),level:$('mLevel').value||deriveLevel(no,job),supervisor_groups:$('mLevel').value==='主管'?selectedSupervisorGroups().join(','):null,nationality:deriveNationality(no),area:$('mArea').value,hire_date:$('mHire').value||null,status:$('mStatus').value,note:$('mNote').value.trim()||null,updated_by:user.id,updated_at:new Date().toISOString()};if(!old)payload.created_by=user.id;let q=old?db.from('employees').update(payload).eq('employee_no',editNo):db.from('employees').insert(payload);let {error}=await q;if(error){alert(error.message);return}
 let contractEnd=$('mContractEnd').value||null,isForeign=/^[WZ]/.test(no);
 if(isForeign&&contractEnd){let {error:ce}=await db.from('foreign_contracts').upsert({employee_no:no,contract_end_date:contractEnd,updated_by:user.id,updated_at:new Date().toISOString()},{onConflict:'employee_no'});if(ce){alert('人員已儲存，但合約日期儲存失敗：'+ce.message);return}}else{await db.from('foreign_contracts').delete().eq('employee_no',no)}
 let type=old?'修改':'新增',detail=old&&old.group_name!==payload.group_name?`調組：${old.group_name||'-'} → ${payload.group_name}`:(old?'資料更新':'新進人員');await db.from('personnel_changes').insert({employee_no:no,employee_name:name,change_type:type,old_group:old?.group_name||null,new_group:payload.group_name,detail,created_by:user.id});$('personModal').classList.remove('show');await loadAll()};
-$('personResign').onclick=()=>{if(!editNo)return;$('personModal').classList.remove('show');openResign(editNo)};
+function populateResignPicker(){
+ let q=$('resignPickerSearch').value.trim().toLowerCase();
+ let list=mainCurrent().filter(p=>{
+   if(!q)return true;
+   return `${p.employee_no} ${p.name} ${personGroup(p)} ${p.job_title||''}`.toLowerCase().includes(q);
+ }).sort((a,b)=>a.employee_no.localeCompare(b.employee_no));
+ $('resignPickerSelect').innerHTML=list.map(p=>`<option value="${esc(p.employee_no)}">${esc(p.employee_no)}｜${esc(p.name)}｜${esc(personGroup(p))}</option>`).join('');
+}
+$('openResignPickerBtn').onclick=()=>{
+ if(!isAdmin())return;
+ $('resignPickerSearch').value='';
+ populateResignPicker();
+ $('resignPickerModal').classList.add('show');
+};
+$('resignPickerSearch').oninput=populateResignPicker;
+$('resignPickerClose').onclick=$('resignPickerCancel').onclick=()=>$('resignPickerModal').classList.remove('show');
+$('resignPickerNext').onclick=()=>{
+ let no=$('resignPickerSelect').value;
+ if(!no)return alert('請先選擇人員');
+ $('resignPickerModal').classList.remove('show');
+ openResign(no);
+};
 window.openResign=no=>{if(!isAdmin())return;resignNo=no;let p=employees.find(x=>x.employee_no===no);$('resignWho').textContent=`${p.employee_no}｜${p.name}｜${personGroup(p)||'-'}`;$('rDate').value=new Date().toISOString().slice(0,10);$('rNote').value='';$('resignModal').classList.add('show')};$('resignClose').onclick=$('resignCancel').onclick=()=>$('resignModal').classList.remove('show');$('resignSave').onclick=async()=>{let p=employees.find(x=>x.employee_no===resignNo),date=$('rDate').value;if(!p||!date)return;let {error}=await db.from('employees').update({status:'離職',resigned_at:date,updated_by:user.id,updated_at:new Date().toISOString()}).eq('employee_no',p.employee_no);if(error){alert(error.message);return}await db.from('personnel_changes').insert({employee_no:p.employee_no,employee_name:p.name,change_type:'離職',old_group:p.group_name,new_group:null,detail:`${$('rReason').value}${$('rNote').value?'｜'+$('rNote').value:''}`,change_date:date,created_by:user.id});$('resignModal').classList.remove('show');await loadAll()};
 
 
@@ -622,6 +685,7 @@ function snapshotPayload(month,p){
    job_title:p.job_title||null,
    group_name:personGroup(p),
    level:p.level||null,
+   supervisor_groups:p.supervisor_groups||null,
    nationality:p.nationality||deriveNationality(p.employee_no),
    area:p.area||'本部',
    hire_date:p.hire_date||null,
@@ -729,8 +793,11 @@ function createForeignSheet(rows,month){
    aoa.push(['NO.','班別','職別','姓名','工號','台籍主管']);
    let start=aoa.length;
    let supervisors=activeRows(rows).filter(p=>
-     personType(p)==='台籍'&&p.area!=='海外事業部'&&p.level==='主管'&&personGroup(p)===g
-   ).map(p=>p.name);
+     personType(p)==='台籍'&&
+     p.area!=='海外事業部'&&
+     p.level==='主管'&&
+     supervisorGroupsOf(p).includes(g)
+   ).map(p=>`${p.name}${p.job_title?`（${p.job_title}）`:''}`);
    let supervisorText=[...new Set(supervisors)].join('、');
    people.forEach((p,i)=>aoa.push([i+1,p.shift||'',p.job_title||'',p.name,p.employee_no,i===0?supervisorText:'']));
    let end=aoa.length-1;
@@ -738,7 +805,7 @@ function createForeignSheet(rows,month){
    aoa.push([]);
  });
  if(aoa.length===2)aoa.push(['','','','本月份沒有外籍員工','','']);
- return sheetFromAOA(aoa,[6,9,22,14,12,18],merges);
+ return sheetFromAOA(aoa,[6,9,22,14,12,26],merges);
 }
 function createTaiwaneseSheet(rows,month){
  let aoa=[],merges=[];
@@ -843,11 +910,11 @@ $('exportMonthBtn').onclick=()=>{
 
 
 // Excel 匯入
-const HEADER_MAP={employee_no:['工號','員工編號','employee_no','工号'],name:['姓名','name','員工姓名'],shift:['班別','班次','shift'],job_title:['職別','職稱','job_title'],group_name:['組別','group','group_name'],level:['職級','分類','level'],nationality:['籍別','國籍','nationality'],area:['區域','area','部門區域'],hire_date:['到職日','到職日期','hire_date','報到日'],status:['狀態','status'],note:['備註','note','說明'],contract_end_date:['合約到期日','外籍合約到期日','合約期限','contract_end_date','contract_end']};
+const HEADER_MAP={employee_no:['工號','員工編號','employee_no','工号'],name:['姓名','name','員工姓名'],shift:['班別','班次','shift'],job_title:['職別','職稱','job_title'],group_name:['組別','group','group_name'],level:['職級','分類','level'],supervisor_groups:['主管負責組別','主管組別','負責組別','supervisor_groups'],nationality:['籍別','國籍','nationality'],area:['區域','area','部門區域'],hire_date:['到職日','到職日期','hire_date','報到日'],status:['狀態','status'],note:['備註','note','說明'],contract_end_date:['合約到期日','外籍合約到期日','合約期限','contract_end_date','contract_end']};
 function pick(row,keys){for(let k of keys)if(Object.prototype.hasOwnProperty.call(row,k)&&row[k]!==''&&row[k]!=null)return row[k];return''}
 function excelDate(v){if(!v)return null;if(typeof v==='number'){let d=XLSX.SSF.parse_date_code(v);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}let d=new Date(v);if(!isNaN(d))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return null}
 function normalizeShift(v){v=String(v||'').trim();if(v==='中'||v.includes('中'))return'中';if(v==='夜'||v==='晚'||v.includes('夜')||v.includes('晚'))return'夜';return'日'}
-function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(no,job),nationality:deriveNationality(no),area:String(pick(row,HEADER_MAP.area)||'').trim()||'本部',hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
+function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(no,job),supervisor_groups:parseSupervisorGroups(pick(row,HEADER_MAP.supervisor_groups)).join(',')||null,nationality:deriveNationality(no),area:String(pick(row,HEADER_MAP.area)||'').trim()||'本部',hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
 async function parseFile(file){try{
  let buf=await file.arrayBuffer(),
      wb=XLSX.read(buf,{type:'array',cellDates:true}),
@@ -871,7 +938,7 @@ async function parseFile(file){try{
 
  $('previewWrap').classList.remove('hidden');
  $('importBtn').classList.toggle('hidden',!importRows.length);
- let cols=['employee_no','name','shift','group_name','job_title','level','nationality','area','hire_date','_contract_end_date'];
+ let cols=['employee_no','name','shift','group_name','job_title','level','supervisor_groups','nationality','area','hire_date','_contract_end_date'];
  $('previewHead').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
  $('previewBody').innerHTML=importRows.slice(0,10).map(r=>'<tr>'+cols.map(c=>`<td>${esc(r[c]||'-')}</td>`).join('')+'</tr>').join('')
 }catch(e){

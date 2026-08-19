@@ -797,7 +797,7 @@ function createForeignSheet(rows,month){
      p.area!=='海外事業部'&&
      p.level==='主管'&&
      supervisorGroupsOf(p).includes(g)
-   ).map(p=>`${p.name}${p.job_title?`（${p.job_title}）`:''}`);
+   ).map(p=>p.name);
    let supervisorText=[...new Set(supervisors)].join('、');
    people.forEach((p,i)=>aoa.push([i+1,p.shift||'',p.job_title||'',p.name,p.employee_no,i===0?supervisorText:'']));
    let end=aoa.length-1;

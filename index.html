@@ -393,7 +393,7 @@ function syncSupervisorGroupState(){
 const LEGACY_OVERSEAS_NAMES=['楊天豪','黃銘彥','溫雁淑','蔡英金','莊翊'];
 function isOverseas(p){
  if(!p)return false;
- return isOverseas(p)||LEGACY_OVERSEAS_NAMES.includes(String(p.name||'').trim());
+ return p.area==='海外事業部'||LEGACY_OVERSEAS_NAMES.includes(String(p.name||'').trim());
 }
 function inferArea(no,name,rawArea=''){
  let raw=String(rawArea||'').trim();
@@ -531,7 +531,18 @@ function populateFilters(){
  $('fJob').innerHTML='<option value="">全部</option>'+jobs.map(x=>`<option>${esc(x)}</option>`).join('');
  $('mGroup').innerHTML=gs.map(x=>`<option>${esc(x)}</option>`).join('');
 }
-function renderAll(){renderDash();renderPeople();renderChanges();renderOverseas();renderContracts()}
+function renderAll(){
+ const jobs=[
+   ['總覽',renderDash],
+   ['人員名單',renderPeople],
+   ['人員變動',renderChanges],
+   ['海外事業部',renderOverseas],
+   ['外籍合約',renderContracts]
+ ];
+ jobs.forEach(([name,fn])=>{
+   try{fn()}catch(e){console.error(name+' 顯示失敗',e)}
+ });
+}
 function renderDash(){
  let a=mainCurrent();
  let k=[

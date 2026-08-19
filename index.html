@@ -138,6 +138,28 @@
  #people .tablewrap,#overseas .tablewrap{max-height:72vh}
 }
 
+
+.pdf-page.pdf-landscape{
+  width:1123px;
+  min-height:794px;
+  padding:28px 30px 24px 30px;
+}
+.pdf-landscape .pdf-table{
+  table-layout:fixed;
+  width:100%;
+}
+.pdf-landscape .pdf-table th,
+.pdf-landscape .pdf-table td{
+  font-size:10px;
+  padding:5px 6px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.pdf-landscape .pdf-title{font-size:22px}
+.pdf-landscape .pdf-header{margin-bottom:12px}
+.pdf-landscape .pdf-section-title{font-size:17px;margin-bottom:8px}
+.pdf-landscape .pdf-caption{margin-bottom:8px}
+
 </style>
 </head>
 <body>
@@ -1269,7 +1291,7 @@ function pdfBarRows(items,color){
 }
 function pdfPeopleTable(title,caption,rows,headers){
  return `
- <div class="pdf-page">
+ <div class="pdf-page pdf-landscape">
   <div class="pdf-header">
    <div><div class="pdf-title">${esc(title)}</div><div class="pdf-sub">${esc(caption)}</div></div>
    <div class="pdf-brand">狗狗在一起強大｜人員統計系統</div>
@@ -1373,10 +1395,28 @@ async function exportMonthPdfReport(){
    let pdf=new jsPDF('p','mm','a4');
    let pages=[...wrap.querySelectorAll('.pdf-page')];
    for(let i=0;i<pages.length;i++){
-     let canvas=await html2canvas(pages[i],{scale:2,backgroundColor:'#ffffff',useCORS:true});
+     let isLandscape=pages[i].classList.contains('pdf-landscape');
+     let canvas=await html2canvas(pages[i],{
+       scale:2,
+       backgroundColor:'#ffffff',
+       useCORS:true,
+       windowWidth:isLandscape?1123:794
+     });
      let img=canvas.toDataURL('image/jpeg',0.95);
-     if(i>0)pdf.addPage();
-     pdf.addImage(img,'JPEG',0,0,210,297);
+
+     if(i===0){
+       if(isLandscape){
+         pdf=new jsPDF('l','mm','a4');
+       }
+     }else{
+       pdf.addPage('a4',isLandscape?'landscape':'portrait');
+     }
+
+     if(isLandscape){
+       pdf.addImage(img,'JPEG',0,0,297,210);
+     }else{
+       pdf.addImage(img,'JPEG',0,0,210,297);
+     }
    }
    pdf.save(`${tm}_人員月報.pdf`);
  }catch(err){

@@ -412,6 +412,11 @@ function personType(p){
 }
 function tenure(date){if(!date)return'-';let d=new Date(date+'T00:00:00'),now=new Date();if(isNaN(d))return'-';let months=(now.getFullYear()-d.getFullYear())*12+now.getMonth()-d.getMonth();if(now.getDate()<d.getDate())months--;if(months<0)return'-';let y=Math.floor(months/12),m=months%12;return y?`${y}年${m?m+'個月':''}`:`${m}個月`}
 function badge(v){return `<span class="badge ${v==='主管'?'orange':'blue'}">${esc(v)}</span>`}
+function changeBadge(t){
+ t=String(t||'');
+ let cls=t.includes('離職')?'red':t.includes('新增')||t.includes('匯入')?'green':'blue';
+ return `<span class="badge ${cls}">${esc(t||'-')}</span>`;
+}
 
 async function ensureDbClient(){
  if(db&&typeof db.from==='function')return db;
@@ -826,7 +831,7 @@ async function saveSnapshotRows(month,rows,{quiet=false}={}){
  if(sm.error)throw sm.error;
  snapshots=sm.data||[];
  if(!quiet)$('snapshotStatus').textContent=`已儲存 ${monthLabel(month)} 月份紀錄，共 ${valid.length} 人。`;
- renderChanges();
+ try{renderChanges()}catch(renderErr){console.error('月份畫面更新失敗',renderErr)}
  return true;
 }
 $('saveSnapshotBtn').onclick=async()=>{

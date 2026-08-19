@@ -160,6 +160,52 @@
 .pdf-landscape .pdf-section-title{font-size:17px;margin-bottom:8px}
 .pdf-landscape .pdf-caption{margin-bottom:8px}
 
+
+.pdf-roster-page .pdf-header{margin-bottom:12px}
+.pdf-roster-page .pdf-section-band{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#eaf2ff;border-left:5px solid #2563eb;
+  padding:8px 11px;margin:10px 0 7px;border-radius:4px;
+  font-size:14px;font-weight:900;color:#15366b
+}
+.pdf-roster-page .pdf-section-band small{font-size:10px;color:#64748b;font-weight:700}
+.pdf-roster-page .pdf-table{table-layout:fixed;width:100%;border-collapse:collapse}
+.pdf-roster-page .pdf-table th{background:#edf4ff;color:#173a6b;font-weight:900;text-align:center}
+.pdf-roster-page .pdf-table td{background:#fff}
+.pdf-roster-page .pdf-table tbody tr:nth-child(even) td{background:#fbfdff}
+.pdf-roster-page .pdf-table .center{text-align:center}
+.pdf-roster-page .pdf-table .supervisor-cell{
+  text-align:center;vertical-align:middle;font-weight:900;color:#1d4ed8;background:#f2f7ff
+}
+.pdf-roster-page .pdf-table .dept-cell{font-weight:800;color:#334155}
+.pdf-roster-page .pdf-table.foreign-table th:nth-child(1){width:6%}
+.pdf-roster-page .pdf-table.foreign-table th:nth-child(2){width:8%}
+.pdf-roster-page .pdf-table.foreign-table th:nth-child(3){width:27%}
+.pdf-roster-page .pdf-table.foreign-table th:nth-child(4){width:15%}
+.pdf-roster-page .pdf-table.foreign-table th:nth-child(5){width:14%}
+.pdf-roster-page .pdf-table.foreign-table th:nth-child(6){width:30%}
+.pdf-roster-page .pdf-table.taiwan-table th:nth-child(1){width:8%}
+.pdf-roster-page .pdf-table.taiwan-table th:nth-child(2){width:32%}
+.pdf-roster-page .pdf-table.taiwan-table th:nth-child(3){width:40%}
+.pdf-roster-page .pdf-table.taiwan-table th:nth-child(4){width:20%}
+.pdf-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pdf-detail-box{border:1px solid #dfe7f2;border-radius:12px;padding:12px;background:#fff}
+.pdf-detail-box h3{margin:0 0 9px;font-size:14px;color:#173a6b}
+.pdf-mini-table{width:100%;border-collapse:collapse;font-size:11px}
+.pdf-mini-table th,.pdf-mini-table td{border:1px solid #e2e8f0;padding:6px 8px}
+.pdf-mini-table th{background:#edf4ff;color:#173a6b;text-align:left}
+.pdf-mini-table td:last-child{text-align:right;font-weight:800}
+.pdf-diff-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9.5px}
+.pdf-diff-table th,.pdf-diff-table td{border:1px solid #dfe7f2;padding:5px 6px;vertical-align:top;word-break:break-word}
+.pdf-diff-table th{background:#edf4ff;color:#173a6b;font-weight:900;text-align:center}
+.pdf-diff-table th:nth-child(1){width:12%}
+.pdf-diff-table th:nth-child(2),.pdf-diff-table th:nth-child(3),.pdf-diff-table th:nth-child(4){width:9%}
+.pdf-diff-table th:nth-child(5),.pdf-diff-table th:nth-child(6){width:30.5%}
+.pdf-diff-table .num{text-align:center;font-weight:800}
+.pdf-diff-table .pos{color:#15803d;font-weight:900}
+.pdf-diff-table .neg{color:#b91c1c;font-weight:900}
+.pdf-note{font-size:10px;line-height:1.5;color:#64748b;margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -1289,36 +1335,162 @@ function pdfBarRows(items,color){
     <div style="text-align:right;font-weight:800">${x[1]} 人</div>
    </div>`).join('')}</div>`;
 }
-function pdfPeopleTable(title,caption,rows,headers){
- return `
- <div class="pdf-page pdf-landscape">
-  <div class="pdf-header">
-   <div><div class="pdf-title">${esc(title)}</div><div class="pdf-sub">${esc(caption)}</div></div>
+function pdfReportHeader(title,sub,landscape=true){
+ return `<div class="pdf-header">
+   <div><div class="pdf-title">${esc(title)}</div><div class="pdf-sub">${esc(sub)}</div></div>
    <div class="pdf-brand">狗狗在一起強大｜人員統計系統</div>
-  </div>
-  <div class="pdf-section-title">${esc(title)}</div>
-  <div class="pdf-caption">${esc(caption)}</div>
-  <table class="pdf-table">
-   <thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead>
-   <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c??'')}</td>`).join('')}</tr>`).join('')}</tbody>
-  </table>
-  <div class="pdf-foot">系統匯出時間：${new Date().toLocaleString('zh-TW')}</div>
  </div>`;
 }
-function buildPersonnelPages(data){
- let pages=[];
- let foreignRows=[...data.foreign].sort((a,b)=>personGroup(a).localeCompare(personGroup(b),'zh-Hant')||a.employee_no.localeCompare(b.employee_no))
-  .map(p=>[p.employee_no,p.name,p.shift||'',personGroup(p)||'',p.job_title||'',p.level||'',personType(p)]);
- let localRows=[...data.local].sort((a,b)=>exportWindDept(a).localeCompare(exportWindDept(b),'zh-Hant')||a.employee_no.localeCompare(b.employee_no))
-  .map(p=>[p.employee_no,p.name,exportWindDept(p),p.shift||'',p.job_title||'',p.level||'']);
- let overseasRows=[...data.overseas].sort((a,b)=>exportOverseasDept(a).localeCompare(exportOverseasDept(b),'zh-Hant')||a.employee_no.localeCompare(b.employee_no))
-  .map(p=>[p.employee_no,p.name,exportOverseasDept(p),p.shift||'',p.job_title||'',p.level||'']);
+function pdfFooter(){return `<div class="pdf-foot">系統匯出時間：${new Date().toLocaleString('zh-TW')}</div>`}
+function splitArray(arr,size){let out=[];for(let i=0;i<arr.length;i+=size)out.push(arr.slice(i,i+size));return out}
 
- function chunk(arr,size){let out=[];for(let i=0;i<arr.length;i+=size)out.push(arr.slice(i,i+size));return out}
- chunk(foreignRows,24).forEach((rows,idx)=>pages.push(pdfPeopleTable(`外籍員工名單${foreignRows.length>24?`（${idx+1}）`:''}`,`${monthLabel(data.tm)}｜外籍員工`,rows,['工號','姓名','班別','組別','職別','職級','類型'])));
- chunk(localRows,24).forEach((rows,idx)=>pages.push(pdfPeopleTable(`台籍員工名單－風力事業部${localRows.length>24?`（${idx+1}）`:''}`,`${monthLabel(data.tm)}｜風力事業部`,rows,['工號','姓名','部門','班別','職別','職級'])));
- chunk(overseasRows,24).forEach((rows,idx)=>pages.push(pdfPeopleTable(`台籍員工名單－海外事業部${overseasRows.length>24?`（${idx+1}）`:''}`,`${monthLabel(data.tm)}｜海外事業部`,rows,['工號','姓名','部門','班別','職別','職級'])));
+function foreignGroupData(data){
+ let primary=['捲板','清根','研磨','手焊','電焊'];
+ let extra=[...new Set(data.foreign.map(personGroup).filter(g=>!primary.includes(g)))].sort((a,b)=>a.localeCompare(b,'zh-Hant'));
+ return [...primary,...extra].map(g=>{
+   let people=data.foreign.filter(p=>personGroup(p)===g).sort((a,b)=>
+     String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||a.employee_no.localeCompare(b.employee_no)
+   );
+   let supervisors=activeRows(data.toRows).filter(p=>
+     personType(p)==='台籍'&&!isOverseas(p)&&p.level==='主管'&&supervisorGroupsOf(p).includes(g)
+   ).map(p=>p.name);
+   return{group:g,people,supervisor:[...new Set(supervisors)].join('、')};
+ }).filter(x=>x.people.length);
+}
+function buildForeignPdfPages(data){
+ let pages=[],segments=[];
+ foreignGroupData(data).forEach(g=>{
+   splitArray(g.people,18).forEach((part,idx)=>segments.push({group:g.group,people:part,supervisor:g.supervisor,offset:idx*18,continued:idx>0}));
+ });
+ if(!segments.length){
+   pages.push(`<div class="pdf-page pdf-landscape pdf-roster-page">${pdfReportHeader(`${monthLabel(data.tm)} 外籍員工`,'依 Excel 外籍員工工作表格式')}<div class="empty">本月份沒有外籍員工</div>${pdfFooter()}</div>`);
+   return pages;
+ }
+ let current=[],used=0;
+ segments.forEach(seg=>{
+   let cost=seg.people.length+4;
+   if(current.length&&used+cost>25){pages.push(current);current=[];used=0}
+   current.push(seg);used+=cost;
+ });
+ if(current.length)pages.push(current);
+ return pages.map((pageSegs,pageIndex)=>{
+   let body=pageSegs.map(seg=>{
+     let sup=seg.supervisor||'';
+     let rows=seg.people.map((p,i)=>`<tr>
+       <td class="center">${seg.offset+i+1}</td>
+       <td class="center">${esc(p.shift||'')}</td>
+       <td>${esc(p.job_title||'')}</td>
+       <td class="center">${esc(p.name)}</td>
+       <td class="center">${esc(p.employee_no)}</td>
+       ${i===0?`<td class="supervisor-cell" rowspan="${seg.people.length}">${esc(sup)}</td>`:''}
+     </tr>`).join('');
+     return `<div class="pdf-section-band"><span>${esc(seg.group)}${seg.continued?'（續）':''}</span><small>${seg.people.length} 人</small></div>
+       <table class="pdf-table foreign-table"><thead><tr><th>NO.</th><th>班別</th><th>職別</th><th>姓名</th><th>工號</th><th>台籍主管</th></tr></thead><tbody>${rows}</tbody></table>`;
+   }).join('');
+   return `<div class="pdf-page pdf-landscape pdf-roster-page">
+    ${pdfReportHeader(`${monthLabel(data.tm)} 外籍員工${pages.length>1?`｜${pageIndex+1}/${pages.length}`:''}`,'排序：捲板 → 清根 → 研磨 → 手焊 → 電焊｜台籍主管依負責組別自動帶入')}
+    ${body}${pdfFooter()}</div>`;
+ });
+}
+
+function windSorted(data){
+ const order=['廠長','副廠長','廠務','清根','電焊','手焊','焊接協調','文管'];
+ const idx=v=>{let i=order.indexOf(v);return i<0?999:i};
+ return [...data.local].sort((a,b)=>{
+   let da=exportWindDept(a),db=exportWindDept(b);
+   return idx(da)-idx(db)||da.localeCompare(db,'zh-Hant')||String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||a.employee_no.localeCompare(b.employee_no);
+ });
+}
+function overseasSorted(data){
+ const order=['總經理','副廠長','財務','行政'];
+ const idx=v=>{let i=order.indexOf(v);return i<0?999:i};
+ return [...data.overseas].sort((a,b)=>{
+   let da=exportOverseasDept(a),db=exportOverseasDept(b);
+   return idx(da)-idx(db)||da.localeCompare(db,'zh-Hant')||String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||a.employee_no.localeCompare(b.employee_no);
+ });
+}
+function buildTaiwanPdfPages(data){
+ let pages=[];
+ function sectionPages(title,people,deptFn){
+   let chunks=splitArray(people,28);
+   if(!chunks.length)chunks=[[]];
+   chunks.forEach((part,idx)=>{
+     let offset=idx*28;
+     let rows=part.length?part.map((p,i)=>`<tr>
+       <td class="center">${offset+i+1}</td>
+       <td class="dept-cell">${esc(deptFn(p))}</td>
+       <td>${esc(p.name)}</td>
+       <td class="center">${esc(p.shift||'')}</td>
+     </tr>`).join(''):`<tr><td colspan="4" class="center">目前沒有資料</td></tr>`;
+     pages.push(`<div class="pdf-page pdf-landscape pdf-roster-page">
+       ${pdfReportHeader(`${monthLabel(data.tm)} 台籍員工`,`${title}${chunks.length>1?`｜第 ${idx+1}/${chunks.length} 頁`:''}`)}
+       <div class="pdf-section-band"><span>${esc(title)}</span><small>${people.length} 人</small></div>
+       <table class="pdf-table taiwan-table"><thead><tr><th>NO.</th><th>部門</th><th>員工</th><th>班別</th></tr></thead><tbody>${rows}</tbody></table>
+       ${pdfFooter()}</div>`);
+   });
+ }
+ sectionPages('第一區｜風力事業部',windSorted(data),exportWindDept);
+ sectionPages('第二區｜海外事業部',overseasSorted(data),exportOverseasDept);
  return pages;
+}
+
+function buildMonthCountPdfPage(data){
+ let basic=[
+   ['總人數',data.mainTo.length],
+   ['台籍',data.mainTo.filter(p=>personType(p)==='台籍').length],
+   ['Z',data.mainTo.filter(p=>personType(p)==='Z').length],
+   ['W',data.mainTo.filter(p=>personType(p)==='W').length],
+   ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length],
+   ['海外事業部',data.overseas.length]
+ ];
+ let mini=(title,rows)=>`<div class="pdf-detail-box"><h3>${esc(title)}</h3><table class="pdf-mini-table"><thead><tr><th>項目</th><th>人數</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} 人</td></tr>`).join('')}</tbody></table></div>`;
+ return `<div class="pdf-page pdf-landscape pdf-roster-page">
+   ${pdfReportHeader(`${monthLabel(data.tm)} 月份人數`,'依 Excel「月份人數」工作表整理')}
+   <div class="pdf-detail-grid">
+    ${mini('人員結構',basic)}
+    ${mini('班別人數',data.shiftCounts)}
+   </div>
+   <div style="margin-top:14px">${mini('組別人數',data.groupCounts)}</div>
+   ${pdfFooter()}</div>`;
+}
+
+function diffPdfRows(rows){
+ return rows.map(r=>{
+   let net=r[3],cls=net>0?'pos':net<0?'neg':'';
+   return `<tr><td>${esc(r[0])}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td><td class="num ${cls}">${net>0?'+'+net:net}</td><td>${esc(r[4]||'無')}</td><td>${esc(r[5]||'無')}</td></tr>`;
+ }).join('');
+}
+function buildDiffPdfPages(data){
+ if(!data.fromRows.length){
+   return [`<div class="pdf-page pdf-landscape pdf-roster-page">${pdfReportHeader(`${monthLabel(data.fm)} → ${monthLabel(data.tm)} 人員增減`,'依 Excel「人員增減」工作表整理')}<div class="pdf-section-band"><span>人員增減</span></div><div class="pdf-note">尚未保存 ${esc(monthLabel(data.fm))} 月份紀錄，因此無法計算完整增減。</div>${pdfFooter()}</div>`];
+ }
+ let fr=mainRows(data.fromRows),tr=data.mainTo;
+ let typeRows=[exportDiffRow('總人數',fr,tr),...['台籍','Z','W','建教生'].map(t=>exportDiffRow(t,fr.filter(p=>personType(p)===t),tr.filter(p=>personType(p)===t)))];
+ let groups=[...new Set([...fr.map(personGroup),...tr.map(personGroup)])].filter(Boolean);
+ let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
+ groups.sort((a,b)=>(groupOrder.get(a)??999)-(groupOrder.get(b)??999)||a.localeCompare(b,'zh-Hant'));
+ let groupRows=groups.map(g=>exportDiffRow(g,fr.filter(p=>personGroup(p)===g),tr.filter(p=>personGroup(p)===g)));
+ let pages=[];
+ pages.push(`<div class="pdf-page pdf-landscape pdf-roster-page">
+   ${pdfReportHeader(`${monthLabel(data.fm)} → ${monthLabel(data.tm)} 人員增減`,'分類增減：淨增減＋實際新增／減少工號')}
+   <div class="pdf-section-band"><span>分類增減</span></div>
+   <table class="pdf-diff-table"><thead><tr><th>分類</th><th>前月人數</th><th>本月人數</th><th>淨增減</th><th>新增人員</th><th>減少人員</th></tr></thead><tbody>${diffPdfRows(typeRows)}</tbody></table>
+   <div class="pdf-note">例如 Z +2 時，會在「新增人員／減少人員」中直接列出實際工號。</div>
+   ${pdfFooter()}</div>`);
+ splitArray(groupRows,12).forEach((part,idx)=>pages.push(`<div class="pdf-page pdf-landscape pdf-roster-page">
+   ${pdfReportHeader(`${monthLabel(data.fm)} → ${monthLabel(data.tm)} 人員增減`,`組別增減${groupRows.length>12?`｜第 ${idx+1}/${Math.ceil(groupRows.length/12)} 頁`:''}`)}
+   <div class="pdf-section-band"><span>組別增減</span></div>
+   <table class="pdf-diff-table"><thead><tr><th>組別</th><th>前月人數</th><th>本月人數</th><th>淨增減</th><th>新增／轉入</th><th>減少／轉出</th></tr></thead><tbody>${diffPdfRows(part)}</tbody></table>
+   ${pdfFooter()}</div>`));
+ return pages;
+}
+function buildExcelReferencePdfPages(data){
+ return [
+   ...buildForeignPdfPages(data),
+   ...buildTaiwanPdfPages(data),
+   buildMonthCountPdfPage(data),
+   ...buildDiffPdfPages(data)
+ ];
 }
 function buildSummaryPdfPage(data){
  let totalFrom=mainRows(data.fromRows).length,totalTo=data.mainTo.length;
@@ -1387,7 +1559,7 @@ async function exportMonthPdfReport(){
 
  let wrap=document.createElement('div');
  wrap.className='pdf-export-wrap';
- wrap.innerHTML=buildSummaryPdfPage(data)+buildPersonnelPages(data).join('');
+ wrap.innerHTML=buildSummaryPdfPage(data)+buildExcelReferencePdfPages(data).join('');
  document.body.appendChild(wrap);
 
  try{

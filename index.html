@@ -347,7 +347,13 @@
 
 <div id="resignModal" class="modalback"><div class="modal"><button id="resignClose" class="close">×</button><h2>登記離職</h2><p id="resignWho"></p><div class="formgrid"><div class="field"><label>離職日期 *</label><input id="rDate" type="date"></div><div class="field"><label>原因</label><select id="rReason"><option>個人生涯規劃</option><option>合約到期</option><option>公司調整</option><option>其他</option></select></div><div class="field full"><label>備註</label><textarea id="rNote" rows="3"></textarea></div></div><div class="modalfoot"><button id="resignCancel" class="btn">取消</button><button id="resignSave" class="btn danger">確認離職</button></div></div></div>
 
-<script src="./config.js"></script>
+<script>
+window.APP_CONFIG = {
+  SUPABASE_URL: "https://vswimekyhofckjozcgbf.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_DGQxnFPDoOzQ0UpIOL9tFQ_YmoXbn1S",
+  VIEWER_EMAIL: "cindygirl0714@gmail.com"
+};
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
       onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>

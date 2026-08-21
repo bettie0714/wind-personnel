@@ -422,7 +422,8 @@ function syncSupervisorGroupState(){
 const LEGACY_OVERSEAS_NAMES=['楊天豪','黃銘彥','溫雁淑','蔡英金','莊翊'];
 function isOverseas(p){
  if(!p)return false;
- return isOverseas(p)||LEGACY_OVERSEAS_NAMES.includes(String(p.name||'').trim());
+ const area=String(p.area||'').trim();
+ return area.includes('海外')||LEGACY_OVERSEAS_NAMES.includes(String(p.name||'').trim());
 }
 function inferArea(no,name,rawArea=''){
  let raw=String(rawArea||'').trim();

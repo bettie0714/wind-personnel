@@ -1028,7 +1028,7 @@
 <section id="contracts" class="page">
  <div class="section">
   <div class="sectionhead">
-   <div><h2>外籍合約到期</h2><div class="mini">檢視者可查看；只有管理員可以修改合約日期。</div></div>
+   <div><h2>外籍合約到期</h2><div class="mini">檢視者可查看與匯出；只有管理員可以修改合約日期。</div></div>
    <button id="exportContractExcelBtn" class="btn success">匯出 Excel</button>
   </div>
   <div class="grid4" id="contractKpis"></div>
@@ -1261,9 +1261,11 @@ async function loadAll(){
  contracts=[];
  let fc=await client.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});
  if(fc.error){
-   console.error(fc.error);
-   // 若尚未套用 V29 RLS，檢視者會讀不到；頁面仍可正常使用其他功能。
- }else contracts=fc.data||[];
+   console.error('讀取外籍合約失敗：',fc.error);
+   contracts=[];
+ }else{
+   contracts=fc.data||[];
+ }
  populateFilters();
  renderAll();
 }
@@ -1494,8 +1496,7 @@ function contractRowsFiltered(){
  let typ=$('cType')?.value||'';
  let all=employees.filter(e=>e.status!=='離職'&&/^[WZ]/.test(e.employee_no)&&cmap.has(e.employee_no)).map(e=>({
    ...e,
-   contract_end_date:cmap.get(e.employee_no).contract_end_date,
-   contract_note:cmap.get(e.employee_no).note||''
+   contract_end_date:cmap.get(e.employee_no).contract_end_date
  }));
  let rows=all.filter(e=>{
    let d=contractDays(e.contract_end_date);
@@ -1515,15 +1516,23 @@ function renderContracts(){
  $('contractKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
  $('contractCount').textContent=`共 ${a.length} 人`;
  $('contractBody').innerHTML=a.map(e=>{
-   let d=contractDays(e.contract_end_date),txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`,cls=d<0?'red':d<=30?'orange':'green';
+   let d=contractDays(e.contract_end_date);
+   let txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
+   let cls=d<0?'red':d<=30?'orange':'green';
    return `<tr>
-    <td><b>${esc(e.employee_no)}</b></td><td>${esc(e.name)}</td><td>${e.employee_no[0]}</td>
-    <td>${badge(personGroup(e)||'-')}</td><td>${esc(e.shift||'-')}</td><td>${esc(e.hire_date||'-')}</td>
-    <td><b>${esc(e.contract_end_date)}</b></td><td><span class="badge ${cls}">${txt}</span></td>
+    <td><b>${esc(e.employee_no)}</b></td>
+    <td>${esc(e.name)}</td>
+    <td>${e.employee_no[0]}</td>
+    <td>${badge(personGroup(e)||'-')}</td>
+    <td>${esc(e.shift||'-')}</td>
+    <td>${esc(e.hire_date||'-')}</td>
+    <td><b>${esc(e.contract_end_date)}</b></td>
+    <td><span class="badge ${cls}">${txt}</span></td>
     ${isAdmin()?`<td><button class="btn" onclick="editPerson('${esc(e.employee_no)}')">操作</button></td>`:''}
    </tr>`;
  }).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有符合條件的合約資料</td></tr>`;
 }
+
 async function exportContractExcel(){
  if(!window.ExcelJS||!window.saveAs)return alert('Excel 匯出元件尚未載入完成，請稍後再試。');
  let {rows}=contractRowsFiltered();
@@ -1541,12 +1550,12 @@ async function exportContractExcel(){
  ws.getRow(1).height=28;
 
  ws.mergeCells('A2:I2');
- ws.getCell('A2').value=`匯出時間：${new Date().toLocaleString('zh-TW')}　｜　目前篩選：${$('cRange').selectedOptions[0].textContent} / ${$('cType').value||'全部類型'}`;
+ let rangeText=$('cRange')?.selectedOptions?.[0]?.textContent||'全部';
+ let typeText=$('cType')?.value||'全部類型';
+ ws.getCell('A2').value=`匯出時間：${new Date().toLocaleString('zh-TW')}　｜　篩選：${rangeText} / ${typeText}`;
  ws.getCell('A2').font={name:'Microsoft JhengHei',size:9,color:{argb:'FF64748B'}};
- ws.getCell('A2').alignment={vertical:'middle',horizontal:'left'};
 
- let header=['NO.','工號','姓名','類型','組別','班別','到職日','合約到期日','剩餘天數'];
- ws.addRow(header);
+ ws.addRow(['NO.','工號','姓名','類型','組別','班別','到職日','合約到期日','剩餘天數']);
  rows.forEach((e,i)=>{
    let d=contractDays(e.contract_end_date);
    let remain=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
@@ -1559,34 +1568,52 @@ async function exportContractExcel(){
    cell.font={name:'Microsoft JhengHei',size:10,bold:true,color:{argb:'FF17365D'}};
    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FF'}};
    cell.alignment={vertical:'middle',horizontal:'center'};
-   cell.border={top:{style:'thin',color:{argb:'FFD9E4EF'}},bottom:{style:'thin',color:{argb:'FFD9E4EF'}},left:{style:'thin',color:{argb:'FFD9E4EF'}},right:{style:'thin',color:{argb:'FFD9E4EF'}}};
  });
 
  for(let r=4;r<=ws.rowCount;r++){
-   let row=ws.getRow(r);row.height=21;
+   let row=ws.getRow(r);
+   row.height=21;
    row.eachCell((cell,col)=>{
      cell.font={name:'Microsoft JhengHei',size:10,bold:col===2||col===3,color:{argb:'FF1E293B'}};
-     cell.alignment={vertical:'middle',horizontal:[1,2,4,6,9].includes(col)?'center':'left',wrapText:false};
-     cell.border={bottom:{style:'hair',color:{argb:'FFE5EAF0'}}};
+     cell.alignment={vertical:'middle',horizontal:[1,2,4,6,9].includes(col)?'center':'left'};
      if(r%2===0)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFAFCFF'}};
    });
    let d=contractDays(rows[r-4].contract_end_date);
    if(d<0)row.getCell(9).font={name:'Microsoft JhengHei',size:10,bold:true,color:{argb:'FFB91C1C'}};
    else if(d<=30)row.getCell(9).font={name:'Microsoft JhengHei',size:10,bold:true,color:{argb:'FFD97706'}};
-  }
+ }
 
  ws.columns=[
-   {width:7},{width:13},{width:28},{width:8},{width:14},{width:9},{width:14},{width:16},{width:17}
+  {width:7},{width:13},{width:28},{width:8},{width:14},{width:9},{width:14},{width:16},{width:17}
  ];
  ws.autoFilter={from:'A3',to:`I${ws.rowCount}`};
- ws.pageSetup={paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.3,right:0.3,top:0.5,bottom:0.5,header:0.2,footer:0.2}};
- ws.headerFooter.oddFooter='&L外籍合約到期&R第 &P 頁 / 共 &N 頁';
+ ws.pageSetup={paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0};
 
  let buffer=await workbook.xlsx.writeBuffer();
- let suffix=($('cRange').value||$('cType').value)?'_篩選結果':'';
- saveAs(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`${monthKey()}_外籍合約到期${suffix}.xlsx`);
+ saveAs(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+   `${monthKey()}_外籍合約到期.xlsx`);
 }
 
+function renderOverseas(){
+ let a=overseasCurrent();
+ let k=[
+   ['海外總人數',a.length],
+   ['台籍',a.filter(x=>x.nationality==='台籍').length]
+ ];
+ $('overseasKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
+ $('overseasCount').textContent=`共 ${a.length} 人`;
+ $('overseasBody').innerHTML=a.map(x=>`<tr>
+  <td><b>${esc(x.employee_no)}</b></td>
+  <td>${esc(x.name)}</td>
+  <td>${esc(x.shift||'-')}</td>
+  <td>${badge(personGroup(x)||'-')}</td>
+  <td>${esc(x.job_title||'-')}</td>
+  <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
+  <td>${esc(x.nationality||'-')}</td>
+  <td>${esc(x.hire_date||'-')}</td>
+  ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
+ </tr>`).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有海外事業部人員</td></tr>`;
+}
 
 ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{
  const el=$(id);

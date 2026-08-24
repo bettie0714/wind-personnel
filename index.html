@@ -1500,8 +1500,52 @@ function renderOverseas(){
   ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
  </tr>`).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有海外事業部人員</td></tr>`;
 }
+
+['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{
+ const el=$(id);
+ if(el)el.addEventListener('input',renderPeople);
+});
+document.querySelectorAll('.quick-filter').forEach(b=>b.onclick=()=>{
+ activeTypeFilter=b.dataset.type;
+ syncTypeButtons();
+ renderPeople();
+});
+['cRange','cType','cSearch'].forEach(id=>$(id)?.addEventListener('input',renderContracts));
+$('clearFilters').onclick=()=>{
+ ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{if($(id))$(id).value=''});
+ activeTypeFilter='';
+ syncTypeButtons();
+ renderPeople();
+};
+
+function openPerson(p=null,area=null){
+ if(!isAdmin())return;
+ editNo=p?.employee_no||null;
+ $('personModalTitle').textContent=p?'人員操作':'新增人員';
+ $('mNo').value=p?.employee_no||'';
+ $('mNo').disabled=!!p;
+ $('mName').value=p?.name||'';
+ $('mShift').value=['日','中','夜'].includes(p?.shift)?p.shift:'日';
+ $('mGroup').value=personGroup(p||{})||'捲板';
+ $('mJob').value=p?.job_title||'';
+ $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);
+ renderSupervisorGroupChecks(p?.supervisor_groups||'');
+ $('mNat').value=p?.nationality||'台籍';
+ $('mArea').value=p?(isOverseas(p)?'海外事業部':'本部'):(area||'本部');
+ let fc=contracts.find(c=>c.employee_no===p?.employee_no);
+ $('mHire').value=p?.hire_date||'';
+ $('mContractEnd').value=fc?.contract_end_date||'';
+ $('mStatus').value=p?.status==='留停'?'留停':'在職';
+ $('mNote').value=p?.note||'';
+ $('personModal').classList.add('show');
+}
+
 $('mLevel').addEventListener('change',syncSupervisorGroupState);
-window.editPerson=no=>openPerson(employees.find(x=>x.employee_no===no));$('addBtn').onclick=$('adminAddBtn').onclick=()=>openPerson();$('overseasAddBtn').onclick=()=>openPerson(null,'海外事業部');$('personClose').onclick=$('personCancel').onclick=()=>$('personModal').classList.remove('show');
+window.editPerson=no=>{
+ let p=employees.find(x=>x.employee_no===no);
+ if(!p){alert('找不到這筆人員資料，請重新整理頁面後再試。');return}
+ openPerson(p);
+};$('addBtn').onclick=$('adminAddBtn').onclick=()=>openPerson();$('overseasAddBtn').onclick=()=>openPerson(null,'海外事業部');$('personClose').onclick=$('personCancel').onclick=()=>$('personModal').classList.remove('show');
 $('personSave').onclick=async()=>{let no=normalizeNo($('mNo').value),name=$('mName').value.trim();if(!no||!name){alert('請輸入工號與姓名');return}let old=employees.find(x=>x.employee_no===editNo);let job=$('mJob').value.trim(),payload={employee_no:no,name,shift:$('mShift').value,job_title:job,group_name:deriveGroup(no,job,$('mGroup').value),level:$('mLevel').value||deriveLevel(no,job),supervisor_groups:$('mLevel').value==='主管'?selectedSupervisorGroups().join(','):null,nationality:deriveNationality(no),area:$('mArea').value,hire_date:$('mHire').value||null,status:$('mStatus').value,note:$('mNote').value.trim()||null,updated_by:user.id,updated_at:new Date().toISOString()};if(!old)payload.created_by=user.id;let q=old?db.from('employees').update(payload).eq('employee_no',editNo):db.from('employees').insert(payload);let {error}=await q;if(error){alert(error.message);return}
 let contractEnd=$('mContractEnd').value||null,isForeign=/^[WZ]/.test(no);
 if(isForeign&&contractEnd){let {error:ce}=await db.from('foreign_contracts').upsert({employee_no:no,contract_end_date:contractEnd,updated_by:user.id,updated_at:new Date().toISOString()},{onConflict:'employee_no'});if(ce){alert('人員已儲存，但合約日期儲存失敗：'+ce.message);return}}else{await db.from('foreign_contracts').delete().eq('employee_no',no)}

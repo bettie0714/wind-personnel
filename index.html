@@ -926,7 +926,7 @@
   <button data-page="changes">↗　人員變動</button>
   <button class="admin-only" data-page="admin">⚙　管理後台</button>
   <button data-page="overseas">🌏　海外事業部</button>
-  <button data-page="contracts" class="admin-only">📅　外籍合約到期</button>
+  <button data-page="contracts">📅　外籍合約到期</button>
  </nav>
 </aside>
 <main class="content">
@@ -1025,9 +1025,12 @@
  <div class="section"><div class="sectionhead"><div><h2>海外事業部</h2></div><button id="overseasAddBtn" class="btn primary admin-only">＋ 新增海外人員</button></div><div id="overseasKpis" class="overseas-kpis"></div></div>
  <div class="section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th class="admin-only">操作</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
 </section>
-<section id="contracts" class="page admin-only">
+<section id="contracts" class="page">
  <div class="section">
-  <div class="sectionhead"><div><h2>外籍合約到期</h2><div class="mini">只有管理員可以查看。</div></div></div>
+  <div class="sectionhead">
+ <div><h2>外籍合約到期</h2><div class="mini">檢視者可查看與匯出；只有管理員可以修改合約日期。</div></div>
+ <button id="exportContractExcelBtn" class="btn success">匯出 Excel</button>
+</div>
   <div class="grid4" id="contractKpis"></div>
  </div>
  <div class="section">
@@ -1039,7 +1042,7 @@
  </div>
  <div class="section">
   <div id="contractCount" class="mini" style="margin-bottom:12px"></div>
-  <div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>類型</th><th>組別</th><th>班別</th><th>到職日</th><th>合約到期日</th><th>剩餘天數</th><th>操作</th></tr></thead><tbody id="contractBody"></tbody></table></div>
+  <div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>類型</th><th>組別</th><th>班別</th><th>到職日</th><th>合約到期日</th><th>剩餘天數</th><th class="admin-only">操作</th></tr></thead><tbody id="contractBody"></tbody></table></div>
  </div>
 </section>
 </main>
@@ -1078,8 +1081,20 @@ let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapsho
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function mainCurrent(){return employees.filter(x=>x.status!=='離職'&&!isOverseas(x))}
-function overseasCurrent(){return employees.filter(x=>x.status!=='離職'&&isOverseas(x))}
+function todayISO(){
+ let d=new Date();
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isActiveAsOf(p,asOf=todayISO()){
+ let resign=String(p?.resigned_at||'').slice(0,10);
+ if(resign){
+   // 離職日當天起不再計入；離職日前仍是目前在職人力。
+   return resign>asOf;
+ }
+ return p?.status!=='離職';
+}
+function mainCurrent(){return employees.filter(x=>isActiveAsOf(x)&&!isOverseas(x))}
+function overseasCurrent(){return employees.filter(x=>isActiveAsOf(x)&&isOverseas(x))}
 function isAdmin(){return role==='admin'}
 function normalizeNo(v){return String(v||'').trim().toUpperCase()}
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
@@ -1256,15 +1271,18 @@ async function loadAll(){
    snapshotReady=true;snapshots=sm.data||[];snapshotError='';
  }
  contracts=[];
- if(isAdmin()){
-   let fc=await client.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});
-   if(fc.error)console.error(fc.error);else contracts=fc.data||[];
+ let fc=await client.from('foreign_contracts').select('*').order('contract_end_date',{ascending:true});
+ if(fc.error){
+   console.error('讀取外籍合約失敗：',fc.error);
+   contracts=[];
+ }else{
+   contracts=fc.data||[];
  }
  populateFilters();
  renderAll();
 }
-function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','僅管理員可查看的 W／Z 合約到期資料']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(['admin','contracts'].includes(b.dataset.page)&&!isAdmin())return;showPage(b.dataset.page)});
+function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','查看 W／Z 合約到期日與剩餘天數']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(b.dataset.page==='admin'&&!isAdmin())return;showPage(b.dataset.page)});
 function populateFilters(){
  let gs=[...new Set([...GROUPS,...employees.map(personGroup).filter(Boolean)])].filter(x=>x!=='Z'&&x!=='W');
  $('fGroup').innerHTML='<option value="">全部</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');
@@ -1377,7 +1395,8 @@ function monthDate(m){return `${m}-01`}
 function monthLabel(m){if(!m)return'-';let [y,mo]=m.split('-');return `${y}/${Number(mo)}`}
 function snapshotMonthOf(r){return String(r.snapshot_month||'').slice(0,7)}
 function snapshotRows(m){return snapshots.filter(r=>snapshotMonthOf(r)===m)}
-function activeRows(rows){return rows.filter(x=>x.status!=='離職')}
+function rowsForMonthEnd(m){return m===monthKey()?employees:snapshotRows(m)}
+function activeRows(rows,asOf=todayISO()){return rows.filter(x=>isActiveAsOf(x,asOf))}
 function mainRows(rows){return activeRows(rows).filter(x=>!isOverseas(x))}
 function snapshotMonths(){return [...new Set(snapshots.map(snapshotMonthOf).filter(Boolean))].sort()}
 function previousMonth(m){let [y,mo]=m.split('-').map(Number),d=new Date(y,mo-2,1);return monthKey(d)}
@@ -1453,7 +1472,7 @@ function deriveMonthStartRows(month,endRows){
  return [...map.values()];
 }
 function monthComparisonRows(fm,tm){
- let rawTo=snapshotRows(tm);
+ let rawTo=rowsForMonthEnd(tm);
  let tr=mainRows(rawTo);
  let rawFrom=snapshotRows(fm);
  let derived=!rawFrom.length||fm===tm;
@@ -1556,7 +1575,91 @@ function renderChanges(){
 }
 
 function contractDays(dateStr){if(!dateStr)return null;let today=new Date();today.setHours(0,0,0,0);let d=new Date(dateStr+'T00:00:00');return Math.ceil((d-today)/86400000)}
-function renderContracts(){if(!isAdmin()||!$('contractBody'))return;let cmap=new Map(contracts.map(c=>[c.employee_no,c])),q=($('cSearch').value||'').trim().toLowerCase(),range=$('cRange').value||'',typ=$('cType').value||'';let all=employees.filter(e=>e.status!=='離職'&&/^[WZ]/.test(e.employee_no)&&cmap.has(e.employee_no)).map(e=>({...e,contract_end_date:cmap.get(e.employee_no).contract_end_date}));let a=all.filter(e=>{let d=contractDays(e.contract_end_date);if(typ&&!e.employee_no.startsWith(typ))return false;if(q&&!(e.employee_no+' '+e.name).toLowerCase().includes(q))return false;if(range==='expired'&&!(d<0))return false;if(range&&range!=='expired'&&!(d>=0&&d<=Number(range)))return false;return true}).sort((a,b)=>a.contract_end_date.localeCompare(b.contract_end_date));let ds=all.map(e=>contractDays(e.contract_end_date));let k=[['外籍合約',all.length],['30天內',ds.filter(d=>d>=0&&d<=30).length],['90天內',ds.filter(d=>d>=0&&d<=90).length],['已到期',ds.filter(d=>d<0).length]];$('contractKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');$('contractCount').textContent=`共 ${a.length} 人`;$('contractBody').innerHTML=a.map(e=>{let d=contractDays(e.contract_end_date),txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`,cls=d<0?'red':d<=30?'orange':'green';return `<tr><td><b>${esc(e.employee_no)}</b></td><td>${esc(e.name)}</td><td>${e.employee_no[0]}</td><td>${badge(personGroup(e)||'-')}</td><td>${esc(e.shift||'-')}</td><td>${esc(e.hire_date||'-')}</td><td><b>${esc(e.contract_end_date)}</b></td><td><span class="badge ${cls}">${txt}</span></td><td><button class="btn" onclick="editPerson('${esc(e.employee_no)}')">操作</button></td></tr>`}).join('')||'<tr><td colspan="9" class="empty">目前沒有符合條件的合約資料</td></tr>'}
+function contractRowsFiltered(){
+ let cmap=new Map(contracts.map(c=>[c.employee_no,c]));
+ let q=($('cSearch')?.value||'').trim().toLowerCase();
+ let range=$('cRange')?.value||'';
+ let typ=$('cType')?.value||'';
+ let all=employees
+   .filter(e=>isActiveAsOf(e)&&/^[WZ]/.test(e.employee_no)&&cmap.has(e.employee_no))
+   .map(e=>({...e,contract_end_date:cmap.get(e.employee_no).contract_end_date}));
+
+ let rows=all.filter(e=>{
+   let d=contractDays(e.contract_end_date);
+   if(typ&&!e.employee_no.startsWith(typ))return false;
+   if(q&&!(e.employee_no+' '+e.name+' '+(e.job_title||'')+' '+personGroup(e)).toLowerCase().includes(q))return false;
+   if(range==='expired'&&!(d<0))return false;
+   if(range&&range!=='expired'&&!(d>=0&&d<=Number(range)))return false;
+   return true;
+ }).sort((a,b)=>a.contract_end_date.localeCompare(b.contract_end_date)||a.employee_no.localeCompare(b.employee_no));
+ return{all,rows};
+}
+function renderContracts(){
+ if(!$('contractBody'))return;
+ let {all,rows:a}=contractRowsFiltered();
+ let ds=all.map(e=>contractDays(e.contract_end_date));
+ let k=[['外籍合約',all.length],['30天內',ds.filter(d=>d>=0&&d<=30).length],['90天內',ds.filter(d=>d>=0&&d<=90).length],['已到期',ds.filter(d=>d<0).length]];
+ $('contractKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
+ $('contractCount').textContent=`共 ${a.length} 人`;
+ $('contractBody').innerHTML=a.map(e=>{
+   let d=contractDays(e.contract_end_date);
+   let txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
+   let cls=d<0?'red':d<=30?'orange':'green';
+   return `<tr>
+    <td><b>${esc(e.employee_no)}</b></td>
+    <td>${esc(e.name)}</td>
+    <td>${e.employee_no[0]}</td>
+    <td>${badge(personGroup(e)||'-')}</td>
+    <td>${esc(e.shift||'-')}</td>
+    <td>${esc(e.hire_date||'-')}</td>
+    <td><b>${esc(e.contract_end_date)}</b></td>
+    <td><span class="badge ${cls}">${txt}</span></td>
+    ${isAdmin()?`<td><button class="btn" onclick="editPerson('${esc(e.employee_no)}')">操作</button></td>`:''}
+   </tr>`;
+ }).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有符合條件的合約資料</td></tr>`;
+}
+
+async function exportContractExcel(){
+ if(!window.ExcelJS||!window.saveAs)return alert('Excel 匯出元件尚未載入完成，請稍後再試。');
+ let {rows}=contractRowsFiltered();
+ if(!rows.length)return alert('目前篩選條件沒有可匯出的合約資料。');
+
+ let workbook=new ExcelJS.Workbook();
+ workbook.creator='風力人員統計系統';
+ workbook.created=new Date();
+ let ws=workbook.addWorksheet('外籍合約到期',{views:[{state:'frozen',ySplit:3}]});
+
+ ws.mergeCells('A1:I1');
+ ws.getCell('A1').value='外籍合約到期名單';
+ ws.getCell('A1').font={name:'Microsoft JhengHei',size:16,bold:true,color:{argb:'FF17365D'}};
+ ws.getCell('A1').alignment={vertical:'middle',horizontal:'center'};
+ ws.getRow(1).height=28;
+
+ ws.mergeCells('A2:I2');
+ ws.getCell('A2').value=`匯出時間：${new Date().toLocaleString('zh-TW')}`;
+ ws.getCell('A2').font={name:'Microsoft JhengHei',size:9,color:{argb:'FF64748B'}};
+
+ ws.addRow(['NO.','工號','姓名','類型','組別','班別','到職日','合約到期日','剩餘天數']);
+ rows.forEach((e,i)=>{
+   let d=contractDays(e.contract_end_date);
+   let remain=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
+   ws.addRow([i+1,e.employee_no,e.name,e.employee_no[0],personGroup(e)||'-',e.shift||'-',e.hire_date||'-',e.contract_end_date||'-',remain]);
+ });
+
+ ws.getRow(3).eachCell(cell=>{
+   cell.font={name:'Microsoft JhengHei',size:10,bold:true,color:{argb:'FF17365D'}};
+   cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEAF2FF'}};
+   cell.alignment={vertical:'middle',horizontal:'center'};
+ });
+
+ ws.columns=[{width:7},{width:13},{width:28},{width:8},{width:14},{width:9},{width:14},{width:16},{width:17}];
+ ws.autoFilter={from:'A3',to:`I${ws.rowCount}`};
+ ws.pageSetup={paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0};
+
+ let buffer=await workbook.xlsx.writeBuffer();
+ saveAs(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+   `${monthKey()}_外籍合約到期.xlsx`);
+}
 
 function renderOverseas(){
  let a=overseasCurrent();
@@ -1589,6 +1692,7 @@ document.querySelectorAll('.quick-filter').forEach(b=>b.onclick=()=>{
  renderPeople();
 });
 ['cRange','cType','cSearch'].forEach(id=>$(id)?.addEventListener('input',renderContracts));
+$('exportContractExcelBtn').onclick=exportContractExcel;
 $('clearFilters').onclick=()=>{
  ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{if($(id))$(id).value=''});
  activeTypeFilter='';
@@ -1662,7 +1766,13 @@ $('resignClose').onclick=$('resignCancel').onclick=()=>$('resignModal').classLis
 $('resignSave').onclick=async()=>{
  let p=employees.find(x=>x.employee_no===resignNo),date=$('rDate').value;
  if(!p||!date)return;
- let {error}=await db.from('employees').update({status:'離職',resigned_at:date,updated_by:user.id,updated_at:new Date().toISOString()}).eq('employee_no',p.employee_no);
+ let future=date>todayISO();
+ let {error}=await db.from('employees').update({
+   status:'離職',
+   resigned_at:date,
+   updated_by:user.id,
+   updated_at:new Date().toISOString()
+ }).eq('employee_no',p.employee_no);
  if(error){alert(error.message);return}
 
  let {error:changeError}=await db.from('personnel_changes').insert({
@@ -1681,6 +1791,9 @@ $('resignSave').onclick=async()=>{
  await loadAll();
  await syncCurrentMonthSnapshot();
  renderAll();
+ if(future){
+   alert(`已登記 ${date} 離職。此人員在 ${date} 前仍會計入目前人數，到了離職日才會自動扣除。`);
+ }
 };
 
 
@@ -1698,7 +1811,7 @@ function snapshotPayload(month,p){
    nationality:p.nationality||deriveNationality(p.employee_no),
    area:isOverseas(p)?'海外事業部':'本部',
    hire_date:p.hire_date||null,
-   status:p.status||'在職',
+   status:p.status==='留停'?'留停':'在職',
    note:p.note||null,
    captured_by:user.id
  };
@@ -1916,7 +2029,7 @@ function createDiffSheet(fromRows,toRows,fromMonth,toMonth){
 }
 
 function collectMonthExportData(tm,fm){
- let toRows=snapshotRows(tm),rawFromRows=snapshotRows(fm);
+ let toRows=rowsForMonthEnd(tm),rawFromRows=snapshotRows(fm);
  let {fr,derived}=monthComparisonRows(fm,tm);
  let fromRows=derived?fr:rawFromRows;
  let activeTo=activeRows(toRows),mainTo=mainRows(toRows);

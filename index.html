@@ -1001,7 +1001,7 @@
  </div>
 
  <div class="section">
-  <div class="sectionhead"><div><h2>人員變動紀錄</h2><div class="mini">最新操作優先顯示；日期欄仍是實際生效日期。</div></div><button id="openResignPickerBtn" class="btn danger admin-only">辦理離職</button></div>
+  <div class="sectionhead"><div><h2>人員變動紀錄</h2><div class="mini">最新操作優先顯示；修改紀錄會列出實際變更的欄位與前後內容。</div></div><button id="openResignPickerBtn" class="btn danger admin-only">辦理離職</button></div>
   <div class="tablewrap"><table><thead><tr><th>日期</th><th>類型</th><th>工號</th><th>姓名</th><th>原組別</th><th>新組別</th><th>內容</th></tr></thead><tbody id="changesBody"></tbody></table></div>
  </div>
 </section>
@@ -1053,7 +1053,7 @@
  <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
- <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field admin-only"><label>區域</label><select id="mArea"><option>本部</option><option>海外事業部</option></select></div>
+ <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field admin-only"><label>區域</label><select id="mArea" style="display:none"><option>本部</option><option>海外事業部</option></select></div>
  <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">只供管理員查看，W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
  </div><div class="modalfoot"><span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
@@ -1728,16 +1728,97 @@ window.editPerson=no=>{
  if(!p){alert('找不到這筆人員資料，請重新整理頁面後再試。');return}
  openPerson(p);
 };$('addBtn').onclick=$('adminAddBtn').onclick=()=>openPerson();$('overseasAddBtn').onclick=()=>openPerson(null,'海外事業部');$('personClose').onclick=$('personCancel').onclick=()=>$('personModal').classList.remove('show');
-$('personSave').onclick=async()=>{let no=normalizeNo($('mNo').value),name=$('mName').value.trim();if(!no||!name){alert('請輸入工號與姓名');return}let old=employees.find(x=>x.employee_no===editNo);let job=$('mJob').value.trim(),payload={employee_no:no,name,shift:$('mShift').value,job_title:job,group_name:deriveGroup(no,job,$('mGroup').value),level:$('mLevel').value||deriveLevel(no,job),supervisor_groups:$('mLevel').value==='主管'?selectedSupervisorGroups().join(','):null,nationality:deriveNationality(no),area:$('mArea').value,hire_date:$('mHire').value||null,status:$('mStatus').value,note:$('mNote').value.trim()||null,updated_by:user.id,updated_at:new Date().toISOString()};if(!old)payload.created_by=user.id;let q=old?db.from('employees').update(payload).eq('employee_no',editNo):db.from('employees').insert(payload);let {error}=await q;if(error){alert(error.message);return}
-let contractEnd=$('mContractEnd').value||null,isForeign=/^[WZ]/.test(no);
-if(isForeign&&contractEnd){let {error:ce}=await db.from('foreign_contracts').upsert({employee_no:no,contract_end_date:contractEnd,updated_by:user.id,updated_at:new Date().toISOString()},{onConflict:'employee_no'});if(ce){alert('人員已儲存，但合約日期儲存失敗：'+ce.message);return}}else{await db.from('foreign_contracts').delete().eq('employee_no',no)}
-let type=old?'修改':'新增',detail=old&&old.group_name!==payload.group_name?`調組：${old.group_name||'-'} → ${payload.group_name}`:(old?'資料更新':'新進人員');
-let {error:changeError}=await db.from('personnel_changes').insert({employee_no:no,employee_name:name,change_type:type,old_group:old?.group_name||null,new_group:payload.group_name,detail,created_by:user.id});
-if(changeError)alert('人員資料已儲存，但異動紀錄寫入失敗：'+changeError.message);
-$('personModal').classList.remove('show');
-await loadAll();
-await syncCurrentMonthSnapshot();
-renderAll()
+$('personSave').onclick=async()=>{
+ let no=normalizeNo($('mNo').value),name=$('mName').value.trim();
+ if(!no||!name){alert('請輸入工號與姓名');return}
+
+ let old=employees.find(x=>x.employee_no===editNo);
+ let oldContractEnd=old?(contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null):null;
+ let job=$('mJob').value.trim();
+ let payload={
+   employee_no:no,
+   name,
+   shift:$('mShift').value,
+   job_title:job,
+   group_name:deriveGroup(no,job,$('mGroup').value),
+   level:$('mLevel').value||deriveLevel(no,job),
+   supervisor_groups:$('mLevel').value==='主管'?selectedSupervisorGroups().join(','):null,
+   nationality:deriveNationality(no),
+   area:$('mArea').value,
+   hire_date:$('mHire').value||null,
+   status:$('mStatus').value,
+   note:$('mNote').value.trim()||null,
+   updated_by:user.id,
+   updated_at:new Date().toISOString()
+ };
+ if(!old)payload.created_by=user.id;
+
+ let q=old?db.from('employees').update(payload).eq('employee_no',editNo):db.from('employees').insert(payload);
+ let {error}=await q;
+ if(error){alert(error.message);return}
+
+ let contractEnd=$('mContractEnd').value||null,isForeign=/^[WZ]/.test(no);
+ if(isForeign&&contractEnd){
+   let {error:ce}=await db.from('foreign_contracts').upsert({
+     employee_no:no,
+     contract_end_date:contractEnd,
+     updated_by:user.id,
+     updated_at:new Date().toISOString()
+   },{onConflict:'employee_no'});
+   if(ce){alert('人員已儲存，但合約日期儲存失敗：'+ce.message);return}
+ }else{
+   await db.from('foreign_contracts').delete().eq('employee_no',no)
+ }
+
+ let type=old?'修改':'新增';
+ let detail='新進人員';
+
+ if(old){
+   const show=v=>{
+     if(v===null||v===undefined||String(v).trim()==='')return '—';
+     return String(v).trim();
+   };
+   const normalizeGroups=v=>String(v||'').split(',').map(x=>x.trim()).filter(Boolean).sort().join('、');
+   let diffs=[];
+
+   const addDiff=(label,before,after,formatter=null)=>{
+     let b=formatter?formatter(before):show(before);
+     let a=formatter?formatter(after):show(after);
+     if(b!==a)diffs.push(`${label}：${b} → ${a}`);
+   };
+
+   addDiff('姓名',old.name,payload.name);
+   addDiff('班別',old.shift,payload.shift);
+   addDiff('職別',old.job_title,payload.job_title);
+   addDiff('組別',old.group_name,payload.group_name);
+   addDiff('職級',old.level,payload.level);
+   addDiff('主管負責組別',old.supervisor_groups,payload.supervisor_groups,v=>show(normalizeGroups(v)));
+   addDiff('到職日',old.hire_date,payload.hire_date);
+   addDiff('狀態',old.status,payload.status);
+   addDiff('備註',old.note,payload.note);
+
+   if(isForeign||oldContractEnd){
+     addDiff('外籍合約到期',oldContractEnd,contractEnd);
+   }
+
+   detail=diffs.length?diffs.join('｜'):'無欄位變更';
+ }
+
+ let {error:changeError}=await db.from('personnel_changes').insert({
+   employee_no:no,
+   employee_name:name,
+   change_type:type,
+   old_group:old?.group_name||null,
+   new_group:payload.group_name,
+   detail,
+   created_by:user.id
+ });
+ if(changeError)alert('人員資料已儲存，但異動紀錄寫入失敗：'+changeError.message);
+
+ $('personModal').classList.remove('show');
+ await loadAll();
+ await syncCurrentMonthSnapshot();
+ renderAll()
 };
 function populateResignPicker(){
  let q=$('resignPickerSearch').value.trim().toLowerCase();

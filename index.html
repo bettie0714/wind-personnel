@@ -915,6 +915,264 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 .presence-filter.active{background:#17365d;color:#fff;border-color:#17365d}
 .temp-fields-note{grid-column:1/-1;padding:9px 11px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:12px}
 
+
+/* V41 - people page refresh */
+#people .section.people-filter-shell{
+  padding:0;
+  overflow:hidden;
+  border:1px solid #e7ecf3;
+  box-shadow:0 10px 30px rgba(15,23,42,.055);
+}
+.people-page-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  padding:22px 24px 18px;
+  border-bottom:1px solid #edf1f6;
+  background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);
+}
+.people-page-title{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.people-page-title b{
+  font-size:19px;
+  color:#172033;
+}
+.people-page-title .mini{
+  font-size:12px;
+}
+.people-filter-body{
+  padding:18px 24px 22px;
+}
+.people-search-row{
+  display:grid;
+  grid-template-columns:minmax(280px,1.35fr) repeat(3,minmax(135px,.55fr));
+  gap:10px;
+  align-items:end;
+}
+.people-search-row .field.search{
+  grid-column:auto;
+}
+.people-search-row .field input,
+.people-search-row .field select{
+  height:40px;
+  border-radius:11px;
+  border-color:#dfe5ee;
+  background:#fff;
+  transition:.16s ease;
+}
+.people-search-row .field input:focus,
+.people-search-row .field select:focus{
+  outline:none;
+  border-color:#93b4ff;
+  box-shadow:0 0 0 3px rgba(37,99,235,.08);
+}
+.people-filter-lower{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:16px;
+}
+.filter-block{
+  min-width:0;
+}
+.filter-block-title{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.06em;
+  color:#94a3b8;
+  margin-bottom:8px;
+}
+.identity-segment{
+  display:flex;
+  gap:5px;
+  padding:4px;
+  width:max-content;
+  max-width:100%;
+  flex-wrap:wrap;
+  background:#f3f6fa;
+  border:1px solid #e7ebf1;
+  border-radius:12px;
+}
+.identity-segment .quick-filter{
+  border:0;
+  background:transparent;
+  color:#64748b;
+  padding:7px 12px;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:none;
+}
+.identity-segment .quick-filter:hover{
+  background:rgba(255,255,255,.7);
+}
+.identity-segment .quick-filter.active{
+  background:#fff;
+  color:#1d4ed8;
+  box-shadow:0 2px 8px rgba(15,23,42,.08);
+}
+.presence-cards{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(105px,1fr));
+  gap:8px;
+}
+.presence-card{
+  appearance:none;
+  border:1px solid #e5eaf1;
+  background:#fff;
+  border-radius:12px;
+  padding:10px 12px;
+  text-align:left;
+  color:#334155;
+  transition:.16s ease;
+  min-height:62px;
+}
+.presence-card:hover{
+  transform:translateY(-1px);
+  border-color:#cbd7e7;
+  box-shadow:0 6px 16px rgba(15,23,42,.06);
+}
+.presence-card.active{
+  border-color:#9db9ff;
+  box-shadow:0 0 0 3px rgba(37,99,235,.07);
+  background:#f8fbff;
+}
+.presence-card .presence-top{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:12px;
+  font-weight:800;
+}
+.presence-card .presence-dot{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:#94a3b8;
+  flex:0 0 auto;
+}
+.presence-card[data-presence="支援"] .presence-dot{background:#f59e0b}
+.presence-card[data-presence="返鄉"] .presence-dot{background:#7c3aed}
+.presence-card[data-presence="返校"] .presence-dot{background:#0284c7}
+.presence-card .presence-count{
+  display:block;
+  margin-top:5px;
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+  color:#172033;
+}
+.presence-card .presence-unit{
+  font-size:10px;
+  color:#94a3b8;
+  font-weight:700;
+  margin-left:3px;
+}
+#peopleSummary{
+  margin:0;
+  padding-top:2px;
+}
+#peopleSummary .people-summary-chip{
+  background:transparent;
+  border:0;
+  padding:0;
+  border-radius:0;
+}
+#peopleSummary .people-summary-chip + .people-summary-chip{
+  padding-left:12px;
+  margin-left:4px;
+  border-left:1px solid #e2e8f0;
+}
+.people-list-section{
+  padding:0!important;
+  overflow:hidden;
+}
+.people-list-section .tablewrap{
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+#people table{
+  min-width:980px;
+}
+#people th{
+  background:#f8fafc;
+  color:#64748b;
+  font-size:11px;
+  letter-spacing:.02em;
+  padding-top:12px;
+  padding-bottom:12px;
+}
+#people td{
+  padding-top:12px;
+  padding-bottom:12px;
+}
+#people tbody tr:last-child td{
+  border-bottom:0;
+}
+.people-toolbar-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.people-toolbar-actions .btn{
+  border-radius:10px;
+}
+.people-toolbar-actions #clearFilters{
+  color:#64748b;
+  background:#f8fafc;
+}
+@media(max-width:1100px){
+  .people-search-row{grid-template-columns:repeat(2,1fr)}
+  .people-search-row .field.search{grid-column:1/-1}
+  .people-filter-lower{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .people-page-head{padding:18px;flex-direction:column}
+  .people-filter-body{padding:16px 18px 18px}
+  .people-search-row{grid-template-columns:1fr}
+  .people-search-row .field.search{grid-column:auto}
+  .presence-cards{grid-template-columns:repeat(2,1fr)}
+}
+
+
+.change-log-option{
+  margin-top:14px;
+  padding:12px 14px;
+  border:1px solid #e3e9f1;
+  border-radius:12px;
+  background:#f8fafc;
+}
+.change-log-option label{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-weight:800;
+  color:#334155;
+}
+.change-log-preview{
+  margin-top:8px;
+  color:#64748b;
+  font-size:12px;
+  line-height:1.55;
+}
+.danger-zone{
+  margin-right:auto;
+}
+.btn.soft-danger{
+  background:#fff;
+  color:#b91c1c;
+  border-color:#fecaca;
+}
+.btn.soft-danger:hover{
+  background:#fff1f2;
+}
+
 </style>
 </head>
 <body>
@@ -985,26 +1243,74 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 </section>
 
 <section id="people" class="page">
- <div class="section"><div class="toolbar"><div><b>在職人員</b><div id="peopleCount" class="mini"></div></div><div><button id="clearFilters" class="btn">清除篩選</button><button id="addBtn" class="btn primary admin-only">＋ 新增人員</button></div></div>
-  <div id="peopleSummary" class="people-summary"></div>
-  <div class="filters"><div class="field"><label>組別</label><select id="fGroup"><option value="">全部</option></select></div><div class="field"><label>班別</label><select id="fShift"><option value="">全部</option></select></div><div class="field"><label>職別</label><select id="fJob"><option value="">全部</option></select></div><div class="field"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field"><label>職級</label><select id="fLevel"><option value="">全部</option><option>主管</option><option>員工</option><option>學生</option></select></div><div class="field search"><label>搜尋</label><input id="fSearch" placeholder="工號／姓名／職別"></div></div>
-  <div class="quick-filter-row">
-    <span class="mini">身份篩選：</span>
-    <button class="quick-filter active" data-type="">全部</button>
-    <button class="quick-filter" data-type="台籍">台籍</button>
-    <button class="quick-filter" data-type="Z">Z</button>
-    <button class="quick-filter" data-type="W">W</button>
-    <button class="quick-filter" data-type="建教生">建教生</button>
+ <div class="section people-filter-shell">
+  <div class="people-page-head">
+   <div class="people-page-title">
+    <b>人員名單</b>
+    <div id="peopleCount" class="mini"></div>
+    <div id="peopleSummary" class="people-summary"></div>
+   </div>
+   <div class="people-toolbar-actions">
+    <button id="clearFilters" class="btn">清除篩選</button>
+    <button id="addBtn" class="btn primary admin-only">＋ 新增人員</button>
+   </div>
   </div>
-  <div class="quick-filter-row">
-    <span class="mini">人員動態：</span>
-    <button class="presence-filter active" data-presence="">全部</button>
-    <button class="presence-filter" data-presence="支援">支援</button>
-    <button class="presence-filter" data-presence="返鄉">返鄉</button>
-    <button class="presence-filter" data-presence="返校">建教生返校</button>
+
+  <div class="people-filter-body">
+   <div class="people-search-row">
+    <div class="field search"><label>搜尋人員</label><input id="fSearch" placeholder="輸入工號、姓名、職別或備註"></div>
+    <div class="field"><label>組別</label><select id="fGroup"><option value="">全部組別</option></select></div>
+    <div class="field"><label>班別</label><select id="fShift"><option value="">全部班別</option></select></div>
+    <div class="field"><label>職級</label><select id="fLevel"><option value="">全部職級</option><option>主管</option><option>員工</option><option>學生</option></select></div>
+    <div class="field hidden"><label>職別</label><select id="fJob"><option value="">全部</option></select></div>
+    <div class="field hidden"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div>
+   </div>
+
+   <div class="people-filter-lower">
+    <div class="filter-block">
+     <div class="filter-block-title">身份</div>
+     <div class="identity-segment">
+      <button class="quick-filter active" data-type="">全部</button>
+      <button class="quick-filter" data-type="台籍">台籍</button>
+      <button class="quick-filter" data-type="Z">Z</button>
+      <button class="quick-filter" data-type="W">W</button>
+      <button class="quick-filter" data-type="建教生">建教生</button>
+     </div>
+    </div>
+
+    <div class="filter-block">
+     <div class="filter-block-title">目前動態</div>
+     <div class="presence-cards">
+      <button class="presence-filter presence-card active" data-presence="">
+       <span class="presence-top"><span class="presence-dot"></span>全部</span>
+       <span class="presence-count" data-presence-count="">0<span class="presence-unit">人</span></span>
+      </button>
+      <button class="presence-filter presence-card" data-presence="支援">
+       <span class="presence-top"><span class="presence-dot"></span>支援</span>
+       <span class="presence-count" data-presence-count="支援">0<span class="presence-unit">人</span></span>
+      </button>
+      <button class="presence-filter presence-card" data-presence="返鄉">
+       <span class="presence-top"><span class="presence-dot"></span>返鄉</span>
+       <span class="presence-count" data-presence-count="返鄉">0<span class="presence-unit">人</span></span>
+      </button>
+      <button class="presence-filter presence-card" data-presence="返校">
+       <span class="presence-top"><span class="presence-dot"></span>返校</span>
+       <span class="presence-count" data-presence-count="返校">0<span class="presence-unit">人</span></span>
+      </button>
+     </div>
+    </div>
+   </div>
   </div>
  </div>
- <div class="section"><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>目前動態</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th class="admin-only">區域</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div></div>
+
+ <div class="section people-list-section">
+  <div class="tablewrap">
+   <table>
+    <thead><tr><th>工號</th><th>姓名</th><th>目前動態</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead>
+    <tbody id="peopleBody"></tbody>
+   </table>
+  </div>
+ </div>
 </section>
 
 <section id="changes" class="page">
@@ -1106,7 +1412,16 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
  <div class="field"><label>預計返廠上班日</label><input id="mExpectedReturn" type="date"></div>
  <div class="temp-fields-note">建教生請用「返校」；W／Z 暫時返鄉請用「返鄉」；到預計返廠日當天，系統會自動視為已返廠。支援人員仍計入在職人數。</div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
- </div><div class="modalfoot"><span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
+ <div class="field full change-log-option" id="changeLogOption">
+  <label><input id="mLogChange" type="checkbox"> 記錄到「人員變動」</label>
+  <div id="mChangePreview" class="change-log-preview">尚未偵測到變更。</div>
+ </div>
+ </div><div class="modalfoot">
+   <div class="danger-zone"><button id="personDelete" class="btn soft-danger hidden">永久刪除資料</button></div>
+   <span style="flex:1"></span>
+   <button id="personCancel" class="btn">取消</button>
+   <button id="personSave" class="btn primary">儲存</button>
+ </div></div></div>
 
 <div id="resignPickerModal" class="modalback"><div class="modal"><button id="resignPickerClose" class="close">×</button><h2>辦理離職</h2><p>請先選擇要辦理離職的人員，下一步才會進入確認畫面。</p><div class="formgrid">
  <div class="field full"><label>搜尋人員</label><input id="resignPickerSearch" placeholder="輸入工號、姓名或組別"></div>
@@ -1437,6 +1752,19 @@ function syncTypeButtons(){
  document.querySelectorAll('.quick-filter').forEach(b=>b.classList.toggle('active',b.dataset.type===activeTypeFilter));
  document.querySelectorAll('.presence-filter').forEach(b=>b.classList.toggle('active',b.dataset.presence===activePresenceFilter));
 }
+function renderPresenceCounts(){
+ let source=employmentCurrent();
+ let counts={
+   '':mainCurrent().length,
+   '支援':source.filter(x=>currentTempStatus(x)==='支援').length,
+   '返鄉':source.filter(x=>currentTempStatus(x)==='返鄉').length,
+   '返校':source.filter(x=>currentTempStatus(x)==='返校').length
+ };
+ document.querySelectorAll('[data-presence-count]').forEach(el=>{
+   let key=el.dataset.presenceCount||'';
+   el.innerHTML=`${counts[key]||0}<span class="presence-unit">人</span>`;
+ });
+}
 function filtered(){
  let q=$('fSearch').value.trim().toLowerCase();
  let source=activePresenceFilter==='返校'?employmentCurrent():mainCurrent();
@@ -1453,17 +1781,21 @@ function filtered(){
 }
 function renderPeople(){
  let a=filtered();
- $('peopleCount').textContent=`共 ${a.length} 人`;
+ renderPresenceCounts();
+ $('peopleCount').textContent=activePresenceFilter
+   ? `目前篩選：${activePresenceFilter}｜共 ${a.length} 人`
+   : `目前顯示 ${a.length} 人`;
+
  let local=a.filter(x=>personType(x)==='台籍').length,
      z=a.filter(x=>personType(x)==='Z').length,
      w=a.filter(x=>personType(x)==='W').length,
      student=a.filter(x=>personType(x)==='建教生').length;
+
  $('peopleSummary').innerHTML=[
-   ['目前顯示',a.length],
    ['台籍',local],
    ['Z',z],
    ['W',w],
-   ['學生',student]
+   ['建教生',student]
  ].map(x=>`<div class="people-summary-chip"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
 
  $('peopleBody').innerHTML=a.map(x=>{
@@ -1478,12 +1810,11 @@ function renderPeople(){
     <td>${esc(x.job_title||'-')}</td>
     <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
     <td>${esc(x.nationality||'-')}</td>
-    ${isAdmin()?`<td>${isOverseas(x)?'海外事業部':'本部'}</td>`:''}
     <td>${esc(x.hire_date||'-')}</td>
     <td>${tenure(x.hire_date)}</td>
     ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="${isAdmin()?12:10}" class="empty">沒有符合條件的人員</td></tr>`;
+ }).join('')||`<tr><td colspan="${isAdmin()?11:10}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -1846,7 +2177,7 @@ function openPerson(p=null,area=null){
  editNo=p?.employee_no||null;
  $('personModalTitle').textContent=p?'人員操作':'新增人員';
  $('mNo').value=p?.employee_no||'';
- $('mNo').disabled=!!p;
+ $('mNo').disabled=false;
  $('mName').value=p?.name||'';
  $('mShift').value=['日','中','夜'].includes(p?.shift)?p.shift:'日';
  $('mGroup').value=personGroup(p||{})||'捲板';
@@ -1863,7 +2194,10 @@ function openPerson(p=null,area=null){
  $('mTempStart').value=p?.temporary_start_date||'';
  $('mExpectedReturn').value=p?.expected_return_date||'';
  $('mNote').value=p?.note||'';
+ $('personDelete').classList.toggle('hidden',!p);
+ $('mLogChange').checked=!p;
  syncTempFields();
+ refreshChangePreview();
  $('personModal').classList.add('show');
 }
 
@@ -1885,23 +2219,11 @@ window.editPerson=no=>{
  if(!p){alert('找不到這筆人員資料，請重新整理頁面後再試。');return}
  openPerson(p);
 };$('addBtn').onclick=$('adminAddBtn').onclick=()=>openPerson();$('overseasAddBtn').onclick=()=>openPerson(null,'海外事業部');$('personClose').onclick=$('personCancel').onclick=()=>$('personModal').classList.remove('show');
-$('personSave').onclick=async()=>{
- let no=normalizeNo($('mNo').value),name=$('mName').value.trim();
- if(!no||!name){alert('請輸入工號與姓名');return}
 
- let old=employees.find(x=>x.employee_no===editNo);
- let oldContractEnd=old?(contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null):null;
- let job=$('mJob').value.trim();
+function personDraft(){
+ let no=normalizeNo($('mNo').value),name=$('mName').value.trim(),job=$('mJob').value.trim();
  let tempStatus=$('mTempStatus').value||null;
- let tempStart=$('mTempStart').value||null;
- let expectedReturn=$('mExpectedReturn').value||null;
-
- if(tempStatus==='返校'&&!no.startsWith('X'))return alert('「返校」只適用建教生（X 工號）。');
- if(tempStatus==='返鄉'&&!/^[WZ]/.test(no))return alert('「返鄉」只適用 W／Z 外籍人員。');
- if(tempStatus&&(tempStart||expectedReturn)&&tempStart&&expectedReturn&&expectedReturn<=tempStart)
-   return alert('預計返廠上班日必須晚於開始日。');
-
- let payload={
+ return{
    employee_no:no,
    name,
    shift:$('mShift').value,
@@ -1915,18 +2237,112 @@ $('personSave').onclick=async()=>{
    status:$('mStatus').value,
    note:$('mNote').value.trim()||null,
    temporary_status:tempStatus,
-   temporary_start_date:tempStatus?tempStart:null,
-   expected_return_date:tempStatus?expectedReturn:null,
+   temporary_start_date:tempStatus?($('mTempStart').value||null):null,
+   expected_return_date:tempStatus?($('mExpectedReturn').value||null):null,
+   contract_end_date:$('mContractEnd').value||null
+ };
+}
+function personDiffs(old,draft){
+ if(!old)return ['新進人員'];
+ const show=v=>{
+   if(v===null||v===undefined||String(v).trim()==='')return '—';
+   return String(v).trim();
+ };
+ const normalizeGroups=v=>String(v||'').split(',').map(x=>x.trim()).filter(Boolean).sort().join('、');
+ let oldContract=contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null;
+ let diffs=[];
+ const add=(label,b,a,formatter=null)=>{
+   let before=formatter?formatter(b):show(b),after=formatter?formatter(a):show(a);
+   if(before!==after)diffs.push(`${label}：${before} → ${after}`);
+ };
+ add('工號',old.employee_no,draft.employee_no);
+ add('姓名',old.name,draft.name);
+ add('班別',old.shift,draft.shift);
+ add('職別',old.job_title,draft.job_title);
+ add('組別',old.group_name,draft.group_name);
+ add('職級',old.level,draft.level);
+ add('主管負責組別',old.supervisor_groups,draft.supervisor_groups,v=>show(normalizeGroups(v)));
+ add('到職日',old.hire_date,draft.hire_date);
+ add('狀態',old.status,draft.status);
+ add('備註',old.note,draft.note);
+ add('人員動態',old.temporary_status,draft.temporary_status);
+ add('動態開始日',old.temporary_start_date,draft.temporary_start_date);
+ add('預計返廠上班日',old.expected_return_date,draft.expected_return_date);
+ if(/^[WZ]/.test(draft.employee_no)||oldContract)add('外籍合約到期',oldContract,draft.contract_end_date);
+ return diffs;
+}
+function importantChange(old,draft,diffs){
+ if(!old)return true;
+ if(!diffs.length)return false;
+ if(old.employee_no!==draft.employee_no)return true;
+ if(old.group_name!==draft.group_name)return true;
+ if(old.shift!==draft.shift)return true;
+ if(String(old.temporary_status||'')!==String(draft.temporary_status||''))return true;
+ let oldContract=contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null;
+ if(String(oldContract||'')!==String(draft.contract_end_date||''))return true;
+ return false;
+}
+function refreshChangePreview(){
+ let old=employees.find(x=>x.employee_no===editNo);
+ let draft=personDraft();
+ let diffs=personDiffs(old,draft);
+ $('mChangePreview').textContent=diffs.length?`本次變更：${diffs.join('｜')}`:'沒有欄位變更，不會建立人員變動紀錄。';
+ $('mLogChange').disabled=!diffs.length;
+ if(!diffs.length)$('mLogChange').checked=false;
+ else if(old)$('mLogChange').checked=importantChange(old,draft,diffs);
+}
+['mNo','mName','mShift','mGroup','mJob','mLevel','mHire','mContractEnd','mStatus','mTempStatus','mTempStart','mExpectedReturn','mNote']
+ .forEach(id=>$(id)?.addEventListener('input',refreshChangePreview));
+
+$('personSave').onclick=async()=>{
+ let draft=personDraft(),no=draft.employee_no,name=draft.name;
+ if(!no||!name){alert('請輸入工號與姓名');return}
+
+ let old=employees.find(x=>x.employee_no===editNo);
+ let oldNo=old?.employee_no||null;
+ let tempStatus=draft.temporary_status,tempStart=draft.temporary_start_date,expectedReturn=draft.expected_return_date;
+
+ if(tempStatus==='返校'&&!no.startsWith('X'))return alert('「返校」只適用建教生（X 工號）。');
+ if(tempStatus==='返鄉'&&!/^[WZ]/.test(no))return alert('「返鄉」只適用 W／Z 外籍人員。');
+ if(tempStatus&&tempStart&&expectedReturn&&expectedReturn<=tempStart)return alert('預計返廠上班日必須晚於開始日。');
+
+ let diffs=personDiffs(old,draft);
+ if(old && oldNo!==no){
+   let exists=employees.some(x=>x.employee_no===no && x.employee_no!==oldNo);
+   if(exists)return alert(`工號 ${no} 已經存在，請確認是不是重複資料。`);
+
+   let {error:renameError}=await db.rpc('admin_rename_employee',{p_old_no:oldNo,p_new_no:no});
+   if(renameError){alert('工號修改失敗：'+renameError.message);return}
+   old={...old,employee_no:no};
+   editNo=no;
+ }
+
+ let payload={
+   employee_no:no,
+   name,
+   shift:draft.shift,
+   job_title:draft.job_title,
+   group_name:draft.group_name,
+   level:draft.level,
+   supervisor_groups:draft.supervisor_groups,
+   nationality:draft.nationality,
+   area:draft.area,
+   hire_date:draft.hire_date,
+   status:draft.status,
+   note:draft.note,
+   temporary_status:draft.temporary_status,
+   temporary_start_date:draft.temporary_start_date,
+   expected_return_date:draft.expected_return_date,
    updated_by:user.id,
    updated_at:new Date().toISOString()
  };
  if(!old)payload.created_by=user.id;
 
- let q=old?db.from('employees').update(payload).eq('employee_no',editNo):db.from('employees').insert(payload);
+ let q=old?db.from('employees').update(payload).eq('employee_no',no):db.from('employees').insert(payload);
  let {error}=await q;
  if(error){alert(error.message);return}
 
- let contractEnd=$('mContractEnd').value||null,isForeign=/^[WZ]/.test(no);
+ let contractEnd=draft.contract_end_date,isForeign=/^[WZ]/.test(no);
  if(isForeign&&contractEnd){
    let {error:ce}=await db.from('foreign_contracts').upsert({
      employee_no:no,
@@ -1939,68 +2355,64 @@ $('personSave').onclick=async()=>{
    await db.from('foreign_contracts').delete().eq('employee_no',no)
  }
 
- let type=old?'修改':'新增';
- let oldTemp=String(old?.temporary_status||'');
- let newTemp=String(payload.temporary_status||'');
- if(old&&oldTemp!==newTemp){
-   if(newTemp==='返校')type='返校';
-   else if(newTemp==='返鄉')type='返鄉';
-   else if(newTemp==='支援')type='支援';
-   else if(!newTemp&&['返校','返鄉'].includes(oldTemp))type='返廠';
-   else if(!newTemp&&oldTemp==='支援')type='支援結束';
- }
- let detail='新進人員';
+ if(diffs.length && $('mLogChange').checked){
+   let type=old?'修改':'新增';
+   let oldTemp=String(old?.temporary_status||'');
+   let newTemp=String(payload.temporary_status||'');
 
- if(old){
-   const show=v=>{
-     if(v===null||v===undefined||String(v).trim()==='')return '—';
-     return String(v).trim();
-   };
-   const normalizeGroups=v=>String(v||'').split(',').map(x=>x.trim()).filter(Boolean).sort().join('、');
-   let diffs=[];
-
-   const addDiff=(label,before,after,formatter=null)=>{
-     let b=formatter?formatter(before):show(before);
-     let a=formatter?formatter(after):show(after);
-     if(b!==a)diffs.push(`${label}：${b} → ${a}`);
-   };
-
-   addDiff('姓名',old.name,payload.name);
-   addDiff('班別',old.shift,payload.shift);
-   addDiff('職別',old.job_title,payload.job_title);
-   addDiff('組別',old.group_name,payload.group_name);
-   addDiff('職級',old.level,payload.level);
-   addDiff('主管負責組別',old.supervisor_groups,payload.supervisor_groups,v=>show(normalizeGroups(v)));
-   addDiff('到職日',old.hire_date,payload.hire_date);
-   addDiff('狀態',old.status,payload.status);
-   addDiff('備註',old.note,payload.note);
-   addDiff('人員動態',old.temporary_status,payload.temporary_status);
-   addDiff('動態開始日',old.temporary_start_date,payload.temporary_start_date);
-   addDiff('預計返廠上班日',old.expected_return_date,payload.expected_return_date);
-
-   if(isForeign||oldContractEnd){
-     addDiff('外籍合約到期',oldContractEnd,contractEnd);
+   if(old&&oldTemp!==newTemp){
+     if(newTemp==='返校')type='返校';
+     else if(newTemp==='返鄉')type='返鄉';
+     else if(newTemp==='支援')type='支援';
+     else if(!newTemp&&['返校','返鄉'].includes(oldTemp))type='返廠';
+     else if(!newTemp&&oldTemp==='支援')type='支援結束';
+   }else if(old && old.group_name!==payload.group_name){
+     type='調組';
+   }else if(oldNo && oldNo!==no){
+     type='工號更正';
    }
 
-   detail=diffs.length?diffs.join('｜'):'無欄位變更';
+   let {error:changeError}=await db.from('personnel_changes').insert({
+     employee_no:no,
+     employee_name:name,
+     change_type:type,
+     old_group:old?.group_name||null,
+     new_group:payload.group_name,
+     detail:diffs.join('｜'),
+     created_by:user.id
+   });
+   if(changeError)alert('人員資料已儲存，但異動紀錄寫入失敗：'+changeError.message);
  }
-
- let {error:changeError}=await db.from('personnel_changes').insert({
-   employee_no:no,
-   employee_name:name,
-   change_type:type,
-   old_group:old?.group_name||null,
-   new_group:payload.group_name,
-   detail,
-   created_by:user.id
- });
- if(changeError)alert('人員資料已儲存，但異動紀錄寫入失敗：'+changeError.message);
 
  $('personModal').classList.remove('show');
  await loadAll();
  await syncCurrentMonthSnapshot();
- renderAll()
+ renderAll();
 };
+
+$('personDelete').onclick=async()=>{
+ if(!isAdmin()||!editNo)return;
+ let p=employees.find(x=>x.employee_no===editNo);
+ if(!p)return alert('找不到這筆人員資料。');
+
+ let confirmText=prompt(
+   `這會永久刪除 ${p.employee_no}｜${p.name} 的人員資料，並清除這個工號的月份快照與人員異動紀錄。\n\n`+
+   `這不是「離職」，刪除後無法從系統還原。\n\n`+
+   `若確定要刪除，請輸入工號 ${p.employee_no}`
+ );
+ if(confirmText===null)return;
+ if(normalizeNo(confirmText)!==p.employee_no)return alert('工號輸入不符，已取消刪除。');
+
+ let {error}=await db.rpc('admin_delete_employee',{p_employee_no:p.employee_no});
+ if(error){alert('刪除失敗：'+error.message);return}
+
+ $('personModal').classList.remove('show');
+ await loadAll();
+ await syncCurrentMonthSnapshot();
+ renderAll();
+ alert(`${p.employee_no}｜${p.name} 已永久刪除。`);
+};
+
 function populateResignPicker(){
  let q=$('resignPickerSearch').value.trim().toLowerCase();
  let list=mainCurrent().filter(p=>{
@@ -3139,21 +3551,9 @@ $('importBtn').onclick=async()=>{
      if(error)throw error;
    }
 
-   // 正式取代視為基準資料，不把每個人都列為「人員變動」。
-   if(!replacing){
-     let logRows=uniqueRows.map(r=>({
-       employee_no:r.employee_no,
-       employee_name:r.name,
-       change_type:'Excel匯入',
-       new_group:r.group_name,
-       detail:'Excel 批次匯入／更新',
-       created_by:user.id
-     }));
-     for(let i=0;i<logRows.length;i+=200){
-       let {error}=await db.from('personnel_changes').insert(logRows.slice(i,i+200));
-       if(error)throw error;
-     }
-   }
+
+   // Excel 匯入只負責同步人員資料，不再為每一列建立瑣碎的人員變動紀錄。
+   // 真正重要的異動由人員編輯時的「記錄到人員變動」勾選決定。
 
    $('uploadStatus').textContent=replacing
      ?`完成：已用正式 Excel 取代目前資料，共 ${uniqueRows.length} 人。`

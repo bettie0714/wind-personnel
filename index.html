@@ -896,6 +896,25 @@ tr.supporting-row td:first-child{
   vertical-align:middle;
 }
 
+
+/* V39 temporary status */
+tr.supporting-row td{background:#fff7d6 !important}
+tr.supporting-row td:first-child{box-shadow:inset 4px 0 0 #d97706}
+tr.homeleave-row td{background:#f4ecff !important}
+tr.homeleave-row td:first-child{box-shadow:inset 4px 0 0 #7c3aed}
+tr.school-row td{background:#eaf7ff !important}
+tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
+.temp-badge{
+ display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:3px 8px;
+ border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap
+}
+.temp-badge.support{background:#f59e0b;color:white}
+.temp-badge.homeleave{background:#7c3aed;color:white}
+.temp-badge.school{background:#0284c7;color:white}
+.temp-detail{font-size:11px;color:#64748b;margin-top:4px;white-space:nowrap}
+.presence-filter.active{background:#17365d;color:#fff;border-color:#17365d}
+.temp-fields-note{grid-column:1/-1;padding:9px 11px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:12px}
+
 </style>
 </head>
 <body>
@@ -970,15 +989,22 @@ tr.supporting-row td:first-child{
   <div id="peopleSummary" class="people-summary"></div>
   <div class="filters"><div class="field"><label>組別</label><select id="fGroup"><option value="">全部</option></select></div><div class="field"><label>班別</label><select id="fShift"><option value="">全部</option></select></div><div class="field"><label>職別</label><select id="fJob"><option value="">全部</option></select></div><div class="field"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field"><label>職級</label><select id="fLevel"><option value="">全部</option><option>主管</option><option>員工</option><option>學生</option></select></div><div class="field search"><label>搜尋</label><input id="fSearch" placeholder="工號／姓名／職別"></div></div>
   <div class="quick-filter-row">
-    <span class="mini">快速篩選：</span>
+    <span class="mini">身份篩選：</span>
     <button class="quick-filter active" data-type="">全部</button>
     <button class="quick-filter" data-type="台籍">台籍</button>
     <button class="quick-filter" data-type="Z">Z</button>
     <button class="quick-filter" data-type="W">W</button>
     <button class="quick-filter" data-type="建教生">建教生</button>
   </div>
+  <div class="quick-filter-row">
+    <span class="mini">人員動態：</span>
+    <button class="presence-filter active" data-presence="">全部</button>
+    <button class="presence-filter" data-presence="支援">支援</button>
+    <button class="presence-filter" data-presence="返鄉">返鄉</button>
+    <button class="presence-filter" data-presence="返校">建教生返校</button>
+  </div>
  </div>
- <div class="section"><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th class="admin-only">區域</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div></div>
+ <div class="section"><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>目前動態</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th class="admin-only">區域</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead><tbody id="peopleBody"></tbody></table></div></div>
 </section>
 
 <section id="changes" class="page">
@@ -1074,7 +1100,11 @@ tr.supporting-row td:first-child{
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
  <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field admin-only"><label>區域</label><select id="mArea" style="display:none"><option>本部</option><option>海外事業部</option></select></div>
- <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">只供管理員查看，W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
+ <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
+ <div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div>
+ <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div>
+ <div class="field"><label>預計返廠上班日</label><input id="mExpectedReturn" type="date"></div>
+ <div class="temp-fields-note">建教生請用「返校」；W／Z 暫時返鄉請用「返鄉」；到預計返廠日當天，系統會自動視為已返廠。支援人員仍計入在職人數。</div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
  </div><div class="modalfoot"><span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button></div></div></div>
 
@@ -1097,7 +1127,7 @@ tr.supporting-row td:first-child{
 const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","建教生","未分類"];
 const cfg=window.APP_CONFIG||{};
-let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='';
+let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='';
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -1113,8 +1143,42 @@ function isActiveAsOf(p,asOf=todayISO()){
  }
  return p?.status!=='離職';
 }
-function mainCurrent(){return employees.filter(x=>isActiveAsOf(x)&&!isOverseas(x))}
-function overseasCurrent(){return employees.filter(x=>isActiveAsOf(x)&&isOverseas(x))}
+function tempStatusActive(p,kind=null,asOf=todayISO()){
+ let status=String(p?.temporary_status||'').trim();
+ if(!status)return false;
+ if(kind&&status!==kind)return false;
+ let start=String(p?.temporary_start_date||'').slice(0,10);
+ let back=String(p?.expected_return_date||'').slice(0,10);
+ if(start&&asOf<start)return false;
+ // 預計返廠日當天起，就視為已返廠。
+ if(back&&asOf>=back)return false;
+ return true;
+}
+function legacySupport(p){
+ return !p?.temporary_status && /支援/.test(String(p?.note||''));
+}
+function isSupporting(p,asOf=todayISO()){return tempStatusActive(p,'支援',asOf)||legacySupport(p)}
+function isHomeLeave(p,asOf=todayISO()){return tempStatusActive(p,'返鄉',asOf)}
+function isSchoolAway(p,asOf=todayISO()){return tempStatusActive(p,'返校',asOf)}
+function employmentCurrent(){return employees.filter(x=>isActiveAsOf(x)&&!isOverseas(x))}
+function mainCurrent(){return employmentCurrent().filter(x=>!isSchoolAway(x))}
+function overseasCurrent(){return employees.filter(x=>isActiveAsOf(x)&&isOverseas(x)&&!isSchoolAway(x))}
+function currentTempStatus(p,asOf=todayISO()){
+ if(isSupporting(p,asOf))return '支援';
+ if(isHomeLeave(p,asOf))return '返鄉';
+ if(isSchoolAway(p,asOf))return '返校';
+ return '';
+}
+function tempStatusHtml(p){
+ let st=currentTempStatus(p);
+ if(!st)return '<span class="mini">—</span>';
+ let back=String(p.expected_return_date||'').slice(0,10);
+ let start=String(p.temporary_start_date||'').slice(0,10);
+ let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
+ let label=st==='返鄉'?'返鄉中':st==='返校'?'返校中':'支援中';
+ let detail=back?`預計 ${back} 返廠`:start?`自 ${start}`:'';
+ return `<span class="temp-badge ${cls}">${label}</span>${detail?`<div class="temp-detail">${esc(detail)}</div>`:''}`;
+}
 function isAdmin(){return role==='admin'}
 function normalizeNo(v){return String(v||'').trim().toUpperCase()}
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
@@ -1187,7 +1251,9 @@ function tenure(date){if(!date)return'-';let d=new Date(date+'T00:00:00'),now=ne
 function badge(v){return `<span class="badge ${v==='主管'?'orange':'blue'}">${esc(v)}</span>`}
 function changeBadge(t){
  t=String(t||'');
- let cls=t.includes('離職')?'red':t.includes('新增')||t.includes('匯入')?'green':'blue';
+ let cls=t.includes('離職')?'red':
+   (t.includes('新增')||t.includes('匯入')||t==='返廠')?'green':
+   (t==='返鄉'||t==='返校')?'orange':'blue';
  return `<span class="badge ${cls}">${esc(t||'-')}</span>`;
 }
 
@@ -1362,21 +1428,27 @@ function renderDash(){
 function openTypeList(type){
  showPage('people');
  activeTypeFilter=type;
+ activePresenceFilter='';
  ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>$(id).value='');
  syncTypeButtons();
  renderPeople();
 }
-function syncTypeButtons(){document.querySelectorAll('.quick-filter').forEach(b=>b.classList.toggle('active',b.dataset.type===activeTypeFilter))}
+function syncTypeButtons(){
+ document.querySelectorAll('.quick-filter').forEach(b=>b.classList.toggle('active',b.dataset.type===activeTypeFilter));
+ document.querySelectorAll('.presence-filter').forEach(b=>b.classList.toggle('active',b.dataset.presence===activePresenceFilter));
+}
 function filtered(){
  let q=$('fSearch').value.trim().toLowerCase();
- return mainCurrent().filter(x=>
+ let source=activePresenceFilter==='返校'?employmentCurrent():mainCurrent();
+ return source.filter(x=>
    (!$('fGroup').value||personGroup(x)===$('fGroup').value)&&
    (!$('fShift').value||x.shift===$('fShift').value)&&
    (!$('fJob').value||x.job_title===$('fJob').value)&&
    (!$('fNat').value||x.nationality===$('fNat').value)&&
    (!$('fLevel').value||x.level===$('fLevel').value)&&
    (!activeTypeFilter||personType(x)===activeTypeFilter)&&
-   (!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')).toLowerCase().includes(q))
+   (!activePresenceFilter||currentTempStatus(x)===activePresenceFilter)&&
+   (!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')+' '+(x.note||'')).toLowerCase().includes(q))
  )
 }
 function renderPeople(){
@@ -1393,19 +1465,25 @@ function renderPeople(){
    ['W',w],
    ['學生',student]
  ].map(x=>`<div class="people-summary-chip"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
- $('peopleBody').innerHTML=a.map(x=>{let supporting=/支援/.test(String(x.note||''));return `<tr class="${supporting?'supporting-row':''}">
-  <td><b>${esc(x.employee_no)}</b></td>
-  <td>${esc(x.name)}${supporting?'<span class="supporting-badge">支援中</span>':''}</td>
-  <td>${esc(x.shift||'-')}</td>
-  <td>${badge(personGroup(x)||'-')}</td>
-  <td>${esc(x.job_title||'-')}</td>
-  <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
-  <td>${esc(x.nationality||'-')}</td>
-  ${isAdmin()?`<td>${isOverseas(x)?'海外事業部':'本部'}</td>`:''}
-  <td>${esc(x.hire_date||'-')}</td>
-  <td>${tenure(x.hire_date)}</td>
-  ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
- </tr>`}).join('')||`<tr><td colspan="${isAdmin()?11:9}" class="empty">沒有符合條件的人員</td></tr>`;
+
+ $('peopleBody').innerHTML=a.map(x=>{
+   let st=currentTempStatus(x);
+   let rowClass=st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
+   return `<tr class="${rowClass}">
+    <td><b>${esc(x.employee_no)}</b></td>
+    <td>${esc(x.name)}</td>
+    <td>${tempStatusHtml(x)}</td>
+    <td>${esc(x.shift||'-')}</td>
+    <td>${badge(personGroup(x)||'-')}</td>
+    <td>${esc(x.job_title||'-')}</td>
+    <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
+    <td>${esc(x.nationality||'-')}</td>
+    ${isAdmin()?`<td>${isOverseas(x)?'海外事業部':'本部'}</td>`:''}
+    <td>${esc(x.hire_date||'-')}</td>
+    <td>${tenure(x.hire_date)}</td>
+    ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
+   </tr>`;
+ }).join('')||`<tr><td colspan="${isAdmin()?12:10}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -1416,7 +1494,7 @@ function monthLabel(m){if(!m)return'-';let [y,mo]=m.split('-');return `${y}/${Nu
 function snapshotMonthOf(r){return String(r.snapshot_month||'').slice(0,7)}
 function snapshotRows(m){return snapshots.filter(r=>snapshotMonthOf(r)===m)}
 function rowsForMonthEnd(m){return m===monthKey()?employees:snapshotRows(m)}
-function activeRows(rows,asOf=todayISO()){return rows.filter(x=>isActiveAsOf(x,asOf))}
+function activeRows(rows,asOf=todayISO()){return rows.filter(x=>isActiveAsOf(x,asOf)&&!isSchoolAway(x,asOf))}
 function mainRows(rows){return activeRows(rows).filter(x=>!isOverseas(x))}
 function snapshotMonths(){return [...new Set(snapshots.map(snapshotMonthOf).filter(Boolean))].sort()}
 function previousMonth(m){let [y,mo]=m.split('-').map(Number),d=new Date(y,mo-2,1);return monthKey(d)}
@@ -1726,9 +1804,9 @@ function renderOverseas(){
  ];
  $('overseasKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
  $('overseasCount').textContent=`共 ${a.length} 人`;
- $('overseasBody').innerHTML=a.map(x=>{let supporting=/支援/.test(String(x.note||''));return `<tr class="${supporting?'supporting-row':''}">
+ $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}">
   <td><b>${esc(x.employee_no)}</b></td>
-  <td>${esc(x.name)}${supporting?'<span class="supporting-badge">支援中</span>':''}</td>
+  <td>${esc(x.name)}${currentTempStatus(x)?tempStatusHtml(x):''}</td>
   <td>${esc(x.shift||'-')}</td>
   <td>${badge(personGroup(x)||'-')}</td>
   <td>${esc(x.job_title||'-')}</td>
@@ -1748,11 +1826,17 @@ document.querySelectorAll('.quick-filter').forEach(b=>b.onclick=()=>{
  syncTypeButtons();
  renderPeople();
 });
+document.querySelectorAll('.presence-filter').forEach(b=>b.onclick=()=>{
+ activePresenceFilter=b.dataset.presence;
+ syncTypeButtons();
+ renderPeople();
+});
 ['cRange','cType','cSearch'].forEach(id=>$(id)?.addEventListener('input',renderContracts));
 $('exportContractExcelBtn').onclick=exportContractExcel;
 $('clearFilters').onclick=()=>{
  ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{if($(id))$(id).value=''});
  activeTypeFilter='';
+ activePresenceFilter='';
  syncTypeButtons();
  renderPeople();
 };
@@ -1775,10 +1859,26 @@ function openPerson(p=null,area=null){
  $('mHire').value=p?.hire_date||'';
  $('mContractEnd').value=fc?.contract_end_date||'';
  $('mStatus').value=p?.status==='留停'?'留停':'在職';
+ $('mTempStatus').value=p?.temporary_status||'';
+ $('mTempStart').value=p?.temporary_start_date||'';
+ $('mExpectedReturn').value=p?.expected_return_date||'';
  $('mNote').value=p?.note||'';
+ syncTempFields();
  $('personModal').classList.add('show');
 }
 
+function syncTempFields(){
+ let st=$('mTempStatus').value;
+ $('mTempStartLabel').textContent=st==='返校'?'返校日':st==='返鄉'?'返鄉日':st==='支援'?'開始支援日':'開始日';
+ let enabled=!!st;
+ $('mTempStart').disabled=!enabled;
+ $('mExpectedReturn').disabled=!enabled;
+ if(!enabled){
+   $('mTempStart').value='';
+   $('mExpectedReturn').value='';
+ }
+}
+$('mTempStatus').addEventListener('change',syncTempFields);
 $('mLevel').addEventListener('change',syncSupervisorGroupState);
 window.editPerson=no=>{
  let p=employees.find(x=>x.employee_no===no);
@@ -1792,6 +1892,15 @@ $('personSave').onclick=async()=>{
  let old=employees.find(x=>x.employee_no===editNo);
  let oldContractEnd=old?(contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null):null;
  let job=$('mJob').value.trim();
+ let tempStatus=$('mTempStatus').value||null;
+ let tempStart=$('mTempStart').value||null;
+ let expectedReturn=$('mExpectedReturn').value||null;
+
+ if(tempStatus==='返校'&&!no.startsWith('X'))return alert('「返校」只適用建教生（X 工號）。');
+ if(tempStatus==='返鄉'&&!/^[WZ]/.test(no))return alert('「返鄉」只適用 W／Z 外籍人員。');
+ if(tempStatus&&(tempStart||expectedReturn)&&tempStart&&expectedReturn&&expectedReturn<=tempStart)
+   return alert('預計返廠上班日必須晚於開始日。');
+
  let payload={
    employee_no:no,
    name,
@@ -1805,6 +1914,9 @@ $('personSave').onclick=async()=>{
    hire_date:$('mHire').value||null,
    status:$('mStatus').value,
    note:$('mNote').value.trim()||null,
+   temporary_status:tempStatus,
+   temporary_start_date:tempStatus?tempStart:null,
+   expected_return_date:tempStatus?expectedReturn:null,
    updated_by:user.id,
    updated_at:new Date().toISOString()
  };
@@ -1828,6 +1940,15 @@ $('personSave').onclick=async()=>{
  }
 
  let type=old?'修改':'新增';
+ let oldTemp=String(old?.temporary_status||'');
+ let newTemp=String(payload.temporary_status||'');
+ if(old&&oldTemp!==newTemp){
+   if(newTemp==='返校')type='返校';
+   else if(newTemp==='返鄉')type='返鄉';
+   else if(newTemp==='支援')type='支援';
+   else if(!newTemp&&['返校','返鄉'].includes(oldTemp))type='返廠';
+   else if(!newTemp&&oldTemp==='支援')type='支援結束';
+ }
  let detail='新進人員';
 
  if(old){
@@ -1853,6 +1974,9 @@ $('personSave').onclick=async()=>{
    addDiff('到職日',old.hire_date,payload.hire_date);
    addDiff('狀態',old.status,payload.status);
    addDiff('備註',old.note,payload.note);
+   addDiff('人員動態',old.temporary_status,payload.temporary_status);
+   addDiff('動態開始日',old.temporary_start_date,payload.temporary_start_date);
+   addDiff('預計返廠上班日',old.expected_return_date,payload.expected_return_date);
 
    if(isForeign||oldContractEnd){
      addDiff('外籍合約到期',oldContractEnd,contractEnd);

@@ -1496,6 +1496,176 @@ body.change-manage-mode .change-manage-inline{
   width:min(700px,100%);
 }
 
+
+/* V50 - compact smart filter bar */
+.people-filter-lower,
+.filter-block,
+.filter-block-title,
+.presence-cards{
+  display:none!important;
+}
+.people-quickbar{
+  margin-top:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.people-quickbar .identity-segment{
+  display:flex;
+  gap:3px;
+  padding:3px;
+  border:1px solid #e3e8ef;
+  border-radius:12px;
+  background:#f4f6f9;
+}
+.people-quickbar .identity-segment .quick-filter{
+  border:0;
+  background:transparent;
+  color:#64748b;
+  min-width:46px;
+  padding:8px 12px;
+  border-radius:9px;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.people-quickbar .identity-segment .quick-filter:hover{
+  color:#1e40af;
+  background:rgba(255,255,255,.72);
+}
+.people-quickbar .identity-segment .quick-filter.active{
+  background:#fff;
+  color:#1d4ed8;
+  box-shadow:0 2px 8px rgba(15,23,42,.08);
+}
+.quickbar-divider{
+  width:1px;
+  height:28px;
+  background:#e4e9f0;
+}
+.presence-segment{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.presence-segment .presence-filter{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:38px;
+  padding:7px 11px;
+  border:1px solid #e3e8ef;
+  border-radius:10px;
+  background:#fff;
+  color:#475569;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.presence-segment .presence-filter:hover{
+  transform:translateY(-1px);
+  border-color:#c8d2df;
+  box-shadow:0 5px 14px rgba(15,23,42,.06);
+}
+.presence-segment .presence-filter.active{
+  background:#f7faff;
+  border-color:#9bb8ff;
+  color:#1d4ed8;
+  box-shadow:0 0 0 3px rgba(37,99,235,.06);
+}
+.presence-segment .presence-dot{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  flex:0 0 auto;
+  background:#94a3b8;
+}
+.presence-segment [data-presence="支援"] .presence-dot{background:#f59e0b}
+.presence-segment [data-presence="返鄉"] .presence-dot{background:#7c3aed}
+.presence-segment [data-presence="返校"] .presence-dot{background:#0284c7}
+.presence-segment .presence-filter b{
+  min-width:24px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:12px;
+  text-align:center;
+}
+.presence-segment .presence-filter.active b{
+  background:#e8efff;
+  color:#1d4ed8;
+}
+@media(max-width:760px){
+  .people-quickbar{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .quickbar-divider{
+    display:none;
+  }
+  .people-quickbar .identity-segment{
+    width:100%;
+    overflow:auto;
+  }
+  .presence-segment{
+    width:100%;
+  }
+}
+
+
+#peopleSummary{
+  display:none!important;
+}
+.people-page-title #peopleCount{
+  margin-top:3px;
+  font-size:13px;
+  font-weight:700;
+  color:#64748b;
+}
+
+
+/* V51 - harden quick filter click targets */
+.people-quickbar,
+.identity-segment,
+.presence-segment{
+  position:relative;
+  z-index:3;
+}
+.people-quickbar button{
+  position:relative;
+  z-index:4;
+  pointer-events:auto!important;
+  touch-action:manipulation;
+}
+.people-quickbar button > *{
+  pointer-events:none;
+}
+
+
+/* V52 - people section nesting/scroll fix */
+#people{
+  min-width:0;
+}
+#people .people-list-section{
+  width:100%;
+  min-width:0;
+}
+#people .tablewrap{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  overflow:auto;
+}
+#people table{
+  width:100%;
+  min-width:980px;
+}
+
 </style>
 </head>
 <body>
@@ -1589,38 +1759,30 @@ body.change-manage-mode .change-manage-inline{
     <div class="field hidden"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div>
    </div>
 
-   <div class="people-filter-lower">
-    <div class="filter-block">
-     <div class="filter-block-title">身份</div>
-     <div class="identity-segment">
-      <button class="quick-filter active" data-type="">全部</button>
-      <button class="quick-filter" data-type="台籍">台籍</button>
-      <button class="quick-filter" data-type="Z">Z</button>
-      <button class="quick-filter" data-type="W">W</button>
-      <button class="quick-filter" data-type="建教生">建教生</button>
-     </div>
+   <div class="people-quickbar">
+    <div class="identity-segment">
+      <button type="button" class="quick-filter active" data-type="" onclick="setPeopleTypeFilter('')">全部</button>
+      <button type="button" class="quick-filter" data-type="台籍" onclick="setPeopleTypeFilter('台籍')">台籍</button>
+      <button type="button" class="quick-filter" data-type="Z" onclick="setPeopleTypeFilter('Z')">Z</button>
+      <button type="button" class="quick-filter" data-type="W" onclick="setPeopleTypeFilter('W')">W</button>
+      <button type="button" class="quick-filter" data-type="建教生" onclick="setPeopleTypeFilter('建教生')">建教生</button>
     </div>
 
-    <div class="filter-block">
-     <div class="filter-block-title">目前動態・點一下直接查看名單</div>
-     <div class="presence-cards">
-      <button class="presence-filter presence-card active" data-presence="">
-       <span class="presence-top"><span class="presence-dot"></span>全部</span>
-       <span class="presence-count" data-presence-count="">0<span class="presence-unit">人</span></span>
+    <div class="quickbar-divider" aria-hidden="true"></div>
+
+    <div class="presence-segment">
+      <button type="button" class="presence-filter" data-presence="支援" onclick="setPeoplePresenceFilter('支援')">
+       <span class="presence-dot"></span><span>支援</span>
+       <b data-presence-count="支援">0</b>
       </button>
-      <button class="presence-filter presence-card" data-presence="支援">
-       <span class="presence-top"><span class="presence-dot"></span>支援</span>
-       <span class="presence-count" data-presence-count="支援">0<span class="presence-unit">人</span></span>
+      <button type="button" class="presence-filter" data-presence="返鄉" onclick="setPeoplePresenceFilter('返鄉')">
+       <span class="presence-dot"></span><span>返鄉</span>
+       <b data-presence-count="返鄉">0</b>
       </button>
-      <button class="presence-filter presence-card" data-presence="返鄉">
-       <span class="presence-top"><span class="presence-dot"></span>返鄉</span>
-       <span class="presence-count" data-presence-count="返鄉">0<span class="presence-unit">人</span></span>
+      <button type="button" class="presence-filter" data-presence="返校" onclick="setPeoplePresenceFilter('返校')">
+       <span class="presence-dot"></span><span>返校</span>
+       <b data-presence-count="返校">0</b>
       </button>
-      <button class="presence-filter presence-card" data-presence="返校">
-       <span class="presence-top"><span class="presence-dot"></span>返校</span>
-       <span class="presence-count" data-presence-count="返校">0<span class="presence-unit">人</span></span>
-      </button>
-     </div>
     </div>
    </div>
   </div>
@@ -2237,51 +2399,48 @@ function renderDash(){
 }
 function openTypeList(type){
  showPage('people');
- activeTypeFilter=type;
- activePresenceFilter='';
- ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>$(id).value='');
- syncTypeButtons();
- renderPeople();
+ setPeopleTypeFilter(type);
 }
 function syncTypeButtons(){
- document.querySelectorAll('.quick-filter').forEach(b=>b.classList.toggle('active',b.dataset.type===activeTypeFilter));
- document.querySelectorAll('.presence-filter').forEach(b=>b.classList.toggle('active',b.dataset.presence===activePresenceFilter));
+ document.querySelectorAll('.quick-filter').forEach(b=>{
+   b.classList.toggle('active',!activePresenceFilter&&b.dataset.type===activeTypeFilter);
+ });
+ document.querySelectorAll('.presence-filter').forEach(b=>{
+   b.classList.toggle('active',!!activePresenceFilter&&b.dataset.presence===activePresenceFilter);
+ });
 }
 function renderPresenceCounts(){
  let source=employmentCurrent();
  let counts={
-   '':mainCurrent().length,
    '支援':source.filter(x=>currentTempStatus(x)==='支援').length,
    '返鄉':source.filter(x=>currentTempStatus(x)==='返鄉').length,
    '返校':source.filter(x=>currentTempStatus(x)==='返校').length
  };
  document.querySelectorAll('[data-presence-count]').forEach(el=>{
    let key=el.dataset.presenceCount||'';
-   el.innerHTML=`${counts[key]||0}<span class="presence-unit">人</span>`;
+   el.textContent=counts[key]||0;
  });
 }
 function filtered(){
  let q=$('fSearch').value.trim().toLowerCase();
  let source=activePresenceFilter==='返校'?employmentCurrent():mainCurrent();
- return source.filter(x=>
-   (!$('fGroup').value||personGroup(x)===$('fGroup').value)&&
-   (!$('fShift').value||x.shift===$('fShift').value)&&
-   (!$('fJob').value||x.job_title===$('fJob').value)&&
-   (!$('fNat').value||x.nationality===$('fNat').value)&&
-   (!$('fLevel').value||x.level===$('fLevel').value)&&
-   (!activeTypeFilter||personType(x)===activeTypeFilter)&&
-   (!activePresenceFilter||currentTempStatus(x)===activePresenceFilter)&&
-   (!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')+' '+(x.note||'')).toLowerCase().includes(q))
- )
+
+ return source.filter(x=>{
+   if(activePresenceFilter && currentTempStatus(x)!==activePresenceFilter)return false;
+   if(!activePresenceFilter && activeTypeFilter && personType(x)!==activeTypeFilter)return false;
+
+   return (!$('fGroup').value||personGroup(x)===$('fGroup').value)&&
+     (!$('fShift').value||x.shift===$('fShift').value)&&
+     (!$('fJob').value||x.job_title===$('fJob').value)&&
+     (!$('fNat').value||x.nationality===$('fNat').value)&&
+     (!$('fLevel').value||x.level===$('fLevel').value)&&
+     (!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')+' '+(x.note||'')).toLowerCase().includes(q));
+ });
 }
 function renderPeople(){
  let a=filtered();
  renderPresenceCounts();
- $('peopleCount').textContent=activePresenceFilter
-   ? `目前動態：${activePresenceFilter}｜共 ${a.length} 人`
-   : activeTypeFilter
-     ? `身份：${activeTypeFilter}｜共 ${a.length} 人`
-     : `目前顯示 ${a.length} 人`;
+ $('peopleCount').textContent=`${a.length} 人`;
 
  let local=a.filter(x=>personType(x)==='台籍').length,
      z=a.filter(x=>personType(x)==='Z').length,
@@ -2669,20 +2828,29 @@ function renderOverseas(){
  const el=$(id);
  if(el)el.addEventListener('input',renderPeople);
 });
-document.querySelectorAll('.quick-filter').forEach(b=>b.onclick=()=>{
- // 身份與「目前動態」是兩種快速入口，不要求使用者同時選兩邊。
- activeTypeFilter=b.dataset.type;
+function resetPeopleAdvancedFilters(){
+ ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{
+   if($(id))$(id).value='';
+ });
+}
+window.setPeopleTypeFilter=type=>{
+ resetPeopleAdvancedFilters();
+ activeTypeFilter=type||'';
  activePresenceFilter='';
  syncTypeButtons();
  renderPeople();
-});
-document.querySelectorAll('.presence-filter').forEach(b=>b.onclick=()=>{
- // 點支援 / 返鄉 / 返校就直接跳到該名單，不受左側身份篩選限制。
- activePresenceFilter=b.dataset.presence;
+};
+window.setPeoplePresenceFilter=presence=>{
+ resetPeopleAdvancedFilters();
+
+ // 動態是獨立快速入口，不需要配合身份。
+ // 再點同一個動態一次，回到全部。
+ activePresenceFilter=activePresenceFilter===presence?'':presence;
  activeTypeFilter='';
+
  syncTypeButtons();
  renderPeople();
-});
+};
 ['cRange','cType','cSearch'].forEach(id=>$(id)?.addEventListener('input',renderContracts));
 $('exportContractExcelBtn').onclick=exportContractExcel;
 $('clearFilters').onclick=()=>{

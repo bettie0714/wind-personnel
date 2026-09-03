@@ -1284,18 +1284,7 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
   font-size:11px;
   border-radius:8px;
 }
-.change-edit-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-.change-edit-grid .field.full{
-  grid-column:1/-1;
-}
-@media(max-width:720px){
-  .change-edit-grid{grid-template-columns:1fr}
-  .change-edit-grid .field.full{grid-column:auto}
-}
+
 
 
 
@@ -1500,6 +1489,11 @@ body.change-manage-mode .change-manage-inline{
     align-items:flex-start;
     flex-direction:column;
   }
+}
+
+
+#changeEditModal .modal{
+  width:min(700px,100%);
 }
 
 </style>
@@ -4121,29 +4115,58 @@ $('importBtn').onclick=async()=>{
 init();
 </script>
 
-<div id="changeEditModal" class="modal">
- <div class="modalbox">
-  <div class="modalhead">
-   <div><b>編輯人員變動紀錄</b><div class="mini">這裡只修改紀錄，不會改動目前人員資料。</div></div>
-   <button id="changeEditClose" class="iconbtn">×</button>
-  </div>
-  <div class="modalbody">
-   <div class="change-edit-grid">
-    <div class="field"><label>日期</label><input id="ceDate" type="date"></div>
-    <div class="field"><label>類型</label>
-     <select id="ceType">
-      <option>新增</option><option>修改</option><option>調組</option><option>工號更正</option>
-      <option>支援</option><option>支援結束</option><option>返鄉</option><option>返校</option>
-      <option>返廠</option><option>離職</option><option>其他</option>
-     </select>
-    </div>
-    <div class="field"><label>工號</label><input id="ceNo"></div>
-    <div class="field"><label>姓名</label><input id="ceName"></div>
-    <div class="field"><label>原組別</label><input id="ceOldGroup"></div>
-    <div class="field"><label>新組別</label><input id="ceNewGroup"></div>
-    <div class="field full"><label>內容</label><textarea id="ceDetail" rows="4"></textarea></div>
+<div id="changeEditModal" class="modalback">
+ <div class="modal">
+  <button id="changeEditClose" class="close">×</button>
+  <h2>編輯人員變動紀錄</h2>
+  <p>只修改這筆紀錄，不會更動目前的人員主檔。</p>
+
+  <div class="formgrid">
+   <div class="field">
+    <label>日期</label>
+    <input id="ceDate" type="date">
+   </div>
+   <div class="field">
+    <label>類型</label>
+    <select id="ceType">
+     <option>新增</option>
+     <option>修改</option>
+     <option>調組</option>
+     <option>工號更正</option>
+     <option>支援</option>
+     <option>支援結束</option>
+     <option>返鄉</option>
+     <option>返校</option>
+     <option>返廠</option>
+     <option>離職</option>
+     <option>其他</option>
+    </select>
+   </div>
+
+   <div class="field">
+    <label>工號</label>
+    <input id="ceNo">
+   </div>
+   <div class="field">
+    <label>姓名</label>
+    <input id="ceName">
+   </div>
+
+   <div class="field">
+    <label>原組別</label>
+    <input id="ceOldGroup">
+   </div>
+   <div class="field">
+    <label>新組別</label>
+    <input id="ceNewGroup">
+   </div>
+
+   <div class="field full">
+    <label>內容</label>
+    <textarea id="ceDetail" rows="4"></textarea>
    </div>
   </div>
+
   <div class="modalfoot">
    <button id="changeDeleteOne" class="btn soft-danger">刪除此紀錄</button>
    <span style="flex:1"></span>
@@ -4152,6 +4175,5 @@ init();
   </div>
  </div>
 </div>
-
 </body>
 </html>

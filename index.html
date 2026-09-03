@@ -2413,22 +2413,18 @@ body.change-manage-mode .change-manage-inline{
 }
 
 
-/* V74 - clean personnel movement summary */
+/* V75 - aligned personnel movement summary */
 .pdf-movement-list{
   width:100%;
-  border-top:1px solid #e4eaf1;
+  border-top:1px solid #dfe6ef;
 }
 .pdf-movement-row{
   display:grid;
-  grid-template-columns:82px 82px 42px;
+  grid-template-columns:82px 92px 46px;
   gap:8px;
   align-items:center;
   padding:7px 2px;
   border-bottom:1px solid #e8edf3;
-  position:relative;
-}
-.pdf-movement-row.changed{
-  padding-bottom:23px;
 }
 .pdf-movement-type{
   color:#334155;
@@ -2443,7 +2439,7 @@ body.change-manage-mode .change-manage-inline{
 }
 .pdf-movement-count span{
   color:#a0aabd;
-  padding:0 3px;
+  padding:0 4px;
 }
 .pdf-movement-net{
   text-align:right;
@@ -2454,61 +2450,70 @@ body.change-manage-mode .change-manage-inline{
 .pdf-movement-net.neg{color:#b42318}
 .pdf-movement-net.zero{color:#94a3b8}
 .pdf-movement-detail{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:5px;
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
+  grid-column:1 / -1;
+  position:static;
+  display:grid;
+  gap:3px;
+  margin-top:2px;
+  padding:6px 0 1px 82px;
+  border-top:1px dashed #e6ebf2;
   color:#65758a;
-  font-size:7.8px;
-  line-height:1.3;
+  font-size:7.9px;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+.pdf-movement-detail span{
+  display:block;
 }
 .pdf-movement-detail b{
+  display:inline-block;
+  min-width:52px;
   color:#475569;
 }
-
-/* V74 - flat change ledger, no cards/date blocks */
+/* V75 - full-width aligned change ledger */
 .pdf-change-ledger{
-  width:660px;
-  max-width:660px;
-  margin:0 auto;
+  width:100%;
+  max-width:714px;
+  margin:0;
   border-top:1px solid #dfe6ef;
   border-bottom:1px solid #dfe6ef;
 }
 .pdf-change-ledger-head,
 .pdf-change-ledger-row{
   display:grid;
-  grid-template-columns:74px 58px 122px minmax(0,1fr);
+  grid-template-columns:82px 62px 128px minmax(0,1fr);
   gap:8px;
   align-items:start;
 }
 .pdf-change-ledger-head{
-  padding:6px 8px;
+  padding:6px 10px;
   background:#f5f8fc;
   color:#62738a;
   font-size:8px;
   font-weight:900;
 }
 .pdf-change-ledger-row{
-  padding:8px 8px;
+  padding:8px 10px;
   border-top:1px solid #edf1f5;
   font-size:8.7px;
   line-height:1.4;
 }
+.pdf-change-ledger-row:nth-child(odd){
+  background:#fcfdff;
+}
 .pdf-change-ledger-date{
   color:#63748a;
   font-weight:800;
+  white-space:nowrap;
 }
 .pdf-change-ledger-type{
   color:#2457d6;
   font-weight:900;
 }
 .pdf-change-ledger-person{
-  display:flex;
-  flex-direction:column;
-  gap:1px;
+  display:grid;
+  grid-template-columns:46px minmax(0,1fr);
+  gap:5px;
   min-width:0;
 }
 .pdf-change-ledger-person b{
@@ -2516,7 +2521,8 @@ body.change-manage-mode .change-manage-inline{
   font-size:8.8px;
 }
 .pdf-change-ledger-person span{
-  color:#64748b;
+  color:#526174;
+  font-weight:700;
   overflow-wrap:anywhere;
 }
 .pdf-change-ledger-content{
@@ -2536,77 +2542,74 @@ body.change-manage-mode .change-manage-inline{
 .pdf-change-ledger-content small b{
   color:#59687b;
 }
-
-/* V74 - separate student roster */
-.pdf-student-summary{
-  display:flex;
-  gap:8px;
-  margin:8px 0 10px;
-}
-.pdf-student-summary span{
-  flex:1;
-  padding:7px 9px;
-  border-radius:7px;
-  background:#f7f9fc;
-  border:1px solid #e4eaf1;
-  color:#64748b;
-  font-size:9px;
-  text-align:center;
-}
-.pdf-student-summary b{
-  color:#0f766e;
-  font-size:11px;
-}
-.pdf-student-table{
+/* V75 - student roster matches foreign/Taiwan report style */
+.pdf-student-table-v75{
   width:660px!important;
   max-width:660px!important;
   min-width:660px!important;
+  table-layout:fixed!important;
   border-collapse:collapse;
-  table-layout:fixed;
-  font-size:8.5px;
-  line-height:1.3;
+  margin:0 auto!important;
+  box-sizing:border-box!important;
 }
-.pdf-student-table th,
-.pdf-student-table td{
-  border:1px solid #e1e7ef;
-  padding:5px 5px;
-  vertical-align:middle;
-  overflow-wrap:anywhere;
+.pdf-student-table-v75 th,
+.pdf-student-table-v75 td{
+  border:1px solid #dbe4ee;
   box-sizing:border-box;
+  vertical-align:middle;
 }
-.pdf-student-table th{
-  background:#f3f7fb;
-  color:#46617f;
+.pdf-student-table-v75 th{
+  height:29px;
+  padding:5px 5px;
+  background:#eaf2ff;
+  color:#17365d;
+  text-align:center;
+  font-size:9.6px;
+  font-weight:900;
+}
+.pdf-student-table-v75 td{
+  height:24px;
+  padding:4px 6px;
+  color:#30465d;
+  font-size:9px;
+  line-height:1.15;
+  background:#fff;
+  overflow-wrap:anywhere;
+}
+.pdf-student-table-v75 tbody tr:nth-child(even):not(.section-row) td{
+  background:#fcfdff;
+}
+.pdf-student-table-v75 .section-row td{
+  height:27px;
+  padding:5px 9px;
+  background:#dceaff!important;
+  color:#17365d;
+  font-size:10px;
+  font-weight:900;
+}
+.pdf-student-table-v75 .center{text-align:center}
+.pdf-student-table-v75 .person-name{
+  color:#102d4b;
+  font-size:9.5px;
+  font-weight:900;
+}
+.pdf-student-table-v75 .employee-no{
+  color:#455b72;
   font-weight:900;
   text-align:center;
+  white-space:nowrap;
 }
-.pdf-student-table th:nth-child(1),.pdf-student-table td:nth-child(1){width:36px}
-.pdf-student-table th:nth-child(2),.pdf-student-table td:nth-child(2){width:44px}
-.pdf-student-table th:nth-child(3),.pdf-student-table td:nth-child(3){width:128px}
-.pdf-student-table th:nth-child(4),.pdf-student-table td:nth-child(4){width:70px}
-.pdf-student-table th:nth-child(5),.pdf-student-table td:nth-child(5){width:118px}
-.pdf-student-table th:nth-child(6),.pdf-student-table td:nth-child(6){width:64px}
-.pdf-student-table th:nth-child(7),.pdf-student-table td:nth-child(7){width:92px}
-.pdf-student-table th:nth-child(8),.pdf-student-table td:nth-child(8){width:108px}
-.student-away-row td{
-  background:#faf9ff;
-}
-.student-status{
-  display:inline-block;
-  min-width:38px;
-  padding:2px 6px;
-  border-radius:999px;
-  font-size:7.8px;
-  font-weight:900;
-  text-align:center;
-}
-.student-status.onsite{
-  background:#eaf8f1;
-  color:#15803d;
-}
-.student-status.away{
-  background:#f1ecff;
-  color:#6d3cc2;
+.pdf-student-table-v75 th:nth-child(1){width:38px}
+.pdf-student-table-v75 th:nth-child(2){width:48px}
+.pdf-student-table-v75 th:nth-child(3){width:142px}
+.pdf-student-table-v75 th:nth-child(4){width:76px}
+.pdf-student-table-v75 th:nth-child(5){width:145px}
+.pdf-student-table-v75 th:nth-child(6){width:91px}
+.pdf-student-table-v75 th:nth-child(7){width:120px}
+.student-roster-note{
+  color:#65758a;
+  font-size:8px;
+  font-weight:700;
 }
 
 </style>
@@ -4915,63 +4918,64 @@ function buildExcelTaiwanSheet(workbook,data){
 function buildExcelStudentSheet(workbook,data){
  let ws=workbook.addWorksheet('建教生');
  ws.columns=[
-   {width:8},
-   {width:10},
-   {width:18},
-   {width:14},
-   {width:22},
-   {width:14},
-   {width:14},
-   {width:16}
+   {width:8},{width:10},{width:18},{width:14},{width:22},{width:14},{width:16}
  ];
- addStyledTitle(ws,`${monthLabel(data.tm)} 建教生名冊`,8);
+ addStyledTitle(ws,`${monthLabel(data.tm)} 建教生名冊`,7);
  ws.addRow([]);
 
  let inPlant=data.studentAll.filter(p=>!isSchoolAway(p,data.asOf));
  let schoolAway=data.studentAll.filter(p=>isSchoolAway(p,data.asOf));
 
  let summary=ws.addRow([
-   `名冊 ${data.studentAll.length} 人`,
+   `建教生合計 ${data.studentAll.length} 人`,
+   '',
    `目前在廠 ${inPlant.length} 人`,
-   `返校 ${schoolAway.length} 人`
+   '',
+   `返校 ${schoolAway.length} 人`,
+   '',
+   ''
  ]);
  ws.mergeCells(summary.number,1,summary.number,2);
- ws.mergeCells(summary.number,3,summary.number,5);
- ws.mergeCells(summary.number,6,summary.number,8);
+ ws.mergeCells(summary.number,3,summary.number,4);
+ ws.mergeCells(summary.number,5,summary.number,7);
  styleRow(summary,{});
  summary.eachCell(c=>{
-   c.font={name:'Microsoft JhengHei',size:11,bold:true,color:{argb:'FF334155'}};
-   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF8FAFC'}};
+   c.font={name:'Microsoft JhengHei',size:11,bold:true,color:{argb:'FF17365D'}};
+   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF7FAFF'}};
    c.alignment={vertical:'middle',horizontal:'center'};
  });
  ws.addRow([]);
 
- addStyledHeader(ws,['NO.','班別','姓名','工號','職別','目前狀態','返校日','預計返廠']);
- if(!data.studentAll.length){
-   let row=ws.addRow(['目前沒有建教生資料']);
-   ws.mergeCells(row.number,1,row.number,8);
-   styleRow(row,{});
-   row.getCell(1).alignment={vertical:'middle',horizontal:'center'};
-   return ws;
- }
+ addStyledHeader(ws,['NO.','班別','姓名','工號','職別','返校日','預計返廠']);
 
- data.studentAll.forEach((p,i)=>{
-   let away=isSchoolAway(p,data.asOf);
-   let row=ws.addRow([
-     i+1,
-     p.shift||'',
-     p.name||'',
-     p.employee_no||'',
-     p.job_title||'建教生',
-     away?'返校':'在廠',
-     away?(p.temporary_start_date||''):'',
-     p.expected_return_date||''
-   ]);
-   styleRow(row,{});
-   if(away){
-     row.eachCell(c=>c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF6F8FF'}});
+ const addSection=(title,list,away)=>{
+   let r=ws.addRow([title]);
+   ws.mergeCells(r.number,1,r.number,7);
+   styleRow(r,{});
+   r.getCell(1).font={name:'Microsoft JhengHei',size:11,bold:true,color:{argb:'FF17365D'}};
+   r.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDCEAFF'}};
+   r.getCell(1).alignment={vertical:'middle',horizontal:'left'};
+
+   if(!list.length){
+     let empty=ws.addRow(['目前沒有資料']);
+     ws.mergeCells(empty.number,1,empty.number,7);
+     styleRow(empty,{});
+     empty.getCell(1).alignment={vertical:'middle',horizontal:'center'};
+     return;
    }
- });
+
+   list.forEach((p,i)=>{
+     let row=ws.addRow([
+       i+1,p.shift||'',p.name||'',p.employee_no||'',p.job_title||'建教生',
+       away?(p.temporary_start_date||''):'',
+       away?(p.expected_return_date||''):''
+     ]);
+     styleRow(row,{});
+   });
+ };
+
+ addSection(`第一區｜目前在廠　${inPlant.length} 人`,inPlant,false);
+ addSection(`第二區｜返校中　${schoolAway.length} 人`,schoolAway,true);
  return ws;
 }
 
@@ -5380,35 +5384,42 @@ function buildStudentRosterPage(data){
  let inPlant=people.filter(p=>!isSchoolAway(p,data.asOf));
  let schoolAway=people.filter(p=>isSchoolAway(p,data.asOf));
 
- let rows=people.length?people.map((p,i)=>{
-   let away=isSchoolAway(p,data.asOf);
-   let returnDate=shortChangeDate(p.expected_return_date||'');
-   let schoolDate=shortChangeDate(p.temporary_start_date||'');
-   return `<tr class="${away?'student-away-row':''}">
-    <td class="center">${i+1}</td>
-    <td class="center">${esc(p.shift||'-')}</td>
-    <td class="person-name">${esc(p.name||'')}</td>
-    <td class="employee-no">${esc(p.employee_no||'')}</td>
-    <td>${esc(p.job_title||'建教生')}</td>
-    <td class="center"><span class="student-status ${away?'away':'onsite'}">${away?'返校':'在廠'}</span></td>
-    <td>${away?esc(schoolDate||'-'):'-'}</td>
-    <td>${returnDate?esc(returnDate):'-'}</td>
-   </tr>`;
- }).join(''):`<tr><td colspan="8" class="center">目前沒有建教生資料</td></tr>`;
+ const studentRows=(list,away)=>{
+   if(!list.length)return `<tr><td colspan="7" class="center">目前沒有資料</td></tr>`;
+   return list.map((p,i)=>{
+     let returnDate=shortChangeDate(p.expected_return_date||'');
+     let schoolDate=shortChangeDate(p.temporary_start_date||'');
+     return `<tr>
+      <td class="center">${i+1}</td>
+      <td class="center">${esc(p.shift||'-')}</td>
+      <td class="person-name">${esc(p.name||'')}</td>
+      <td class="employee-no">${esc(p.employee_no||'')}</td>
+      <td>${esc(p.job_title||'建教生')}</td>
+      <td class="center">${away?esc(schoolDate||'-'):'-'}</td>
+      <td class="center">${away?esc(returnDate||'-'):'-'}</td>
+     </tr>`;
+   }).join('');
+ };
 
  return `<div class="pdf-page pdf-roster-4">
   <div class="pdf-safe">
    ${pdfReportHeader(`${monthLabel(data.tm)} 建教生名冊`)}
-   <div class="pdf-student-summary">
-    <span>名冊 <b>${people.length}</b> 人</span>
-    <span>目前在廠 <b>${inPlant.length}</b> 人</span>
-    <span>返校 <b>${schoolAway.length}</b> 人</span>
+   <div class="pdf-taiwan-summary-v25">
+    <span>建教生合計 <b>${people.length}</b></span>
+    <span>目前在廠 <b>${inPlant.length}</b></span>
+    <span>返校 <b>${schoolAway.length}</b></span>
    </div>
-   <table class="pdf-student-table">
+
+   <table class="pdf-student-table-v75">
     <thead>
-     <tr><th>NO.</th><th>班別</th><th>姓名</th><th>工號</th><th>職別</th><th>狀態</th><th>返校日</th><th>預計返廠</th></tr>
+     <tr><th>NO.</th><th>班別</th><th>姓名</th><th>工號</th><th>職別</th><th>返校日</th><th>預計返廠</th></tr>
     </thead>
-    <tbody>${rows}</tbody>
+    <tbody>
+     <tr class="section-row"><td colspan="7">第一區｜目前在廠　${inPlant.length} 人</td></tr>
+     ${studentRows(inPlant,false)}
+     <tr class="section-row"><td colspan="7">第二區｜返校中　${schoolAway.length} 人</td></tr>
+     ${studentRows(schoolAway,true)}
+    </tbody>
    </table>
   </div>
   ${pdfFooter()}
@@ -5509,10 +5520,8 @@ function buildChangeLogPdfPages(data){
     ${part.map((c,idx)=>{
       let detail=changeDetailText(c);
       let note=changeNoteText(c);
-      let prev=idx>0?part[idx-1]:null;
-      let showDate=!prev||String(prev.change_date||'')!==String(c.change_date||'');
       return `<div class="pdf-change-ledger-row">
-       <div class="pdf-change-ledger-date">${showDate?esc(c.change_date||''):''}</div>
+       <div class="pdf-change-ledger-date">${esc(c.change_date||'')}</div>
        <div class="pdf-change-ledger-type">${esc(c.change_type||'')}</div>
        <div class="pdf-change-ledger-person"><b>${esc(c.employee_no||'')}</b><span>${esc(c.employee_name||'')}</span></div>
        <div class="pdf-change-ledger-content">

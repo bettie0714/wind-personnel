@@ -2032,6 +2032,50 @@ body.change-manage-mode .change-manage-inline{
 
 
 
+
+/* V62 - monthly report change log */
+.pdf-change-log{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:8.5px;
+  line-height:1.35;
+}
+.pdf-change-log th,
+.pdf-change-log td{
+  border:1px solid #dfe7f1;
+  padding:5px 6px;
+  vertical-align:top;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.pdf-change-log th{
+  background:#f3f7fc;
+  color:#334e70;
+  font-weight:900;
+  text-align:center;
+}
+.pdf-change-log tbody tr:nth-child(even) td{
+  background:#fbfdff;
+}
+.pdf-change-log th:nth-child(1){width:11%}
+.pdf-change-log th:nth-child(2){width:10%}
+.pdf-change-log th:nth-child(3){width:10%}
+.pdf-change-log th:nth-child(4){width:11%}
+.pdf-change-log th:nth-child(5){width:11%}
+.pdf-change-log th:nth-child(6){width:11%}
+.pdf-change-log th:nth-child(7){width:24%}
+.pdf-change-log th:nth-child(8){width:12%}
+.pdf-change-empty{
+  padding:26px 12px;
+  text-align:center;
+  color:#94a3b8;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  background:#fafcff;
+  font-size:11px;
+}
+
 </style>
 </head>
 <body>
@@ -2184,7 +2228,7 @@ body.change-manage-mode .change-manage-inline{
 <section id="changes" class="page">
  <div class="section">
   <div class="sectionhead">
-   <div><h2>月份人數／人員增減</h2><div class="mini">保留每月人員紀錄，可比較兩個月份並匯出 Excel 與專業 PDF 報表；第一次匯出若尚無月份紀錄，管理員可直接建立本月紀錄。</div></div>
+   <div><h2>人員月報</h2><div class="mini">包含月份人數、人員增減與本月保留的人員變動紀錄。</div></div>
    <div style="display:flex;gap:8px;flex-wrap:wrap">
     <button id="exportMonthBtn" class="btn success">匯出月份 Excel</button>
     <button id="exportMonthPdfBtn" class="btn">匯出圖表 PDF</button>
@@ -2973,7 +3017,29 @@ function snapshotMonthOf(r){return String(r.snapshot_month||'').slice(0,7)}
 function snapshotRows(m){return snapshots.filter(r=>snapshotMonthOf(r)===m)}
 function rowsForMonthEnd(m){return m===monthKey()?employees:snapshotRows(m)}
 function activeRows(rows,asOf=todayISO()){return rows.filter(x=>isActiveAsOf(x,asOf)&&!isSchoolAway(x,asOf))}
-function mainRows(rows){return activeRows(rows).filter(x=>!isOverseas(x))}
+function mainRows(rows,asOf=todayISO()){return activeRows(rows,asOf).filter(x=>!isOverseas(x))}
+function reportAsOfDate(month){
+ if(!month||month===monthKey())return todayISO();
+ let [y,m]=month.split('-').map(Number);
+ return new Date(y,m,0).toISOString().slice(0,10);
+}
+function onsiteRows(rows,asOf=todayISO()){
+ return mainRows(rows,asOf).filter(p=>!isHomeLeave(p,asOf)&&!isOffsiteSupport(p,asOf));
+}
+function reportTempCounts(rows,asOf=todayISO()){
+ let employed=mainRows(rows,asOf);
+ return{
+   support:employed.filter(p=>isSupporting(p,asOf)).length,
+   taipei:employed.filter(p=>isSupporting(p,asOf)&&String(p.support_location||'')==='台北港').length,
+   east17:employed.filter(p=>isSupporting(p,asOf)&&String(p.support_location||'')==='東17').length,
+   manufacturing:employed.filter(p=>isSupporting(p,asOf)&&String(p.support_location||'')==='製造部').length,
+   homeleave:employed.filter(p=>isHomeLeave(p,asOf)).length,
+   school:employmentCurrentForRows(rows,asOf).filter(p=>isSchoolAway(p,asOf)).length
+ };
+}
+function employmentCurrentForRows(rows,asOf=todayISO()){
+ return rows.filter(x=>isActiveAsOf(x,asOf)&&!isOverseas(x));
+}
 function snapshotMonths(){return [...new Set(snapshots.map(snapshotMonthOf).filter(Boolean))].sort()}
 function previousMonth(m){let [y,mo]=m.split('-').map(Number),d=new Date(y,mo-2,1);return monthKey(d)}
 function signNum(n){return n>0?`+${n}`:`${n}`}
@@ -3703,6 +3769,10 @@ function snapshotPayload(month,p){
    hire_date:p.hire_date||null,
    status:p.status==='留停'?'留停':'在職',
    note:p.note||null,
+   temporary_status:p.temporary_status||null,
+   temporary_start_date:p.temporary_start_date||null,
+   expected_return_date:p.expected_return_date||null,
+   support_location:p.support_location||null,
    captured_by:user.id
  };
 }
@@ -3872,26 +3942,30 @@ function createTaiwaneseSheet(rows,month){
  return sheetFromAOA(aoa,[6,18,18,10],merges);
 }
 function createMonthCountSheet(rows,month){
- let aoa=[],merges=[];
+ let aoa=[],merges=[],asOf=reportAsOfDate(month);
  addMergedTitle(aoa,merges,`${monthLabel(month)} 月份人數`,2);
  aoa.push([]);
- let main=mainRows(rows),overseas=activeRows(rows).filter(p=>isOverseas(p));
- aoa.push(['項目','人數']);
- aoa.push(['總人數',main.length]);
+ let main=mainRows(rows,asOf),onsite=onsiteRows(rows,asOf),overseas=activeRows(rows,asOf).filter(p=>isOverseas(p)),tc=reportTempCounts(rows,asOf);
+ aoa.push(['人力概況','人數']);
+ aoa.push(['目前在廠',onsite.length]);
+ aoa.push(['在職總人數',main.length]);
  aoa.push(['台籍',main.filter(p=>personType(p)==='台籍').length]);
  aoa.push(['Z',main.filter(p=>personType(p)==='Z').length]);
  aoa.push(['W',main.filter(p=>personType(p)==='W').length]);
  aoa.push(['建教生',main.filter(p=>personType(p)==='建教生').length]);
  aoa.push(['海外事業部',overseas.length]);
  aoa.push([]);
- aoa.push(['組別','人數']);
- let counts={};main.forEach(p=>counts[personGroup(p)]=(counts[personGroup(p)]||0)+1);
+ aoa.push(['人員動態','人數']);
+ aoa.push(['支援合計',tc.support],['台北港',tc.taipei],['東17',tc.east17],['製造部',tc.manufacturing],['返鄉',tc.homeleave],['返校',tc.school]);
+ aoa.push([]);
+ aoa.push(['目前在廠組別','人數']);
+ let counts={};onsite.filter(p=>personType(p)!=='建教生').forEach(p=>{let g=personGroup(p);if(g)counts[g]=(counts[g]||0)+1});
  let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
  Object.entries(counts).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]).forEach(x=>aoa.push(x));
  aoa.push([]);
- aoa.push(['班別','人數']);
- ['日','中','夜'].forEach(sh=>aoa.push([sh,main.filter(p=>p.shift===sh).length]));
- return sheetFromAOA(aoa,[22,12],merges);
+ aoa.push(['目前在廠班別','人數']);
+ ['日','中','夜'].forEach(sh=>aoa.push([sh,onsite.filter(p=>p.shift===sh).length]));
+ return sheetFromAOA(aoa,[28,14],merges);
 }
 function exportDiffRow(label,fromRows,toRows){
  let d=peopleDiff(fromRows,toRows);
@@ -3907,7 +3981,7 @@ function createDiffSheet(fromRows,toRows,fromMonth,toMonth){
  }
  let fr=mainRows(fromRows),tr=mainRows(toRows);
  aoa.push(['分類','前月人數','本月人數','淨增減','新增人員','減少人員']);
- aoa.push(exportDiffRow('總人數',fr,tr));
+ aoa.push(exportDiffRow('在職總人數',fr,tr));
  ['台籍','Z','W','建教生'].forEach(t=>aoa.push(exportDiffRow(t,fr.filter(p=>personType(p)===t),tr.filter(p=>personType(p)===t))));
  aoa.push([]);
  aoa.push(['組別','前月人數','本月人數','淨增減','新增／轉入','減少／轉出']);
@@ -3918,32 +3992,95 @@ function createDiffSheet(fromRows,toRows,fromMonth,toMonth){
  return sheetFromAOA(aoa,[18,12,12,12,42,42],merges);
 }
 
+
+function buildExcelChangeLogSheet(workbook,data){
+ let ws=workbook.addWorksheet('人員變動紀錄');
+ ws.columns=[
+   {width:14},  // 日期
+   {width:14},  // 類型
+   {width:14},  // 工號
+   {width:16},  // 姓名
+   {width:16},  // 原組別
+   {width:16},  // 新組別
+   {width:54},  // 內容
+   {width:34}   // 備註
+ ];
+ addStyledTitle(ws,`${monthLabel(data.tm)} 人員變動紀錄`,8);
+ ws.addRow([]);
+
+ addStyledHeader(ws,['日期','類型','工號','姓名','原組別','新組別','內容','備註']);
+
+ let rows=[...(data.monthChanges||[])].sort((a,b)=>
+   String(a.change_date||'').localeCompare(String(b.change_date||'')) ||
+   String(a.employee_no||'').localeCompare(String(b.employee_no||''))
+ );
+
+ if(!rows.length){
+   let row=ws.addRow(['本月份沒有保留的人員變動紀錄']);
+   ws.mergeCells(row.number,1,row.number,8);
+   styleRow(row,{});
+   row.getCell(1).alignment={vertical:'middle',horizontal:'center',wrapText:true};
+   return ws;
+ }
+
+ rows.forEach(c=>{
+   let row=ws.addRow([
+     c.change_date||'',
+     c.change_type||'',
+     c.employee_no||'',
+     c.employee_name||'',
+     c.old_group||'',
+     c.new_group||'',
+     changeDetailText(c)==='-'?'':changeDetailText(c),
+     changeNoteText(c)==='-'?'':changeNoteText(c)
+   ]);
+   styleRow(row,{});
+   row.height=30;
+   row.getCell(7).alignment={vertical:'middle',wrapText:true};
+   row.getCell(8).alignment={vertical:'middle',wrapText:true};
+ });
+
+ ws.views=[{state:'frozen',ySplit:3}];
+ return ws;
+}
+
 function collectMonthExportData(tm,fm){
  let toRows=rowsForMonthEnd(tm),rawFromRows=snapshotRows(fm);
  let {fr,derived}=monthComparisonRows(fm,tm);
  let fromRows=derived?fr:rawFromRows;
- let activeTo=activeRows(toRows),mainTo=mainRows(toRows);
- let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p)));
+ let asOf=reportAsOfDate(tm);
+
+ let activeTo=activeRows(toRows,asOf);
+ let mainTo=mainRows(toRows,asOf);       // 在職總人數（返校已排除）
+ let onsiteTo=onsiteRows(toRows,asOf);   // 目前在廠（再扣返鄉/台北港/東17）
+ let tempCounts=reportTempCounts(toRows,asOf);
+
+ let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p))&&!isOverseas(p));
  let local=activeTo.filter(p=>personType(p)==='台籍'&&!isOverseas(p));
  let overseas=activeTo.filter(p=>personType(p)==='台籍'&&isOverseas(p));
+
  let groups={};
- mainTo.filter(p=>personType(p)!=='建教生').forEach(p=>{
+ onsiteTo.filter(p=>personType(p)!=='建教生').forEach(p=>{
    let g=personGroup(p);
    if(g&&g!=='建教生')groups[g]=(groups[g]||0)+1;
  });
  let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
  let groupCounts=Object.entries(groups).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]);
- let shiftCounts=['日','中','夜'].map(sh=>[sh,mainTo.filter(p=>p.shift===sh).length]);
+
+ let shiftCounts=['日','中','夜'].map(sh=>[sh,onsiteTo.filter(p=>p.shift===sh).length]);
+
  let typeRows=['台籍','Z','W','建教生'].map(t=>({
    type:t,
    from:fr.filter(p=>personType(p)===t),
    to:mainTo.filter(p=>personType(p)===t)
  }));
+
  return{
-   tm,fm,toRows,fromRows,activeTo,mainTo,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
+   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
    fromDerived:derived,
    rangeText:monthRangeText(fm,tm,derived),
-   monthChanges:meaningfulMonthChanges(tm)
+   monthChanges:meaningfulMonthChanges(tm),
+   asOf
  };
 }
 function excelBaseStyle(cell,{header=false,title=false,section=false}={}){
@@ -4060,23 +4197,38 @@ function buildExcelTaiwanSheet(workbook,data){
 }
 function buildExcelCountSheet(workbook,data){
  let ws=workbook.addWorksheet('月份人數');
- ws.columns=[{width:24},{width:12}];
+ ws.columns=[{width:28},{width:14}];
  addStyledTitle(ws,`${monthLabel(data.tm)} 月份人數`,2);
  ws.addRow([]);
- addStyledHeader(ws,['項目','人數']);
+
+ addStyledHeader(ws,['人力概況','人數']);
  [
-  ['總人數',data.mainTo.length],
+  ['目前在廠',data.onsiteTo.length],
+  ['在職總人數',data.mainTo.length],
   ['台籍',data.mainTo.filter(p=>personType(p)==='台籍').length],
   ['Z',data.mainTo.filter(p=>personType(p)==='Z').length],
   ['W',data.mainTo.filter(p=>personType(p)==='W').length],
   ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length],
   ['海外事業部',data.overseas.length]
  ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
+
  ws.addRow([]);
- addStyledHeader(ws,['組別','人數']);
+ addStyledHeader(ws,['人員動態','人數']);
+ [
+  ['支援合計',data.tempCounts.support],
+  ['　台北港',data.tempCounts.taipei],
+  ['　東17',data.tempCounts.east17],
+  ['　製造部',data.tempCounts.manufacturing],
+  ['返鄉',data.tempCounts.homeleave],
+  ['返校（不列在職總人數）',data.tempCounts.school]
+ ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
+
+ ws.addRow([]);
+ addStyledHeader(ws,['目前在廠組別','人數']);
  data.groupCounts.forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
+
  ws.addRow([]);
- addStyledHeader(ws,['班別','人數']);
+ addStyledHeader(ws,['目前在廠班別','人數']);
  data.shiftCounts.forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
  return ws;
 }
@@ -4092,7 +4244,7 @@ function buildExcelDiffSheet(workbook,data){
 
  let fr=mainRows(data.fromRows),tr=data.mainTo;
  addStyledHeader(ws,['分類','前月人數','本月人數','淨增減','新增人員','減少人員']);
- [exportDiffRow('總人數',fr,tr),
+ [exportDiffRow('在職總人數',fr,tr),
   ...['台籍','Z','W','建教生'].map(t=>exportDiffRow(t,fr.filter(p=>personType(p)===t),tr.filter(p=>personType(p)===t)))
  ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
  ws.addRow([]);
@@ -4156,6 +4308,7 @@ async function exportMonthExcelStyled(){
  buildExcelTaiwanSheet(workbook,data);
  buildExcelCountSheet(workbook,data);
  buildExcelDiffSheet(workbook,data);
+ buildExcelChangeLogSheet(workbook,data);
  workbook.eachSheet(ws=>{
    ws.eachRow((row)=>{
      row.eachCell((cell)=>{
@@ -4278,21 +4431,33 @@ function buildTaiwanPdfPages(data){
 
 function buildMonthCountPdfPage(data){
  let basic=[
-   ['總人數',data.mainTo.length],
+   ['目前在廠',data.onsiteTo.length],
+   ['在職總人數',data.mainTo.length],
    ['台籍',data.mainTo.filter(p=>personType(p)==='台籍').length],
    ['Z',data.mainTo.filter(p=>personType(p)==='Z').length],
    ['W',data.mainTo.filter(p=>personType(p)==='W').length],
    ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length],
    ['海外事業部',data.overseas.length]
  ];
+ let dynamics=[
+   ['支援合計',data.tempCounts.support],
+   ['台北港',data.tempCounts.taipei],
+   ['東17',data.tempCounts.east17],
+   ['製造部',data.tempCounts.manufacturing],
+   ['返鄉',data.tempCounts.homeleave],
+   ['返校',data.tempCounts.school]
+ ];
  let mini=(title,rows)=>`<div class="pdf-detail-box"><h3>${esc(title)}</h3><table class="pdf-mini-table"><thead><tr><th>項目</th><th>人數</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} 人</td></tr>`).join('')}</tbody></table></div>`;
  return `<div class="pdf-page pdf-roster-page">
    ${pdfReportHeader(`${monthLabel(data.tm)} 月份人數`)}
    <div class="pdf-detail-grid">
-    ${mini('人員結構',basic)}
-    ${mini('班別人數',data.shiftCounts)}
+    ${mini('人力概況',basic)}
+    ${mini('人員動態',dynamics)}
    </div>
-   <div style="margin-top:14px">${mini('組別人數',data.groupCounts)}</div>
+   <div class="pdf-detail-grid" style="margin-top:14px">
+    ${mini('目前在廠班別',data.shiftCounts)}
+    ${mini('目前在廠組別',data.groupCounts)}
+   </div>
    ${pdfFooter()}</div>`;
 }
 
@@ -4321,7 +4486,7 @@ function buildDiffPdfPages(data){
  }
  let fr=mainRows(data.fromRows),tr=data.mainTo;
  let typeRows=[
-   exportDiffRow('總人數',fr,tr),
+   exportDiffRow('在職總人數',fr,tr),
    ...['台籍','Z','W','建教生'].map(t=>exportDiffRow(t,fr.filter(p=>personType(p)===t),tr.filter(p=>personType(p)===t)))
  ];
  let groups=[...new Set([...fr.map(personGroup),...tr.map(personGroup)])].filter(Boolean);
@@ -4479,17 +4644,71 @@ function buildTaiwanRosterOnePage(data){
    ${pdfFooter()}
  </div>`;
 }
+
+function buildChangeLogPdfPages(data){
+ let rows=[...(data.monthChanges||[])].sort((a,b)=>
+   String(a.change_date||'').localeCompare(String(b.change_date||'')) ||
+   String(a.employee_no||'').localeCompare(String(b.employee_no||''))
+ );
+
+ if(!rows.length){
+   return [`<div class="pdf-page pdf-roster-page">
+    ${pdfReportHeader(`${monthLabel(data.tm)} 人員變動紀錄`)}
+    <div class="pdf-section-band"><span>人員變動紀錄</span></div>
+    <div class="pdf-change-empty">本月份沒有保留的人員變動紀錄</div>
+    ${pdfFooter()}
+   </div>`];
+ }
+
+ // A4 直式保持可讀性，每頁最多 17 筆。
+ return splitArray(rows,17).map((part,pageIndex)=>`
+  <div class="pdf-page pdf-roster-page">
+   ${pdfReportHeader(`${monthLabel(data.tm)} 人員變動紀錄`)}
+   <div class="pdf-section-band">
+    <span>人員變動紀錄</span>
+    <small>${rows.length} 筆${rows.length>17?`・第 ${pageIndex+1} / ${Math.ceil(rows.length/17)} 頁`:''}</small>
+   </div>
+
+   <table class="pdf-change-log">
+    <thead>
+     <tr>
+      <th>日期</th><th>類型</th><th>工號</th><th>姓名</th>
+      <th>原組別</th><th>新組別</th><th>內容</th><th>備註</th>
+     </tr>
+    </thead>
+    <tbody>
+     ${part.map(c=>`<tr>
+      <td>${esc(c.change_date||'')}</td>
+      <td>${esc(c.change_type||'')}</td>
+      <td>${esc(c.employee_no||'')}</td>
+      <td>${esc(c.employee_name||'')}</td>
+      <td>${esc(c.old_group||'')}</td>
+      <td>${esc(c.new_group||'')}</td>
+      <td>${esc(changeDetailText(c)==='-'?'':changeDetailText(c))}</td>
+      <td>${esc(changeNoteText(c)==='-'?'':changeNoteText(c))}</td>
+     </tr>`).join('')}
+    </tbody>
+   </table>
+   ${pdfFooter()}
+  </div>`);
+}
+
 function buildFourPageReport(data){
- return[buildSummaryPdfPage(data),...buildForeignRosterPages(data),buildTaiwanRosterOnePage(data)];
+ return[
+   buildSummaryPdfPage(data),
+   ...buildChangeLogPdfPages(data),
+   ...buildForeignRosterPages(data),
+   buildTaiwanRosterOnePage(data)
+ ];
 }
 
 function buildSummaryPdfPage(data){
- let totalFrom=mainRows(data.fromRows).length,totalTo=data.mainTo.length;
+ let fromEmployed=mainRows(data.fromRows).length,totalTo=data.mainTo.length;
  let kpis=[
-   ['總人數',totalTo,`${totalFrom} → ${totalTo}　${signNum(totalTo-totalFrom)}`],
-   ['台籍',data.mainTo.filter(p=>personType(p)==='台籍').length,''],
-   ['Z',data.mainTo.filter(p=>personType(p)==='Z').length,''],
-   ['W',data.mainTo.filter(p=>personType(p)==='W').length,'']
+   ['目前在廠',data.onsiteTo.length,'實際廠內人力'],
+   ['在職總人數',totalTo,`${fromEmployed} → ${totalTo}　${signNum(totalTo-fromEmployed)}`],
+   ['Z',data.mainTo.filter(p=>personType(p)==='Z').length,'在職'],
+   ['W',data.mainTo.filter(p=>personType(p)==='W').length,'在職']
  ];
  let typeCounts=[
    ['台籍',data.mainTo.filter(p=>personType(p)==='台籍').length],
@@ -4502,40 +4721,49 @@ function buildSummaryPdfPage(data){
    let d=peopleDiff(x.from,x.to);
    return `<div class="pdf-list-item"><b>${esc(x.type)}</b>：${x.from.length} → ${x.to.length}（${signNum(x.to.length-x.from.length)}）<br>新增：${d.added.map(p=>p.employee_no).join('、')||'無'}<br>減少：${d.removed.map(p=>p.employee_no).join('、')||'無'}</div>`;
  }).join('');
- let shiftBlocks=data.shiftCounts.map(x=>`<div class="pdf-list-item"><b>${esc(x[0])}班</b>：${x[1]} 人</div>`).join('');
+ let dynamics=[
+   ['支援',data.tempCounts.support],
+   ['台北港',data.tempCounts.taipei],
+   ['東17',data.tempCounts.east17],
+   ['製造部',data.tempCounts.manufacturing],
+   ['返鄉',data.tempCounts.homeleave],
+   ['返校',data.tempCounts.school]
+ ];
+ let dynamicBlocks=dynamics.map(x=>`<div class="pdf-list-item"><b>${esc(x[0])}</b>：${x[1]} 人</div>`).join('');
+
  return `
  <div class="pdf-page">
   <div class="pdf-header">
    <div>
     <div class="pdf-title">${monthLabel(data.tm)} 人員月報</div>
-    <div class="pdf-sub">比較區間：${esc(data.rangeText)}<br>部門：狗狗在一起強大</div>
+    <div class="pdf-sub">比較區間：${esc(data.rangeText)}</div>
    </div>
    <div class="pdf-brand">Personnel Report</div>
   </div>
 
   <div class="pdf-kpis">
-   ${kpis.map(x=>`<div class="pdf-kpi"><div class="k">${esc(x[0])}</div><div class="v">${x[1]} 人</div><div class="d">${esc(x[2]||'本月份統計')}</div></div>`).join('')}
+   ${kpis.map(x=>`<div class="pdf-kpi"><div class="k">${esc(x[0])}</div><div class="v">${x[1]} 人</div><div class="d">${esc(x[2])}</div></div>`).join('')}
   </div>
 
   <div class="pdf-grid2">
    <div class="pdf-panel">
-    <h3>人員結構</h3>
+    <h3>在職人員結構</h3>
     ${pdfBarRows(typeCounts,'#2563eb')}
    </div>
    <div class="pdf-panel">
-    <h3>主要組別人數</h3>
+    <h3>目前在廠組別</h3>
     ${pdfBarRows(topGroups,'#14b8a6')}
    </div>
   </div>
 
   <div class="pdf-grid2" style="margin-top:14px">
    <div class="pdf-panel">
-    <h3>Z／W／台籍增減明細</h3>
-    <div class="pdf-list">${diffBlocks}</div>
+    <h3>人員動態</h3>
+    <div class="pdf-list">${dynamicBlocks}</div>
    </div>
    <div class="pdf-panel">
-    <h3>班別分布</h3>
-    <div class="pdf-list">${shiftBlocks}</div>
+    <h3>人員增減</h3>
+    <div class="pdf-list">${diffBlocks}</div>
    </div>
   </div>
   <div class="pdf-foot">系統匯出時間：${new Date().toLocaleString('zh-TW')}</div>

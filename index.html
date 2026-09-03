@@ -2033,53 +2033,86 @@ body.change-manage-mode .change-manage-inline{
 
 
 
-/* V62 - monthly report change log */
-.pdf-change-safe{
+/* V69 - readable monthly change log */
+.pdf-change-list{
   width:660px!important;
   max-width:660px!important;
-  min-width:660px!important;
   margin:0 auto!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
+  display:grid;
+  gap:7px;
 }
-.pdf-change-log{
-  width:660px!important;
-  max-width:660px!important;
-  min-width:660px!important;
-  border-collapse:collapse;
-  table-layout:fixed!important;
-  font-size:8px;
-  line-height:1.3;
-  box-sizing:border-box!important;
-}
-.pdf-change-log th,
-.pdf-change-log td{
+.pdf-change-card{
   border:1px solid #dfe7f1;
-  padding:4px 5px;
-  vertical-align:top;
-  overflow:hidden;
-  overflow-wrap:anywhere;
-  word-break:break-word;
-  white-space:normal;
-  box-sizing:border-box!important;
+  border-radius:8px;
+  background:#fff;
+  padding:8px 10px;
+  box-sizing:border-box;
+  break-inside:avoid;
 }
-.pdf-change-log th{
-  background:#f3f7fc;
-  color:#334e70;
+.pdf-change-card-head{
+  display:grid;
+  grid-template-columns:72px 60px 1fr;
+  gap:8px;
+  align-items:center;
+  margin-bottom:5px;
+}
+.pdf-change-date{
+  font-size:9px;
+  font-weight:800;
+  color:#64748b;
+}
+.pdf-change-type{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  min-height:21px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#eef4ff;
+  color:#2457d6;
+  font-size:8.5px;
   font-weight:900;
-  text-align:center;
+  white-space:nowrap;
 }
-.pdf-change-log tbody tr:nth-child(even) td{
-  background:#fbfdff;
+.pdf-change-person{
+  min-width:0;
+  font-size:10px;
+  font-weight:900;
+  color:#1f2f46;
+  overflow-wrap:anywhere;
 }
-.pdf-change-log th:nth-child(1),.pdf-change-log td:nth-child(1){width:72px}
-.pdf-change-log th:nth-child(2),.pdf-change-log td:nth-child(2){width:58px}
-.pdf-change-log th:nth-child(3),.pdf-change-log td:nth-child(3){width:58px}
-.pdf-change-log th:nth-child(4),.pdf-change-log td:nth-child(4){width:72px}
-.pdf-change-log th:nth-child(5),.pdf-change-log td:nth-child(5){width:66px}
-.pdf-change-log th:nth-child(6),.pdf-change-log td:nth-child(6){width:66px}
-.pdf-change-log th:nth-child(7),.pdf-change-log td:nth-child(7){width:184px}
-.pdf-change-log th:nth-child(8),.pdf-change-log td:nth-child(8){width:84px}
+.pdf-change-person .no{
+  color:#5b6b80;
+  font-weight:800;
+  margin-right:6px;
+}
+.pdf-change-summary{
+  font-size:10px;
+  line-height:1.45;
+  color:#334155;
+  font-weight:700;
+}
+.pdf-change-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 12px;
+  margin-top:5px;
+  font-size:8.5px;
+  line-height:1.4;
+  color:#64748b;
+}
+.pdf-change-meta b{
+  color:#475569;
+}
+.pdf-change-note{
+  margin-top:5px;
+  padding:5px 7px;
+  border-radius:6px;
+  background:#f8fafc;
+  font-size:8.7px;
+  line-height:1.4;
+  color:#5f6f83;
+}
 .pdf-change-empty{
   padding:26px 12px;
   text-align:center;
@@ -2107,26 +2140,34 @@ body.change-manage-mode .change-manage-inline{
 .pdf-dynamic-table th:nth-child(2){width:18%}
 .pdf-dynamic-table th:nth-child(3){width:60%}
 .pdf-dynamic-table td:nth-child(3){
-  color:#64748b;
-  font-size:9px;
+  color:#475569;
+  font-size:10px;
+  font-weight:700;
+  line-height:1.5;
 }
 
 
-/* V65 - dashboard quick status actions */
-.dashboard-status-actions{
+/* V68 - dashboard status actions integrated into group card */
+.dashboard-groups-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+}
+.dashboard-groups-head .dashboard-status-actions{
   display:flex;
   align-items:center;
-  justify-content:flex-end;
-  gap:8px;
-  margin:-6px 2px 16px;
+  gap:7px;
+  margin:0!important;
+  flex-wrap:wrap;
 }
 .dashboard-status-btn{
   appearance:none;
   border:1px solid #e2e8f0;
-  background:#fff;
+  background:#f8fafc;
   color:#475569;
   border-radius:999px;
-  padding:7px 11px;
+  padding:6px 10px;
   display:inline-flex;
   align-items:center;
   gap:7px;
@@ -2137,7 +2178,7 @@ body.change-manage-mode .change-manage-inline{
 }
 .dashboard-status-btn:hover{
   transform:translateY(-1px);
-  box-shadow:0 5px 14px rgba(15,23,42,.06);
+  box-shadow:0 4px 12px rgba(15,23,42,.06);
 }
 .dashboard-status-btn .status-dot{
   width:7px;
@@ -2147,9 +2188,9 @@ body.change-manage-mode .change-manage-inline{
 }
 .dashboard-status-btn b{
   min-width:22px;
-  padding:2px 7px;
+  padding:2px 6px;
   border-radius:999px;
-  background:#f1f5f9;
+  background:#fff;
   color:#334155;
   font-size:11px;
   text-align:center;
@@ -2165,10 +2206,9 @@ body.change-manage-mode .change-manage-inline{
   background:#fbf8ff;
 }
 @media(max-width:720px){
-  .dashboard-status-actions{
-    justify-content:flex-start;
-    flex-wrap:wrap;
-    margin-top:-4px;
+  .dashboard-groups-head{
+    align-items:flex-start!important;
+    flex-direction:column!important;
   }
 }
 
@@ -2180,6 +2220,50 @@ body.change-manage-mode .change-manage-inline{
 }
 .pdf-change-log td:nth-child(7){
   line-height:1.45;
+}
+
+
+/* V67 - clearer support details in monthly report */
+.pdf-dynamic-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:7px;
+}
+.pdf-dynamic-head b{
+  font-size:10.5px;
+  color:#7c4a03;
+}
+.pdf-dynamic-head strong{
+  font-size:12px;
+  color:#92400e;
+}
+.pdf-dynamic-support-list{
+  display:grid;
+  gap:4px;
+}
+.pdf-support-row{
+  display:grid;
+  grid-template-columns:72px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  padding:4px 7px;
+  border-radius:6px;
+  background:#fff;
+  border:1px solid #f4e4bd;
+  font-size:10px;
+  line-height:1.35;
+}
+.pdf-support-row span{
+  color:#7c5b21;
+  font-weight:800;
+}
+.pdf-support-row b{
+  color:#334155;
+  font-size:10.5px;
+  letter-spacing:.01em;
+  overflow-wrap:anywhere;
 }
 
 </style>
@@ -2243,17 +2327,19 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="dashboard" class="page active">
  <div id="kpis" class="people-overview-strip"></div>
- <div class="dashboard-status-actions">
-  <button type="button" class="dashboard-status-btn support" onclick="openPresenceFromDashboard('支援')">
-   <span class="status-dot"></span><span>支援</span><b id="dashboardSupportCount">0</b>
-  </button>
-  <button type="button" class="dashboard-status-btn homeleave" onclick="openPresenceFromDashboard('返鄉')">
-   <span class="status-dot"></span><span>返鄉</span><b id="dashboardHomeleaveCount">0</b>
-  </button>
- </div>
  <div class="chartgrid dashboard-main-grid">
   <div class="section dashboard-groups">
-   <div class="sectionhead"><div><h2>組別人力</h2></div></div>
+   <div class="sectionhead dashboard-groups-head">
+    <div><h2>組別人力</h2></div>
+    <div class="dashboard-status-actions">
+     <button type="button" class="dashboard-status-btn support" onclick="openPresenceFromDashboard('支援')">
+      <span class="status-dot"></span><span>支援</span><b id="dashboardSupportCount">0</b>
+     </button>
+     <button type="button" class="dashboard-status-btn homeleave" onclick="openPresenceFromDashboard('返鄉')">
+      <span class="status-dot"></span><span>返鄉</span><b id="dashboardHomeleaveCount">0</b>
+     </button>
+    </div>
+   </div>
    <div id="groupChart"></div>
   </div>
 
@@ -4288,6 +4374,12 @@ function collectMonthExportData(tm,fm){
  let mainTo=mainRows(toRows,asOf);       // 在職總人數（返校已排除）
  let onsiteTo=onsiteRows(toRows,asOf);   // 目前在廠（再扣返鄉/台北港/東17）
  let tempCounts=reportTempCounts(toRows,asOf);
+ let supportDetails=['台北港','東17','製造部'].map(location=>({
+   location,
+   people:mainTo
+     .filter(p=>isSupporting(p,asOf)&&String(p.support_location||'')===location)
+     .sort((a,b)=>String(a.employee_no||'').localeCompare(String(b.employee_no||'')))
+ }));
 
  let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p))&&!isOverseas(p));
  let local=activeTo.filter(p=>personType(p)==='台籍'&&!isOverseas(p));
@@ -4310,7 +4402,7 @@ function collectMonthExportData(tm,fm){
  }));
 
  return{
-   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
+   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,supportDetails,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
    fromDerived:derived,
    rangeText:monthRangeText(fm,tm,derived),
    monthChanges:meaningfulMonthChanges(tm),
@@ -4450,11 +4542,11 @@ function buildExcelCountSheet(workbook,data){
  ws.columns=[{width:28},{width:14},{width:42}];
  addStyledHeader(ws,['人員動態','人數','明細']);
  [
-  ['支援',data.tempCounts.support,[
-    data.tempCounts.taipei?`台北港 ${data.tempCounts.taipei} 人`:'',
-    data.tempCounts.east17?`東17 ${data.tempCounts.east17} 人`:'',
-    data.tempCounts.manufacturing?`製造部 ${data.tempCounts.manufacturing} 人`:''
-   ].filter(Boolean).join('｜')||'—'],
+  ['支援',data.tempCounts.support,
+    data.supportDetails
+      .filter(x=>x.people.length)
+      .map(x=>`${x.location}：${x.people.map(p=>p.employee_no).join('、')}`)
+      .join('｜')||'—'],
   ['返鄉',data.tempCounts.homeleave,''],
   ['返校',data.tempCounts.school,'不列入在職總人數']
  ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{});row.getCell(3).alignment={vertical:'middle',wrapText:true}});
@@ -4675,11 +4767,10 @@ function buildMonthCountPdfPage(data){
    ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length],
    ['海外事業部',data.overseas.length]
  ];
- let supportDetail=[
-   data.tempCounts.taipei?`台北港 ${data.tempCounts.taipei} 人`:'',
-   data.tempCounts.east17?`東17 ${data.tempCounts.east17} 人`:'',
-   data.tempCounts.manufacturing?`製造部 ${data.tempCounts.manufacturing} 人`:''
- ].filter(Boolean).join('・')||'—';
+ let supportDetail=data.supportDetails
+   .filter(x=>x.people.length)
+   .map(x=>`${x.location}：${x.people.map(p=>p.employee_no).join('、')}`)
+   .join('　')||'—';
  let dynamics=[
    ['支援',data.tempCounts.support,supportDetail],
    ['返鄉',data.tempCounts.homeleave,''],
@@ -4899,36 +4990,31 @@ function buildChangeLogPdfPages(data){
    </div>`];
  }
 
- // A4 直式保持可讀性，每頁最多 17 筆。
- return splitArray(rows,17).map((part,pageIndex)=>`
+ // 卡片式版面每頁最多 10 筆，避免表格欄位太多、文字被擠壓。
+ return splitArray(rows,10).map((part,pageIndex)=>`
   <div class="pdf-page pdf-roster-page">
    ${pdfReportHeader(`${monthLabel(data.tm)} 人員變動紀錄`)}
    <div class="pdf-section-band">
     <span>人員變動紀錄</span>
-    <small>${rows.length} 筆${rows.length>17?`・第 ${pageIndex+1} / ${Math.ceil(rows.length/17)} 頁`:''}</small>
+    <small>${rows.length} 筆${rows.length>10?`・第 ${pageIndex+1} / ${Math.ceil(rows.length/10)} 頁`:''}</small>
    </div>
 
-   <div class="pdf-change-safe">
-    <table class="pdf-change-log">
-     <thead>
-      <tr>
-       <th>日期</th><th>類型</th><th>工號</th><th>姓名</th>
-       <th>原組別</th><th>新組別</th><th>內容</th><th>備註</th>
-      </tr>
-     </thead>
-     <tbody>
-      ${part.map(c=>`<tr>
-       <td>${esc(c.change_date||'')}</td>
-       <td>${esc(c.change_type||'')}</td>
-       <td>${esc(c.employee_no||'')}</td>
-       <td>${esc(c.employee_name||'')}</td>
-       <td>${esc(c.old_group||'')}</td>
-       <td>${esc(c.new_group||'')}</td>
-       <td>${esc(changeDetailText(c)==='-'?'':changeDetailText(c))}</td>
-       <td>${esc(changeNoteText(c)==='-'?'':changeNoteText(c))}</td>
-      </tr>`).join('')}
-     </tbody>
-    </table>
+   <div class="pdf-change-list">
+    ${part.map(c=>{
+      let detail=changeDetailText(c);
+      let note=changeNoteText(c);
+      let groupChanged=c.old_group&&c.new_group&&c.old_group!==c.new_group;
+      return `<div class="pdf-change-card">
+       <div class="pdf-change-card-head">
+        <div class="pdf-change-date">${esc(c.change_date||'')}</div>
+        <div class="pdf-change-type">${esc(c.change_type||'')}</div>
+        <div class="pdf-change-person"><span class="no">${esc(c.employee_no||'')}</span>${esc(c.employee_name||'')}</div>
+       </div>
+       <div class="pdf-change-summary">${esc(detail==='-'?'':detail)}</div>
+       ${groupChanged?`<div class="pdf-change-meta"><span><b>組別</b> ${esc(c.old_group)} → ${esc(c.new_group)}</span></div>`:''}
+       ${note!=='-'?`<div class="pdf-change-note"><b>備註：</b>${esc(note)}</div>`:''}
+      </div>`;
+    }).join('')}
    </div>
    ${pdfFooter()}
   </div>`);
@@ -4962,13 +5048,21 @@ function buildSummaryPdfPage(data){
    let d=peopleDiff(x.from,x.to);
    return `<div class="pdf-list-item"><b>${esc(x.type)}</b>：${x.from.length} → ${x.to.length}（${signNum(x.to.length-x.from.length)}）<br>新增：${d.added.map(p=>p.employee_no).join('、')||'無'}<br>減少：${d.removed.map(p=>p.employee_no).join('、')||'無'}</div>`;
  }).join('');
- let supportDetail=[
-   data.tempCounts.taipei?`台北港 ${data.tempCounts.taipei} 人`:'',
-   data.tempCounts.east17?`東17 ${data.tempCounts.east17} 人`:'',
-   data.tempCounts.manufacturing?`製造部 ${data.tempCounts.manufacturing} 人`:''
- ].filter(Boolean).join('・')||'無';
+ let supportDetail=data.supportDetails
+   .filter(x=>x.people.length)
+   .map(x=>`${x.location}：${x.people.map(p=>p.employee_no).join('、')}`)
+   .join('　')||'—';
  let dynamicBlocks=[
-   `<div class="pdf-list-item pdf-dynamic-main"><b>支援</b>：${data.tempCounts.support} 人<div class="pdf-dynamic-sub">${esc(supportDetail)}</div></div>`,
+   `<div class="pdf-list-item pdf-dynamic-main">
+     <div class="pdf-dynamic-head"><b>支援</b><strong>${data.tempCounts.support} 人</strong></div>
+     <div class="pdf-dynamic-support-list">
+      ${data.supportDetails.filter(x=>x.people.length).map(x=>`
+       <div class="pdf-support-row">
+        <span>${esc(x.location)}</span>
+        <b>${esc(x.people.map(p=>p.employee_no).join('、'))}</b>
+       </div>`).join('')||'<div class="pdf-support-row"><span>目前無支援人員</span></div>'}
+     </div>
+    </div>`,
    `<div class="pdf-list-item"><b>返鄉</b>：${data.tempCounts.homeleave} 人</div>`,
    `<div class="pdf-list-item"><b>返校</b>：${data.tempCounts.school} 人<div class="pdf-dynamic-sub">不列入在職總人數</div></div>`
  ].join('');
@@ -5043,23 +5137,6 @@ async function exportMonthPdfReport(){
 
      // V26：真正擷取前先鎖定寬度，避免瀏覽器因長姓名或 rowspan
      // 把 table 的 intrinsic width 撐出 A4。
-     if(pageEl.querySelector('.pdf-change-log')){
-       let safe=pageEl.querySelector('.pdf-change-safe');
-       if(safe){
-         safe.style.width='660px';
-         safe.style.maxWidth='660px';
-         safe.style.minWidth='660px';
-         safe.style.margin='0 auto';
-         safe.style.overflow='hidden';
-       }
-       let changeTable=pageEl.querySelector('.pdf-change-log');
-       if(changeTable){
-         changeTable.style.width='660px';
-         changeTable.style.maxWidth='660px';
-         changeTable.style.minWidth='660px';
-         changeTable.style.tableLayout='fixed';
-       }
-     }
 
      if(pageEl.classList.contains('pdf-roster-4')){
        let safe=pageEl.querySelector('.pdf-safe');
@@ -5105,29 +5182,6 @@ async function exportMonthPdfReport(){
            el.style.maxWidth='794px';
            el.style.overflow='hidden';
            el.style.margin='0';
-           el.style.boxSizing='border-box';
-         });
-         doc.querySelectorAll('.pdf-change-safe').forEach(el=>{
-           el.style.width='660px';
-           el.style.maxWidth='660px';
-           el.style.minWidth='660px';
-           el.style.marginLeft='auto';
-           el.style.marginRight='auto';
-           el.style.overflow='hidden';
-           el.style.boxSizing='border-box';
-         });
-         doc.querySelectorAll('.pdf-change-log').forEach(el=>{
-           el.style.width='660px';
-           el.style.maxWidth='660px';
-           el.style.minWidth='660px';
-           el.style.tableLayout='fixed';
-           el.style.boxSizing='border-box';
-         });
-         doc.querySelectorAll('.pdf-change-log th,.pdf-change-log td').forEach(el=>{
-           el.style.overflow='hidden';
-           el.style.whiteSpace='normal';
-           el.style.overflowWrap='anywhere';
-           el.style.wordBreak='break-word';
            el.style.boxSizing='border-box';
          });
 

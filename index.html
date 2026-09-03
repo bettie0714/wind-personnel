@@ -1666,6 +1666,263 @@ body.change-manage-mode .change-manage-inline{
   min-width:980px;
 }
 
+
+#openEmployeeDataManageBtn{
+  color:#475569;
+  background:#fff;
+  border-color:#dbe2ea;
+}
+#openEmployeeDataManageBtn:hover{
+  background:#f8fafc;
+  border-color:#cbd5e1;
+}
+#employeeDataManageModal .modal{
+  width:min(680px,100%);
+}
+
+
+/* V55 - dashboard refresh */
+#dashboard{
+  --dash-text:#16233a;
+  --dash-muted:#7a879a;
+  --dash-line:#e8edf3;
+  --dash-blue:#2f63ee;
+  --dash-bg:#f7f9fc;
+}
+
+/* top overview: one card, no heavy separators */
+.people-overview-strip{
+  display:grid!important;
+  grid-template-columns:minmax(230px,1.35fr) repeat(4,minmax(115px,.78fr))!important;
+  gap:8px!important;
+  padding:10px!important;
+  background:#fff!important;
+  border:1px solid #e7ecf2!important;
+  border-radius:18px!important;
+  box-shadow:0 8px 24px rgba(24,39,75,.05)!important;
+  overflow:visible!important;
+  margin-bottom:18px!important;
+}
+.people-overview-strip .overview-item{
+  appearance:none;
+  -webkit-appearance:none;
+  border:0!important;
+  outline:0;
+  min-height:92px!important;
+  padding:15px 18px!important;
+  border-radius:13px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  text-align:left!important;
+  background:transparent!important;
+  color:inherit;
+  font:inherit;
+  box-shadow:none!important;
+}
+.people-overview-strip .overview-item + .overview-item{
+  border-left:0!important;
+}
+.people-overview-strip .overview-total{
+  background:#f4f7fb!important;
+  padding-left:20px!important;
+}
+.people-overview-strip .overview-item.clickable{
+  cursor:pointer;
+  border:1px solid transparent!important;
+}
+.people-overview-strip .overview-item.clickable:hover{
+  background:#f7f9ff!important;
+  border-color:#dbe5ff!important;
+  transform:translateY(-1px);
+}
+.people-overview-strip .overview-item.clickable::after{
+  display:none!important;
+}
+.people-overview-strip .overview-label{
+  margin:0 0 7px!important;
+  font-size:12px!important;
+  font-weight:700!important;
+  color:#718096!important;
+}
+.people-overview-strip .overview-value{
+  font-size:30px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  color:#2f63ee!important;
+  letter-spacing:-.035em!important;
+}
+.people-overview-strip .overview-total .overview-value{
+  font-size:34px!important;
+  color:#16233a!important;
+  font-weight:800!important;
+}
+.people-overview-strip .overview-item.student .overview-value{
+  color:#13965a!important;
+}
+.people-overview-strip .overview-unit{
+  font-size:12px!important;
+  color:#94a3b8!important;
+  font-weight:600!important;
+}
+.people-overview-strip .overview-note{
+  margin-top:8px!important;
+  font-size:10px!important;
+  color:#9aa5b5!important;
+}
+
+/* main dashboard cards */
+.dashboard-main-grid{
+  display:grid!important;
+  grid-template-columns:minmax(0,2.15fr) minmax(220px,.85fr)!important;
+  gap:16px!important;
+  align-items:start;
+}
+.dashboard-main-grid .section{
+  border:1px solid #e7ecf2!important;
+  border-radius:18px!important;
+  box-shadow:0 8px 24px rgba(24,39,75,.045)!important;
+  background:#fff!important;
+}
+.dashboard-groups{
+  grid-row:span 2;
+  min-height:360px;
+}
+.dashboard-side-card{
+  min-height:172px;
+}
+#dashboard .sectionhead{
+  margin-bottom:14px!important;
+}
+#dashboard .sectionhead h2{
+  font-size:17px!important;
+  color:#18253a!important;
+  letter-spacing:.01em;
+}
+
+/* group list: compact rows rather than many boxed tiles */
+.group-overview-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px 26px!important;
+}
+.group-overview-card{
+  appearance:none;
+  -webkit-appearance:none;
+  width:100%;
+  border:0!important;
+  border-bottom:1px solid #edf1f5!important;
+  border-radius:0!important;
+  padding:12px 2px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  cursor:pointer;
+  text-align:left;
+}
+.group-overview-card:hover{
+  background:#f8faff!important;
+  transform:none!important;
+}
+.group-overview-top{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.group-overview-card .group-name{
+  font-size:14px!important;
+  font-weight:700!important;
+  color:#26344a!important;
+}
+.group-overview-card .group-total{
+  font-size:23px!important;
+  font-weight:750!important;
+  color:#2f63ee!important;
+}
+.group-overview-card .group-total small{
+  font-size:11px!important;
+  color:#94a3b8!important;
+  font-weight:600!important;
+  margin-left:3px;
+}
+
+/* donut/card cleanup */
+#shiftChart{
+  justify-content:center!important;
+  gap:18px!important;
+  min-height:110px;
+}
+#shiftChart .donut{
+  width:98px!important;
+  height:98px!important;
+}
+#shiftChart .legend{
+  gap:9px!important;
+}
+#shiftChart .legendrow{
+  font-size:12px!important;
+  color:#536176!important;
+}
+
+/* person structure becomes compact rows */
+#typeChart > div:first-child{
+  height:8px!important;
+  border-radius:999px!important;
+  margin:12px 0 16px!important;
+}
+#typeChart button[data-type]{
+  grid-template-columns:10px 1fr auto!important;
+  gap:8px!important;
+  padding:8px 2px!important;
+  border-bottom:1px solid #edf1f5!important;
+  font-size:12px!important;
+}
+#typeChart button[data-type] > span:last-child{
+  display:none!important;
+}
+#typeChart button[data-type] b{
+  font-size:13px!important;
+  color:#26344a!important;
+}
+
+/* recent changes slightly quieter */
+#dashboard > .section:last-child{
+  margin-top:16px;
+  border-radius:18px!important;
+  border:1px solid #e7ecf2!important;
+  box-shadow:0 8px 24px rgba(24,39,75,.04)!important;
+}
+#dashboard > .section:last-child .tablewrap{
+  border-color:#edf1f5!important;
+}
+
+@media(max-width:1120px){
+  .people-overview-strip{
+    grid-template-columns:repeat(3,1fr)!important;
+  }
+  .people-overview-strip .overview-total{
+    grid-column:span 1!important;
+  }
+  .dashboard-main-grid{
+    grid-template-columns:1fr!important;
+  }
+  .dashboard-groups{
+    grid-row:auto;
+  }
+}
+@media(max-width:720px){
+  .people-overview-strip{
+    grid-template-columns:repeat(2,1fr)!important;
+  }
+  .people-overview-strip .overview-total{
+    grid-column:1/-1!important;
+  }
+  .group-overview-grid{
+    grid-template-columns:1fr!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1727,10 +1984,10 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="dashboard" class="page active">
  <div id="kpis" class="people-overview-strip"></div>
- <div class="chartgrid">
-  <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">僅顯示實際工作組別；建教生請由上方獨立入口查看</div></div></div><div id="groupChart"></div></div>
-  <div class="section"><div class="sectionhead"><div><h2>班別分布</h2><div class="mini">本部在職</div></div></div><div id="shiftChart" class="donutwrap"></div></div>
-  <div class="section"><div class="sectionhead"><div><h2>人員結構</h2><div class="mini">台籍／W／Z／建教生</div></div></div><div id="typeChart"></div></div>
+ <div class="chartgrid dashboard-main-grid">
+  <div class="section dashboard-groups"><div class="sectionhead"><div><h2>組別人力</h2></div></div><div id="groupChart"></div></div>
+  <div class="section dashboard-side-card"><div class="sectionhead"><div><h2>班別</h2></div></div><div id="shiftChart" class="donutwrap"></div></div>
+  <div class="section dashboard-side-card"><div class="sectionhead"><div><h2>人員結構</h2></div></div><div id="typeChart"></div></div>
  </div>
  <div class="section"><div class="sectionhead"><div><h2>最近人員異動</h2><div class="mini">新增、修改與離職</div></div></div><div class="tablewrap"><table><thead><tr><th>類型</th><th>姓名</th><th>工號</th><th>組別</th><th>內容</th><th>日期</th></tr></thead><tbody id="recentBody"></tbody></table></div></div>
 </section>
@@ -1855,6 +2112,7 @@ body.change-manage-mode .change-manage-inline{
    </div>
    <div class="manage-actions">
     <button id="openResignPickerBtn" class="btn danger">辦理離職</button>
+    <button id="openEmployeeDataManageBtn" class="btn">人員資料管理</button>
     <button id="deleteSelectedChanges" class="btn soft-danger" disabled>刪除選取</button>
    </div>
   </div>
@@ -1947,7 +2205,7 @@ body.change-manage-mode .change-manage-inline{
   </label>
  </div>
  </div><div class="modalfoot">
-   <div class="danger-zone"><button id="personDelete" class="btn soft-danger hidden">永久刪除資料</button></div>
+   
    <span style="flex:1"></span>
    <button id="personCancel" class="btn">取消</button>
    <button id="personSave" class="btn primary">儲存</button>
@@ -2019,6 +2277,30 @@ body.change-manage-mode .change-manage-inline{
    <span style="flex:1"></span>
    <button id="changeEditCancel" class="btn">取消</button>
    <button id="changeEditSave" class="btn primary">儲存紀錄</button>
+  </div>
+ </div>
+</div>
+
+
+<div id="employeeDataManageModal" class="modalback">
+ <div class="modal">
+  <button id="employeeDataManageClose" class="close">×</button>
+  <h2>人員資料管理</h2>
+  <p>僅用於重複匯入、工號輸入錯誤或測試資料。正式離職請使用「辦理離職」。</p>
+  <div class="formgrid">
+   <div class="field full">
+    <label>搜尋人員</label>
+    <input id="employeeDataManageSearch" placeholder="輸入工號、姓名或組別">
+   </div>
+   <div class="field full">
+    <label>選擇要管理的人員</label>
+    <select id="employeeDataManageSelect" size="8" style="min-height:220px"></select>
+   </div>
+  </div>
+  <div class="modalfoot">
+   <span class="mini" style="margin-right:auto">永久刪除會一併清除該工號的月份快照、外籍合約與人員變動紀錄。</span>
+   <button id="employeeDataManageCancel" class="btn">取消</button>
+   <button id="employeeDataDeleteBtn" class="btn soft-danger">永久刪除人員</button>
   </div>
  </div>
 </div>
@@ -2421,12 +2703,12 @@ function renderDash(){
 
  $('kpis').innerHTML=`
    <div class="overview-item overview-total">
-     <div class="overview-label">目前廠內總人數</div>
+     <div class="overview-label">目前廠內人力</div>
      <div class="overview-value">${a.length}<span class="overview-unit">人</span></div>
      <div class="overview-note">不含海外事業部</div>
    </div>
    ${k.map(x=>`
-     <button class="overview-item clickable ${x[2]==='建教生'?'student':''}" data-type="${x[2]}">
+     <button type="button" class="overview-item clickable ${x[2]==='建教生'?'student':''}" data-type="${x[2]}">
        <div class="overview-label">${x[0]}</div>
        <div class="overview-value">${x[1]}<span class="overview-unit">人</span></div>
      </button>
@@ -2443,7 +2725,7 @@ function renderDash(){
  });
  let groups=Object.entries(gc).sort((a,b)=>b[1]-a[1]);
  $('groupChart').innerHTML='<div class="group-overview-grid">'+groups.map(([g,total])=>`
-   <button class="group-overview-card" data-g="${esc(g)}">
+   <button type="button" class="group-overview-card" data-g="${esc(g)}">
      <div class="group-overview-top"><span class="group-name">${esc(g)}</span><span class="group-total">${total}<small> 人</small></span></div>
    </button>`).join('')+'</div>';
  $('groupChart').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{showPage('people');activeTypeFilter='';syncTypeButtons();$('fGroup').value=b.dataset.g;renderPeople()});
@@ -2945,7 +3227,6 @@ function openPerson(p=null,area=null){
  $('mTempStart').value=p?.temporary_start_date||'';
  $('mExpectedReturn').value=p?.expected_return_date||'';
  $('mNote').value=p?.note||'';
- $('personDelete').classList.toggle('hidden',!p);
  logChoiceTouched=false;
  $('mLogChange').checked=!p;
  syncTempFields();
@@ -3148,28 +3429,6 @@ $('personSave').onclick=async()=>{
  renderAll();
 };
 
-$('personDelete').onclick=async()=>{
- if(!isAdmin()||!editNo)return;
- let p=employees.find(x=>x.employee_no===editNo);
- if(!p)return alert('找不到這筆人員資料。');
-
- let confirmText=prompt(
-   `這會永久刪除 ${p.employee_no}｜${p.name} 的人員資料，並清除這個工號的月份快照與人員異動紀錄。\n\n`+
-   `這不是「離職」，刪除後無法從系統還原。\n\n`+
-   `若確定要刪除，請輸入工號 ${p.employee_no}`
- );
- if(confirmText===null)return;
- if(normalizeNo(confirmText)!==p.employee_no)return alert('工號輸入不符，已取消刪除。');
-
- let {error}=await db.rpc('admin_delete_employee',{p_employee_no:p.employee_no});
- if(error){alert('刪除失敗：'+error.message);return}
-
- $('personModal').classList.remove('show');
- await loadAll();
- await syncCurrentMonthSnapshot();
- renderAll();
- alert(`${p.employee_no}｜${p.name} 已永久刪除。`);
-};
 
 function populateResignPicker(){
  let q=$('resignPickerSearch').value.trim().toLowerCase();
@@ -3179,6 +3438,55 @@ function populateResignPicker(){
  }).sort((a,b)=>a.employee_no.localeCompare(b.employee_no));
  $('resignPickerSelect').innerHTML=list.map(p=>`<option value="${esc(p.employee_no)}">${esc(p.employee_no)}｜${esc(p.name)}｜${esc(personGroup(p))}</option>`).join('');
 }
+
+function populateEmployeeDataManage(){
+ let q=$('employeeDataManageSearch').value.trim().toLowerCase();
+ let list=[...employees].filter(p=>{
+   if(!q)return true;
+   return `${p.employee_no} ${p.name} ${personGroup(p)||''} ${p.job_title||''} ${p.status||''}`.toLowerCase().includes(q);
+ }).sort((a,b)=>a.employee_no.localeCompare(b.employee_no));
+
+ $('employeeDataManageSelect').innerHTML=list.map(p=>{
+   let status=isActiveAsOf(p)?'在職':(p.status||'離職');
+   return `<option value="${esc(p.employee_no)}">${esc(p.employee_no)}｜${esc(p.name)}｜${esc(personGroup(p)||'未設定')}｜${esc(status)}</option>`;
+ }).join('');
+}
+$('openEmployeeDataManageBtn').onclick=()=>{
+ if(!isAdmin())return;
+ $('employeeDataManageSearch').value='';
+ populateEmployeeDataManage();
+ $('employeeDataManageModal').classList.add('show');
+};
+$('employeeDataManageSearch').addEventListener('input',populateEmployeeDataManage);
+$('employeeDataManageClose').onclick=$('employeeDataManageCancel').onclick=()=>{
+ $('employeeDataManageModal').classList.remove('show');
+};
+$('employeeDataDeleteBtn').onclick=async()=>{
+ if(!isAdmin())return;
+ let no=normalizeNo($('employeeDataManageSelect').value);
+ if(!no)return alert('請先選擇要刪除的人員。');
+
+ let person=employees.find(x=>x.employee_no===no);
+ if(!person)return alert('找不到這筆人員資料。');
+
+ let confirmText=prompt(
+   `這會永久刪除 ${person.employee_no}｜${person.name} 的人員資料。\n\n`+
+   `這不是「離職」，刪除後無法從系統還原。\n\n`+
+   `若確定要刪除，請輸入工號 ${person.employee_no}`
+ );
+ if(confirmText===null)return;
+ if(normalizeNo(confirmText)!==person.employee_no)return alert('工號輸入不符，已取消刪除。');
+
+ let {error}=await db.rpc('admin_delete_employee',{p_employee_no:person.employee_no});
+ if(error){alert('刪除失敗：'+error.message);return}
+
+ $('employeeDataManageModal').classList.remove('show');
+ await loadAll();
+ await syncCurrentMonthSnapshot();
+ renderAll();
+ alert(`${person.employee_no}｜${person.name} 已永久刪除。`);
+};
+
 $('openResignPickerBtn').onclick=()=>{
  if(!isAdmin())return;
  $('resignPickerSearch').value='';

@@ -1251,7 +1251,7 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 
 
 /* V44 - editable personnel change log */
-.change-log-toolbar{
+.change-log-toolbar-obsolete{
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -1298,52 +1298,208 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 }
 
 
-/* V46 - top KPI: total / local / Z / W / students */
-.grid5{
+
+
+/* V47 - compact dashboard people overview */
+.people-overview-strip{
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:14px;
-}
-.grid5 .stat{
-  position:relative;
+  grid-template-columns:minmax(180px,1.35fr) repeat(4,minmax(120px,1fr));
+  gap:0;
+  background:#fff;
+  border:1px solid #e4e9f1;
+  border-radius:18px;
+  box-shadow:0 10px 28px rgba(15,23,42,.055);
   overflow:hidden;
-  min-height:126px;
+  margin-bottom:16px;
 }
-.grid5 .stat::before{
+.people-overview-strip .overview-item{
+  position:relative;
+  min-height:112px;
+  padding:18px 22px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:#fff;
+}
+.people-overview-strip .overview-item + .overview-item{
+  border-left:1px solid #edf1f5;
+}
+.people-overview-strip .overview-item.clickable{
+  cursor:pointer;
+  transition:.16s ease;
+}
+.people-overview-strip .overview-item.clickable:hover{
+  background:#f8fbff;
+}
+.people-overview-strip .overview-item.clickable::after{
   content:'';
   position:absolute;
-  left:0;
-  top:0;
+  left:22px;
+  right:22px;
   bottom:0;
-  width:3px;
-  background:#dbe4f0;
+  height:2px;
+  background:#4f7cff;
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:.16s ease;
 }
-.grid5 .stat.kpi-click::before{background:#7aa2ff}
-.grid5 .stat.student-kpi::before{background:#37b26c}
-.grid5 .stat.student-kpi .num{color:#178a4d}
-.grid5 .stat .kpi-icon{
-  position:absolute;
-  right:16px;
-  top:15px;
-  width:28px;
-  height:28px;
-  border-radius:9px;
-  display:grid;
-  place-items:center;
-  background:#f4f7fb;
+.people-overview-strip .overview-item.clickable:hover::after{
+  transform:scaleX(1);
+}
+.people-overview-strip .overview-label{
+  font-size:12px;
+  font-weight:700;
   color:#64748b;
-  font-size:13px;
-  font-weight:900;
+  margin-bottom:6px;
 }
-.grid5 .stat.student-kpi .kpi-icon{
-  background:#eefaf3;
-  color:#178a4d;
+.people-overview-strip .overview-value{
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  font-size:31px;
+  line-height:1;
+  font-weight:500;
+  color:#2457e6;
+  letter-spacing:-.03em;
 }
-@media(max-width:1180px){
-  .grid5{grid-template-columns:repeat(3,1fr)}
+.people-overview-strip .overview-total .overview-value{
+  font-size:35px;
+  color:#17365d;
+  font-weight:800;
+}
+.people-overview-strip .overview-unit{
+  font-size:12px;
+  color:#94a3b8;
+  font-weight:600;
+}
+.people-overview-strip .overview-note{
+  margin-top:7px;
+  font-size:11px;
+  color:#94a3b8;
+}
+.people-overview-strip .overview-item.student .overview-value{
+  color:#169a55;
+}
+.people-overview-strip .overview-item.active-type{
+  background:#f7faff;
+}
+@media(max-width:960px){
+  .people-overview-strip{
+    grid-template-columns:repeat(3,1fr);
+  }
+  .people-overview-strip .overview-item:nth-child(4){
+    border-left:0;
+    border-top:1px solid #edf1f5;
+  }
+  .people-overview-strip .overview-item:nth-child(5){
+    border-top:1px solid #edf1f5;
+  }
+}
+@media(max-width:640px){
+  .people-overview-strip{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .people-overview-strip .overview-item{
+    min-height:92px;
+    padding:15px 17px;
+  }
+  .people-overview-strip .overview-item:nth-child(odd){
+    border-left:0;
+  }
+  .people-overview-strip .overview-item:nth-child(n+3){
+    border-top:1px solid #edf1f5;
+  }
+  .people-overview-strip .overview-total{
+    grid-column:1/-1;
+  }
+  .people-overview-strip .overview-value{
+    font-size:27px;
+  }
+  .people-overview-strip .overview-total .overview-value{
+    font-size:32px;
+  }
+}
+
+
+/* V48 - change log manage mode */
+.change-log-manage-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  border-radius:10px;
+}
+.change-log-manage-btn .edit-dot{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  background:#315efb;
+}
+.change-log-manage-btn.is-editing{
+  background:#17365d;
+  border-color:#17365d;
+  color:#fff;
+}
+.change-manage-bar{
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  margin:10px 0 12px;
+  border:1px solid #e4e9f1;
+  border-radius:12px;
+  background:#f8fafc;
+}
+.change-manage-bar.show{
+  display:flex;
+}
+.change-manage-bar .manage-info{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#64748b;
+  font-size:12px;
+}
+.change-manage-bar .manage-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.change-manage-bar .manage-actions .btn{
+  padding:7px 11px;
+  border-radius:9px;
+  font-size:12px;
+}
+.change-manage-bar .manage-actions .btn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+.change-edit-only{
+  display:none!important;
+}
+body.change-manage-mode .change-edit-only{
+  display:table-cell!important;
+}
+body.change-manage-mode .change-manage-inline{
+  display:inline-flex!important;
+}
+.change-manage-inline{
+  display:none!important;
+}
+#changes table.change-table-manage{
+  min-width:1080px;
+}
+#changes .change-row-edit{
+  padding:5px 9px;
+  font-size:11px;
+  border-radius:8px;
 }
 @media(max-width:760px){
-  .grid5{grid-template-columns:repeat(2,1fr)}
+  .change-manage-bar.show{
+    align-items:flex-start;
+    flex-direction:column;
+  }
 }
 
 </style>
@@ -1406,7 +1562,7 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 </header>
 
 <section id="dashboard" class="page active">
- <div id="kpis" class="grid5"></div>
+ <div id="kpis" class="people-overview-strip"></div>
  <div class="chartgrid">
   <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">僅顯示實際工作組別；建教生請由上方獨立入口查看</div></div></div><div id="groupChart"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>班別分布</h2><div class="mini">本部在職</div></div></div><div id="shiftChart" class="donutwrap"></div></div>
@@ -1526,15 +1682,46 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
  </div>
 
  <div class="section">
-  <div class="sectionhead"><div><h2>人員變動紀錄</h2><div class="mini">V34 之後的修改會顯示欄位前後差異；更早的舊版紀錄若當時未保存差異，會明確標示。</div></div><button id="openResignPickerBtn" class="btn danger admin-only">辦理離職</button></div>
-<div class="change-log-toolbar admin-only">
- <div class="left">
-  <span>勾選不要保留的紀錄，再批次刪除。</span>
-  <span id="changeSelectedCount">已選 0 筆</span>
- </div>
- <button id="deleteSelectedChanges" class="btn soft-danger">刪除選取</button>
-</div>
-  <div class="tablewrap"><table><thead><tr><th class="admin-only"><input id="selectAllChanges" class="change-select" type="checkbox" aria-label="全選人員變動紀錄"></th><th>日期</th><th>類型</th><th>工號</th><th>姓名</th><th>原組別</th><th>新組別</th><th>內容</th><th>備註</th><th class="admin-only">操作</th></tr></thead><tbody id="changesBody"></tbody></table></div>
+  <div class="sectionhead">
+   <div>
+    <h2>人員變動紀錄</h2>
+    <div class="mini">保留真正需要追蹤的人員異動；需要整理時再進入編輯模式。</div>
+   </div>
+   <button id="toggleChangeManageBtn" class="btn change-log-manage-btn admin-only">
+    <span class="edit-dot"></span><span id="toggleChangeManageText">編輯紀錄</span>
+   </button>
+  </div>
+
+  <div id="changeManageBar" class="change-manage-bar admin-only">
+   <div class="manage-info">
+    <span>勾選要刪除的紀錄</span>
+    <b id="changeSelectedCount">已選 0 筆</b>
+   </div>
+   <div class="manage-actions">
+    <button id="openResignPickerBtn" class="btn danger">辦理離職</button>
+    <button id="deleteSelectedChanges" class="btn soft-danger" disabled>刪除選取</button>
+   </div>
+  </div>
+
+  <div class="tablewrap">
+   <table id="changesTable">
+    <thead>
+     <tr>
+      <th class="admin-only change-edit-only"><input id="selectAllChanges" class="change-select" type="checkbox" aria-label="全選人員變動紀錄"></th>
+      <th>日期</th>
+      <th>類型</th>
+      <th>工號</th>
+      <th>姓名</th>
+      <th>原組別</th>
+      <th>新組別</th>
+      <th>內容</th>
+      <th>備註</th>
+      <th class="admin-only change-edit-only">操作</th>
+     </tr>
+    </thead>
+    <tbody id="changesBody"></tbody>
+   </table>
+  </div>
  </div>
 </section>
 
@@ -1633,6 +1820,7 @@ let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapsho
 let logChoiceTouched=false;
 let editingChangeId=null;
 let selectedChangeIds=new Set();
+let changeManageMode=false;
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -1885,7 +2073,7 @@ async function loadAll(){
  populateFilters();
  renderAll();
 }
-function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','查看 W／Z 合約到期日與剩餘天數']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
+function showPage(id){if(id!=='changes'&&changeManageMode){changeManageMode=false;selectedChangeIds.clear();document.body.classList.remove('change-manage-mode');}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','查看 W／Z 合約到期日與剩餘天數']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(b.dataset.page==='admin'&&!isAdmin())return;showPage(b.dataset.page)});
 function populateFilters(){
  let gs=[...new Set([...GROUPS,...employees.map(personGroup).filter(Boolean)])]
@@ -1897,6 +2085,26 @@ function populateFilters(){
  $('fJob').innerHTML='<option value="">全部</option>'+jobs.map(x=>`<option>${esc(x)}</option>`).join('');
  $('mGroup').innerHTML='<option value="">— 不設定組別 —</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');
 }
+
+
+function setChangeManageMode(on){
+ if(!isAdmin())return;
+ changeManageMode=!!on;
+ document.body.classList.toggle('change-manage-mode',changeManageMode);
+ $('changeManageBar').classList.toggle('show',changeManageMode);
+ $('toggleChangeManageBtn').classList.toggle('is-editing',changeManageMode);
+ $('toggleChangeManageText').textContent=changeManageMode?'完成':'編輯紀錄';
+
+ if(!changeManageMode){
+   selectedChangeIds.clear();
+   if($('selectAllChanges')){
+     $('selectAllChanges').checked=false;
+     $('selectAllChanges').indeterminate=false;
+   }
+ }
+ renderChanges();
+}
+$('toggleChangeManageBtn').onclick=()=>setChangeManageMode(!changeManageMode);
 
 window.openChangeEditor=id=>{
  if(!isAdmin())return;
@@ -1987,18 +2195,25 @@ function renderAll(){
 function renderDash(){
  let a=mainCurrent();
  let k=[
-   ['總人數',a.length,'','總'],
-   ['台籍',a.filter(x=>personType(x)==='台籍').length,'台籍','台'],
-   ['Z',a.filter(x=>personType(x)==='Z').length,'Z','Z'],
-   ['W',a.filter(x=>personType(x)==='W').length,'W','W'],
-   ['建教生',a.filter(x=>personType(x)==='建教生').length,'建教生','學']
+   ['台籍',a.filter(x=>personType(x)==='台籍').length,'台籍'],
+   ['Z',a.filter(x=>personType(x)==='Z').length,'Z'],
+   ['W',a.filter(x=>personType(x)==='W').length,'W'],
+   ['建教生',a.filter(x=>personType(x)==='建教生').length,'建教生']
  ];
- $('kpis').innerHTML=k.map(x=>`<div class="stat ${x[2]?'kpi-click':''} ${x[2]==='建教生'?'student-kpi':''}" ${x[2]?`data-type="${x[2]}"`:''}>
-   <span class="kpi-icon">${x[3]}</span>
-   <div class="label">${x[0]}</div>
-   <div class="num">${x[1]} <span style="font-size:14px;color:#64748b;font-weight:500">人</span></div>
-   ${x[2]?'<div class="mini">點擊查看名單</div>':'<div class="mini">目前廠內人力</div>'}
- </div>`).join('');
+
+ $('kpis').innerHTML=`
+   <div class="overview-item overview-total">
+     <div class="overview-label">目前廠內總人數</div>
+     <div class="overview-value">${a.length}<span class="overview-unit">人</span></div>
+     <div class="overview-note">不含海外事業部</div>
+   </div>
+   ${k.map(x=>`
+     <button class="overview-item clickable ${x[2]==='建教生'?'student':''}" data-type="${x[2]}">
+       <div class="overview-label">${x[0]}</div>
+       <div class="overview-value">${x[1]}<span class="overview-unit">人</span></div>
+     </button>
+   `).join('')}
+ `;
  $('kpis').querySelectorAll('[data-type]').forEach(card=>card.onclick=()=>openTypeList(card.dataset.type));
 
  // 組別卡片：真正組別 + 該組的 Z/W 人數
@@ -2312,6 +2527,8 @@ function changeNoteText(c){
 function syncChangeSelectionUI(){
  if(!$('changeSelectedCount'))return;
  $('changeSelectedCount').textContent=`已選 ${selectedChangeIds.size} 筆`;
+ if($('deleteSelectedChanges'))$('deleteSelectedChanges').disabled=selectedChangeIds.size===0;
+
  let allIds=changes.map(c=>String(c.id));
  let selectedVisible=allIds.filter(id=>selectedChangeIds.has(id)).length;
  if($('selectAllChanges')){
@@ -2320,8 +2537,10 @@ function syncChangeSelectionUI(){
  }
 }
 function renderChanges(){
+ if($('changesTable'))$('changesTable').classList.toggle('change-table-manage',changeManageMode);
+
  $('changesBody').innerHTML=changes.map(c=>`<tr>
-  ${isAdmin()?`<td><input class="change-select change-row-select" type="checkbox" data-change-id="${c.id}" ${selectedChangeIds.has(String(c.id))?'checked':''}></td>`:''}
+  ${isAdmin()&&changeManageMode?`<td><input class="change-select change-row-select" type="checkbox" data-change-id="${c.id}" ${selectedChangeIds.has(String(c.id))?'checked':''}></td>`:''}
   <td>${esc(c.change_date)}</td>
   <td>${changeBadge(c.change_type)}</td>
   <td>${esc(c.employee_no||'-')}</td>
@@ -2330,8 +2549,8 @@ function renderChanges(){
   <td>${esc(c.new_group||'-')}</td>
   <td>${esc(changeDetailText(c))}</td>
   <td>${esc(changeNoteText(c))}</td>
-  ${isAdmin()?`<td><div class="change-action-wrap"><button class="btn" onclick="openChangeEditor(${c.id})">編輯</button><button class="btn soft-danger" onclick="deleteChangeRecord(${c.id})">刪除</button></div></td>`:''}
- </tr>`).join('')||`<tr><td colspan="${isAdmin()?10:8}" class="empty">目前沒有變動紀錄</td></tr>`;
+  ${isAdmin()&&changeManageMode?`<td><button class="btn change-row-edit" onclick="openChangeEditor(${c.id})">編輯</button></td>`:''}
+ </tr>`).join('')||`<tr><td colspan="${isAdmin()&&changeManageMode?10:8}" class="empty">目前沒有變動紀錄</td></tr>`;
 
  document.querySelectorAll('.change-row-select').forEach(cb=>{
    cb.onchange=()=>{

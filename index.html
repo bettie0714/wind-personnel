@@ -2612,6 +2612,84 @@ body.change-manage-mode .change-manage-inline{
   font-weight:700;
 }
 
+
+/* V76 - clearer summary meters */
+.pdf-meter-list{display:grid;gap:9px}
+.pdf-meter-item{display:grid;gap:4px}
+.pdf-meter-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.pdf-meter-label{color:#334155;font-size:10.2px;font-weight:800}
+.pdf-meter-value{color:#1e293b;font-size:11px;font-weight:900;white-space:nowrap}
+.pdf-meter-value small{color:#8190a3;font-size:8px;font-weight:700}
+.pdf-meter-track{
+  height:8px;border:1px solid #dfe6ef;border-radius:999px;
+  background:#f1f4f8;overflow:hidden
+}
+.pdf-meter-fill{height:100%;min-width:3px;border-radius:999px}
+
+/* V76 - movement summary: counts first, details structured */
+.pdf-movement-list{width:100%;border-top:1px solid #e2e8f0}
+.pdf-movement-row{padding:7px 0;border-bottom:1px solid #e7edf4}
+.pdf-movement-main{
+  display:grid;grid-template-columns:80px 92px 42px;gap:8px;align-items:center
+}
+.pdf-movement-type{color:#334155;font-size:9.3px;font-weight:900}
+.pdf-movement-count{color:#475569;font-size:9.3px;font-weight:800;text-align:center}
+.pdf-movement-count span{color:#a0aabd;padding:0 5px}
+.pdf-movement-net{text-align:right;font-size:9.5px;font-weight:900}
+.pdf-movement-net.pos{color:#15803d}
+.pdf-movement-net.neg{color:#b42318}
+.pdf-movement-net.zero{color:#94a3b8}
+.pdf-movement-detail{
+  display:grid;grid-template-columns:1fr 1fr;gap:5px 8px;
+  margin-top:6px;padding:7px 8px;border-radius:7px;
+  background:#f8fafc;border:1px solid #e7edf4
+}
+.pdf-movement-detail-item{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  color:#64748b;font-size:8px
+}
+.pdf-movement-detail-item span{font-weight:700}
+.pdf-movement-detail-item b{color:#334155;font-size:8.7px;white-space:nowrap}
+.pdf-movement-more{
+  grid-column:1/-1;padding-top:3px;border-top:1px dashed #dde5ef;
+  color:#8a97a8;font-size:7.2px;line-height:1.3
+}
+
+/* V76 - same date shown once, rows stay aligned */
+.pdf-change-ledger-v76{width:100%;border-top:1px solid #dfe6ef;border-bottom:1px solid #dfe6ef}
+.pdf-change-ledger-head-v76{
+  display:grid;grid-template-columns:82px 62px 128px minmax(0,1fr);
+  gap:8px;padding:6px 10px;background:#f5f8fc;color:#62738a;font-size:8px;font-weight:900
+}
+.pdf-change-date-group{
+  display:grid;grid-template-columns:82px minmax(0,1fr);border-top:1px solid #e7edf4
+}
+.pdf-change-group-date{
+  padding:9px 8px 8px 10px;color:#42566f;font-size:8.5px;font-weight:900;
+  background:#fbfcfe;border-right:1px solid #e7edf4;white-space:nowrap
+}
+.pdf-change-group-rows{min-width:0}
+.pdf-change-entry{
+  display:grid;grid-template-columns:62px 128px minmax(0,1fr);
+  gap:8px;padding:8px 10px 8px 8px;border-top:1px solid #edf1f5;line-height:1.4
+}
+.pdf-change-entry:first-child{border-top:0}
+.pdf-change-entry-type{color:#2457d6;font-size:8.5px;font-weight:900}
+.pdf-change-entry-person{
+  display:grid;grid-template-columns:46px minmax(0,1fr);gap:5px;min-width:0
+}
+.pdf-change-entry-person b{color:#334155;font-size:8.7px}
+.pdf-change-entry-person span{
+  color:#526174;font-size:8.4px;font-weight:700;overflow-wrap:anywhere
+}
+.pdf-change-entry-content{
+  color:#334155;font-size:8.8px;font-weight:700;min-width:0;overflow-wrap:anywhere
+}
+.pdf-change-entry-content small{
+  display:block;margin-top:3px;color:#7a8798;font-size:7.5px;font-weight:600
+}
+.pdf-change-entry-content small b{color:#59687b}
+
 </style>
 </head>
 <body>
@@ -5110,12 +5188,18 @@ async function exportMonthExcelStyled(){
 }
 function pdfBarRows(items,color){
  let max=Math.max(...items.map(x=>x[1]),1);
- return `<div class="pdf-bars">${items.map(x=>`
-   <div class="pdf-bar-row">
-    <div>${esc(x[0])}</div>
-    <div class="pdf-bar-track"><div class="pdf-bar-fill" style="width:${(x[1]/max)*100}%;background:${color}"></div></div>
-    <div style="text-align:right;font-weight:800">${x[1]} 人</div>
-   </div>`).join('')}</div>`;
+ return `<div class="pdf-meter-list">${items.map(x=>{
+   let pct=(x[1]/max)*100;
+   return `<div class="pdf-meter-item">
+    <div class="pdf-meter-head">
+     <span class="pdf-meter-label">${esc(x[0])}</span>
+     <span class="pdf-meter-value">${x[1]} <small>人</small></span>
+    </div>
+    <div class="pdf-meter-track">
+     <div class="pdf-meter-fill" style="width:${pct}%;background:${color}"></div>
+    </div>
+   </div>`;
+ }).join('')}</div>`;
 }
 function pdfReportHeader(title){
  return `<div class="pdf-header">
@@ -5503,9 +5587,30 @@ function buildChangeLogPdfPages(data){
    </div>`];
  }
 
- let pages=splitArray(rows,16);
+ let dayGroups=[];
+ rows.forEach(c=>{
+   let date=String(c.change_date||'');
+   let last=dayGroups[dayGroups.length-1];
+   if(!last||last.date!==date){
+     last={date,rows:[]};
+     dayGroups.push(last);
+   }
+   last.rows.push(c);
+ });
 
- return pages.map((part,pageIndex)=>`
+ let pages=[],current=[],count=0;
+ dayGroups.forEach(g=>{
+   if(current.length && count+g.rows.length>15){
+     pages.push(current);
+     current=[];
+     count=0;
+   }
+   current.push(g);
+   count+=g.rows.length;
+ });
+ if(current.length)pages.push(current);
+
+ return pages.map((groups,pageIndex)=>`
   <div class="pdf-page pdf-roster-page">
    ${pdfReportHeader(`${monthLabel(data.tm)} 人員變動紀錄`)}
    <div class="pdf-section-band">
@@ -5513,28 +5618,34 @@ function buildChangeLogPdfPages(data){
     <small>${rows.length} 筆${pages.length>1?`・第 ${pageIndex+1} / ${pages.length} 頁`:''}</small>
    </div>
 
-   <div class="pdf-change-ledger">
-    <div class="pdf-change-ledger-head">
+   <div class="pdf-change-ledger-v76">
+    <div class="pdf-change-ledger-head-v76">
      <span>日期</span><span>類型</span><span>人員</span><span>異動內容</span>
     </div>
-    ${part.map((c,idx)=>{
-      let detail=changeDetailText(c);
-      let note=changeNoteText(c);
-      return `<div class="pdf-change-ledger-row">
-       <div class="pdf-change-ledger-date">${esc(c.change_date||'')}</div>
-       <div class="pdf-change-ledger-type">${esc(c.change_type||'')}</div>
-       <div class="pdf-change-ledger-person"><b>${esc(c.employee_no||'')}</b><span>${esc(c.employee_name||'')}</span></div>
-       <div class="pdf-change-ledger-content">
-        <div>${esc(detail==='-'?'':detail)}</div>
-        ${note!=='-'?`<small><b>備註</b> ${esc(note)}</small>`:''}
-       </div>
-      </div>`;
-    }).join('')}
+    ${groups.map(g=>`
+     <div class="pdf-change-date-group">
+      <div class="pdf-change-group-date">${esc(g.date)}</div>
+      <div class="pdf-change-group-rows">
+       ${g.rows.map(c=>{
+        let detail=changeDetailText(c);
+        let note=changeNoteText(c);
+        return `<div class="pdf-change-entry">
+         <div class="pdf-change-entry-type">${esc(c.change_type||'')}</div>
+         <div class="pdf-change-entry-person">
+          <b>${esc(c.employee_no||'')}</b><span>${esc(c.employee_name||'')}</span>
+         </div>
+         <div class="pdf-change-entry-content">
+          <div>${esc(detail==='-'?'':detail)}</div>
+          ${note!=='-'?`<small><b>備註</b> ${esc(note)}</small>`:''}
+         </div>
+        </div>`;
+       }).join('')}
+      </div>
+     </div>`).join('')}
    </div>
    ${pdfFooter()}
   </div>`);
 }
-
 function buildFourPageReport(data){
  return[
    buildSummaryPdfPage(data),
@@ -5564,7 +5675,6 @@ function buildSummaryPdfPage(data){
   ${data.typeRows.map(x=>{
     let d=peopleDiff(x.from,x.to);
     let net=x.to.length-x.from.length;
-    let netText=net>0?`+${net}`:`${net}`;
     let isStudent=x.type==='建教生';
 
     let detail='';
@@ -5572,15 +5682,22 @@ function buildSummaryPdfPage(data){
       let addLabel=isStudent?'進廠／返廠':'新增';
       let removeLabel=isStudent?'返校':'減少';
       detail=`<div class="pdf-movement-detail">
-       ${d.added.length?`<span><b>${addLabel}</b> ${esc(d.added.map(p=>p.employee_no).join('、'))}</span>`:''}
-       ${d.removed.length?`<span><b>${removeLabel}</b> ${esc(d.removed.map(p=>p.employee_no).join('、'))}</span>`:''}
+       <div class="pdf-movement-detail-item">
+        <span>${addLabel}</span><b>${d.added.length} 人</b>
+       </div>
+       <div class="pdf-movement-detail-item">
+        <span>${removeLabel}</span><b>${d.removed.length} 人</b>
+       </div>
+       ${isStudent?'<div class="pdf-movement-more">詳細工號請見「建教生名冊」與「人員變動紀錄」</div>':''}
       </div>`;
     }
 
-    return `<div class="pdf-movement-row ${net!==0?'changed':''}">
-     <div class="pdf-movement-type">${esc(x.type)}</div>
-     <div class="pdf-movement-count">${x.from.length} <span>→</span> ${x.to.length}</div>
-     <div class="pdf-movement-net ${net>0?'pos':net<0?'neg':'zero'}">${net===0?'±0':netText}</div>
+    return `<div class="pdf-movement-row">
+     <div class="pdf-movement-main">
+      <div class="pdf-movement-type">${esc(x.type)}</div>
+      <div class="pdf-movement-count">${x.from.length}<span>→</span>${x.to.length}</div>
+      <div class="pdf-movement-net ${net>0?'pos':net<0?'neg':'zero'}">${net===0?'±0':net>0?'+'+net:String(net)}</div>
+     </div>
      ${detail}
     </div>`;
   }).join('')}

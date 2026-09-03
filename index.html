@@ -2034,20 +2034,34 @@ body.change-manage-mode .change-manage-inline{
 
 
 /* V62 - monthly report change log */
+.pdf-change-safe{
+  width:660px!important;
+  max-width:660px!important;
+  min-width:660px!important;
+  margin:0 auto!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
 .pdf-change-log{
-  width:100%;
+  width:660px!important;
+  max-width:660px!important;
+  min-width:660px!important;
   border-collapse:collapse;
-  table-layout:fixed;
-  font-size:8.5px;
-  line-height:1.35;
+  table-layout:fixed!important;
+  font-size:8px;
+  line-height:1.3;
+  box-sizing:border-box!important;
 }
 .pdf-change-log th,
 .pdf-change-log td{
   border:1px solid #dfe7f1;
-  padding:5px 6px;
+  padding:4px 5px;
   vertical-align:top;
+  overflow:hidden;
   overflow-wrap:anywhere;
   word-break:break-word;
+  white-space:normal;
+  box-sizing:border-box!important;
 }
 .pdf-change-log th{
   background:#f3f7fc;
@@ -2058,14 +2072,14 @@ body.change-manage-mode .change-manage-inline{
 .pdf-change-log tbody tr:nth-child(even) td{
   background:#fbfdff;
 }
-.pdf-change-log th:nth-child(1){width:11%}
-.pdf-change-log th:nth-child(2){width:10%}
-.pdf-change-log th:nth-child(3){width:10%}
-.pdf-change-log th:nth-child(4){width:11%}
-.pdf-change-log th:nth-child(5){width:11%}
-.pdf-change-log th:nth-child(6){width:11%}
-.pdf-change-log th:nth-child(7){width:24%}
-.pdf-change-log th:nth-child(8){width:12%}
+.pdf-change-log th:nth-child(1),.pdf-change-log td:nth-child(1){width:72px}
+.pdf-change-log th:nth-child(2),.pdf-change-log td:nth-child(2){width:58px}
+.pdf-change-log th:nth-child(3),.pdf-change-log td:nth-child(3){width:58px}
+.pdf-change-log th:nth-child(4),.pdf-change-log td:nth-child(4){width:72px}
+.pdf-change-log th:nth-child(5),.pdf-change-log td:nth-child(5){width:66px}
+.pdf-change-log th:nth-child(6),.pdf-change-log td:nth-child(6){width:66px}
+.pdf-change-log th:nth-child(7),.pdf-change-log td:nth-child(7){width:184px}
+.pdf-change-log th:nth-child(8),.pdf-change-log td:nth-child(8){width:84px}
 .pdf-change-empty{
   padding:26px 12px;
   text-align:center;
@@ -2074,6 +2088,98 @@ body.change-manage-mode .change-manage-inline{
   border-radius:10px;
   background:#fafcff;
   font-size:11px;
+}
+
+
+/* V63 - report activity hierarchy */
+.pdf-dynamic-sub{
+  margin-top:4px;
+  padding-left:10px;
+  color:#64748b;
+  font-size:8.4px;
+  line-height:1.45;
+}
+.pdf-dynamic-main{
+  background:#fffaf0;
+  border-color:#f3dfb2!important;
+}
+.pdf-dynamic-table th:nth-child(1){width:22%}
+.pdf-dynamic-table th:nth-child(2){width:18%}
+.pdf-dynamic-table th:nth-child(3){width:60%}
+.pdf-dynamic-table td:nth-child(3){
+  color:#64748b;
+  font-size:9px;
+}
+
+
+/* V65 - dashboard quick status actions */
+.dashboard-status-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  margin:-6px 2px 16px;
+}
+.dashboard-status-btn{
+  appearance:none;
+  border:1px solid #e2e8f0;
+  background:#fff;
+  color:#475569;
+  border-radius:999px;
+  padding:7px 11px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.dashboard-status-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 5px 14px rgba(15,23,42,.06);
+}
+.dashboard-status-btn .status-dot{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  flex:0 0 auto;
+}
+.dashboard-status-btn b{
+  min-width:22px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:11px;
+  text-align:center;
+}
+.dashboard-status-btn.support .status-dot{background:#f59e0b}
+.dashboard-status-btn.homeleave .status-dot{background:#7c3aed}
+.dashboard-status-btn.support:hover{
+  border-color:#f3d28a;
+  background:#fffaf2;
+}
+.dashboard-status-btn.homeleave:hover{
+  border-color:#d7c4f5;
+  background:#fbf8ff;
+}
+@media(max-width:720px){
+  .dashboard-status-actions{
+    justify-content:flex-start;
+    flex-wrap:wrap;
+    margin-top:-4px;
+  }
+}
+
+
+/* V66 - readable personnel change summaries */
+#changesBody td:nth-child(8){
+  line-height:1.55;
+  color:#334155;
+}
+.pdf-change-log td:nth-child(7){
+  line-height:1.45;
 }
 
 </style>
@@ -2137,6 +2243,14 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="dashboard" class="page active">
  <div id="kpis" class="people-overview-strip"></div>
+ <div class="dashboard-status-actions">
+  <button type="button" class="dashboard-status-btn support" onclick="openPresenceFromDashboard('支援')">
+   <span class="status-dot"></span><span>支援</span><b id="dashboardSupportCount">0</b>
+  </button>
+  <button type="button" class="dashboard-status-btn homeleave" onclick="openPresenceFromDashboard('返鄉')">
+   <span class="status-dot"></span><span>返鄉</span><b id="dashboardHomeleaveCount">0</b>
+  </button>
+ </div>
  <div class="chartgrid dashboard-main-grid">
   <div class="section dashboard-groups">
    <div class="sectionhead"><div><h2>組別人力</h2></div></div>
@@ -2878,6 +2992,9 @@ function renderAll(){
 function renderDash(){
  let employed=mainCurrent();
  let a=onsiteCurrent();
+
+ if($('dashboardSupportCount'))$('dashboardSupportCount').textContent=employmentCurrent().filter(x=>currentTempStatus(x)==='支援').length;
+ if($('dashboardHomeleaveCount'))$('dashboardHomeleaveCount').textContent=employmentCurrent().filter(x=>currentTempStatus(x)==='返鄉').length;
  let k=[
    ['台籍',employed.filter(x=>personType(x)==='台籍').length,'台籍'],
    ['Z',employed.filter(x=>personType(x)==='Z').length,'Z'],
@@ -2929,6 +3046,12 @@ function renderDash(){
 
  $('recentBody').innerHTML=changes.slice(0,6).map(c=>`<tr><td>${changeBadge(c.change_type)}</td><td>${esc(c.employee_name)}</td><td>${esc(c.employee_no)}</td><td>${esc(c.new_group||c.old_group||'-')}</td><td>${esc(c.detail||'-')}</td><td>${esc(c.change_date)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">目前沒有異動紀錄</td></tr>';
 }
+
+window.openPresenceFromDashboard=presence=>{
+ showPage('people');
+ setPeoplePresenceFilter(presence);
+};
+
 function openTypeList(type){
  showPage('people');
  setPeopleTypeFilter(type);
@@ -3211,26 +3334,116 @@ function renderMonthComparison(){
    return diffBlock(g,a,b);
  }).join('')+'</div>';
 }
+function parseChangeParts(detail){
+ let parts={};
+ String(detail||'').split('｜').map(x=>x.trim()).filter(Boolean).forEach(seg=>{
+   let m=seg.match(/^([^：]+)：\s*(.*?)\s*→\s*(.*)$/);
+   if(m)parts[m[1].trim()]={before:m[2].trim(),after:m[3].trim()};
+ });
+ return parts;
+}
+function shortChangeDate(v){
+ v=String(v||'').trim();
+ let m=v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(!m)return v==='—'?'':v;
+ return `${Number(m[2])}/${Number(m[3])}`;
+}
+function naturalFieldChange(label,before,after){
+ before=String(before||'').trim();
+ after=String(after||'').trim();
+
+ if(label==='備註'||label==='人員動態'||label==='動態開始日'||label==='預計返廠上班日'||label==='支援地點')return '';
+ if(label==='組別'){
+   if(before&&before!=='—'&&after&&after!=='—')return `${before}調至${after}`;
+   if(after&&after!=='—')return `調至${after}`;
+ }
+ if(label==='班別'){
+   if(before&&before!=='—'&&after&&after!=='—')return `${before}班改為${after}班`;
+   if(after&&after!=='—')return `班別改為${after}班`;
+ }
+ if(label==='工號'&&after&&after!=='—')return `工號更正為 ${after}`;
+ if(label==='外籍合約到期'&&after&&after!=='—')return `合約到期日改為 ${shortChangeDate(after)}`;
+ if(after==='—'||!after)return `${label}已清除`;
+ if(before==='—'||!before)return `${label}：${after}`;
+ return `${label}：${before}改為${after}`;
+}
 function changeDetailText(c){
  let detail=String(c.detail||'').trim();
+ if(!detail)return '-';
+
  if(detail==='資料更新'){
    if(c.old_group&&c.new_group&&c.old_group!==c.new_group){
-     return `組別：${c.old_group} → ${c.new_group}`;
+     return `${c.old_group}調至${c.new_group}`;
    }
-   return '舊版紀錄：當時未保存欄位差異';
+   return '舊版資料更新';
  }
- return detail||'-';
+
+ let p=parseChangeParts(detail);
+ let type=String(c.change_type||'').trim();
+ let start=shortChangeDate(p['動態開始日']?.after);
+ let back=shortChangeDate(p['預計返廠上班日']?.after);
+ let location=String(p['支援地點']?.after||'').trim();
+
+ if(type==='返鄉'){
+   let a=[];
+   if(start)a.push(`${start} 返鄉`);
+   else a.push('返鄉');
+   if(back)a.push(`預計 ${back} 返廠`);
+   return a.join('，');
+ }
+ if(type==='返校'){
+   let a=[];
+   if(start)a.push(`${start} 返校`);
+   else a.push('返校');
+   if(back)a.push(`預計 ${back} 返廠`);
+   return a.join('，');
+ }
+ if(type==='支援'){
+   let a=[];
+   a.push(location&&location!=='—'?`支援 ${location}`:'開始支援');
+   if(start)a.push(`${start} 起`);
+   if(back)a.push(`預計 ${back} 返廠`);
+   return a.join('，');
+ }
+ if(type==='支援結束')return '支援結束，已回本廠';
+ if(type==='返廠')return '已返廠';
+ if(type==='調組'){
+   let from=String(c.old_group||p['組別']?.before||'').trim();
+   let to=String(c.new_group||p['組別']?.after||'').trim();
+   if(from&&to&&from!==to)return `${from}調至${to}`;
+   if(to)return `調至${to}`;
+ }
+ if(type==='工號更正'){
+   let to=String(p['工號']?.after||c.employee_no||'').trim();
+   return to?`工號更正為 ${to}`:'工號已更正';
+ }
+
+ let sentences=[];
+ Object.entries(p).forEach(([label,v])=>{
+   let text=naturalFieldChange(label,v.before,v.after);
+   if(text)sentences.push(text);
+ });
+
+ // 舊版或手動編輯過、無法解析的內容仍保留原文。
+ return sentences.length?sentences.join('，'):detail.replaceAll('｜','，').replaceAll(' → ','改為');
 }
 function changeNoteText(c){
  let detail=String(c.detail||'').trim();
- let m=detail.match(/(?:^|｜)備註：([^｜]*)→\s*([^｜]*)/);
- if(m){
-   let latest=String(m[2]||'').trim();
+ let parts=parseChangeParts(detail);
+ if(parts['備註']){
+   let latest=String(parts['備註'].after||'').trim();
    return latest&&latest!=='—'?latest:'-';
  }
+
+ let m=detail.match(/備註[：:]\s*([^｜，\n]+)/);
+ if(m){
+   let latest=String(m[1]||'').trim();
+   return latest&&latest!=='—'?latest:'-';
+ }
+
  if(c.change_type==='離職' && detail.includes('｜')){
-   let parts=detail.split('｜').map(x=>x.trim()).filter(Boolean);
-   if(parts.length>1)return parts.slice(1).join('｜');
+   let oldParts=detail.split('｜').map(x=>x.trim()).filter(Boolean);
+   if(oldParts.length>1)return oldParts.slice(1).join('，');
  }
  return '-';
 }
@@ -3535,8 +3748,19 @@ function refreshChangePreview(){
  let draft=personDraft();
  let diffs=personDiffs(old,draft);
 
+ let previewText=diffs.map(seg=>{
+   let m=String(seg).match(/^([^：]+)：\s*(.*?)\s*→\s*(.*)$/);
+   if(!m)return seg;
+   let label=m[1].trim(),before=m[2].trim(),after=m[3].trim();
+   if(label==='備註')return after&&after!=='—'?`備註：${after}`:'';
+   if(label==='動態開始日')return after&&after!=='—'?`開始日：${shortChangeDate(after)}`:'';
+   if(label==='預計返廠上班日')return after&&after!=='—'?`預計返廠：${shortChangeDate(after)}`:'';
+   if(label==='支援地點')return after&&after!=='—'?`支援地點：${after}`:'';
+   return naturalFieldChange(label,before,after)||`${label}：${after}`;
+ }).filter(Boolean).join('，');
+
  $('mChangePreview').textContent=diffs.length
-   ? `本次變更：${diffs.join('｜')}`
+   ? `本次變更：${previewText}`
    : '目前沒有欄位變更；即使開啟「記錄」，儲存時也不會產生空白紀錄。';
 
  if(!logChoiceTouched){
@@ -3955,8 +4179,18 @@ function createMonthCountSheet(rows,month){
  aoa.push(['建教生',main.filter(p=>personType(p)==='建教生').length]);
  aoa.push(['海外事業部',overseas.length]);
  aoa.push([]);
- aoa.push(['人員動態','人數']);
- aoa.push(['支援合計',tc.support],['台北港',tc.taipei],['東17',tc.east17],['製造部',tc.manufacturing],['返鄉',tc.homeleave],['返校',tc.school]);
+ aoa.push(['人員動態','人數','明細']);
+ aoa.push([
+   '支援',
+   tc.support,
+   [
+    tc.taipei?`台北港 ${tc.taipei} 人`:'',
+    tc.east17?`東17 ${tc.east17} 人`:'',
+    tc.manufacturing?`製造部 ${tc.manufacturing} 人`:''
+   ].filter(Boolean).join('｜')||'—'
+ ]);
+ aoa.push(['返鄉',tc.homeleave,'']);
+ aoa.push(['返校',tc.school,'不列入在職總人數']);
  aoa.push([]);
  aoa.push(['目前在廠組別','人數']);
  let counts={};onsite.filter(p=>personType(p)!=='建教生').forEach(p=>{let g=personGroup(p);if(g)counts[g]=(counts[g]||0)+1});
@@ -4213,15 +4447,17 @@ function buildExcelCountSheet(workbook,data){
  ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
 
  ws.addRow([]);
- addStyledHeader(ws,['人員動態','人數']);
+ ws.columns=[{width:28},{width:14},{width:42}];
+ addStyledHeader(ws,['人員動態','人數','明細']);
  [
-  ['支援合計',data.tempCounts.support],
-  ['　台北港',data.tempCounts.taipei],
-  ['　東17',data.tempCounts.east17],
-  ['　製造部',data.tempCounts.manufacturing],
-  ['返鄉',data.tempCounts.homeleave],
-  ['返校（不列在職總人數）',data.tempCounts.school]
- ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{})});
+  ['支援',data.tempCounts.support,[
+    data.tempCounts.taipei?`台北港 ${data.tempCounts.taipei} 人`:'',
+    data.tempCounts.east17?`東17 ${data.tempCounts.east17} 人`:'',
+    data.tempCounts.manufacturing?`製造部 ${data.tempCounts.manufacturing} 人`:''
+   ].filter(Boolean).join('｜')||'—'],
+  ['返鄉',data.tempCounts.homeleave,''],
+  ['返校',data.tempCounts.school,'不列入在職總人數']
+ ].forEach(x=>{let row=ws.addRow(x);styleRow(row,{});row.getCell(3).alignment={vertical:'middle',wrapText:true}});
 
  ws.addRow([]);
  addStyledHeader(ws,['目前在廠組別','人數']);
@@ -4439,24 +4675,27 @@ function buildMonthCountPdfPage(data){
    ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length],
    ['海外事業部',data.overseas.length]
  ];
+ let supportDetail=[
+   data.tempCounts.taipei?`台北港 ${data.tempCounts.taipei} 人`:'',
+   data.tempCounts.east17?`東17 ${data.tempCounts.east17} 人`:'',
+   data.tempCounts.manufacturing?`製造部 ${data.tempCounts.manufacturing} 人`:''
+ ].filter(Boolean).join('・')||'—';
  let dynamics=[
-   ['支援合計',data.tempCounts.support],
-   ['台北港',data.tempCounts.taipei],
-   ['東17',data.tempCounts.east17],
-   ['製造部',data.tempCounts.manufacturing],
-   ['返鄉',data.tempCounts.homeleave],
-   ['返校',data.tempCounts.school]
+   ['支援',data.tempCounts.support,supportDetail],
+   ['返鄉',data.tempCounts.homeleave,''],
+   ['返校',data.tempCounts.school,'不列入在職總人數']
  ];
- let mini=(title,rows)=>`<div class="pdf-detail-box"><h3>${esc(title)}</h3><table class="pdf-mini-table"><thead><tr><th>項目</th><th>人數</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} 人</td></tr>`).join('')}</tbody></table></div>`;
+ let mini2=(title,rows)=>`<div class="pdf-detail-box"><h3>${esc(title)}</h3><table class="pdf-mini-table"><thead><tr><th>項目</th><th>人數</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} 人</td></tr>`).join('')}</tbody></table></div>`;
+ let mini3=(title,rows)=>`<div class="pdf-detail-box"><h3>${esc(title)}</h3><table class="pdf-mini-table pdf-dynamic-table"><thead><tr><th>項目</th><th>人數</th><th>明細</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} 人</td><td>${esc(x[2]||'')}</td></tr>`).join('')}</tbody></table></div>`;
  return `<div class="pdf-page pdf-roster-page">
    ${pdfReportHeader(`${monthLabel(data.tm)} 月份人數`)}
    <div class="pdf-detail-grid">
-    ${mini('人力概況',basic)}
-    ${mini('人員動態',dynamics)}
+    ${mini2('人力概況',basic)}
+    ${mini3('人員動態',dynamics)}
    </div>
    <div class="pdf-detail-grid" style="margin-top:14px">
-    ${mini('目前在廠班別',data.shiftCounts)}
-    ${mini('目前在廠組別',data.groupCounts)}
+    ${mini2('目前在廠班別',data.shiftCounts)}
+    ${mini2('目前在廠組別',data.groupCounts)}
    </div>
    ${pdfFooter()}</div>`;
 }
@@ -4669,26 +4908,28 @@ function buildChangeLogPdfPages(data){
     <small>${rows.length} 筆${rows.length>17?`・第 ${pageIndex+1} / ${Math.ceil(rows.length/17)} 頁`:''}</small>
    </div>
 
-   <table class="pdf-change-log">
-    <thead>
-     <tr>
-      <th>日期</th><th>類型</th><th>工號</th><th>姓名</th>
-      <th>原組別</th><th>新組別</th><th>內容</th><th>備註</th>
-     </tr>
-    </thead>
-    <tbody>
-     ${part.map(c=>`<tr>
-      <td>${esc(c.change_date||'')}</td>
-      <td>${esc(c.change_type||'')}</td>
-      <td>${esc(c.employee_no||'')}</td>
-      <td>${esc(c.employee_name||'')}</td>
-      <td>${esc(c.old_group||'')}</td>
-      <td>${esc(c.new_group||'')}</td>
-      <td>${esc(changeDetailText(c)==='-'?'':changeDetailText(c))}</td>
-      <td>${esc(changeNoteText(c)==='-'?'':changeNoteText(c))}</td>
-     </tr>`).join('')}
-    </tbody>
-   </table>
+   <div class="pdf-change-safe">
+    <table class="pdf-change-log">
+     <thead>
+      <tr>
+       <th>日期</th><th>類型</th><th>工號</th><th>姓名</th>
+       <th>原組別</th><th>新組別</th><th>內容</th><th>備註</th>
+      </tr>
+     </thead>
+     <tbody>
+      ${part.map(c=>`<tr>
+       <td>${esc(c.change_date||'')}</td>
+       <td>${esc(c.change_type||'')}</td>
+       <td>${esc(c.employee_no||'')}</td>
+       <td>${esc(c.employee_name||'')}</td>
+       <td>${esc(c.old_group||'')}</td>
+       <td>${esc(c.new_group||'')}</td>
+       <td>${esc(changeDetailText(c)==='-'?'':changeDetailText(c))}</td>
+       <td>${esc(changeNoteText(c)==='-'?'':changeNoteText(c))}</td>
+      </tr>`).join('')}
+     </tbody>
+    </table>
+   </div>
    ${pdfFooter()}
   </div>`);
 }
@@ -4721,15 +4962,16 @@ function buildSummaryPdfPage(data){
    let d=peopleDiff(x.from,x.to);
    return `<div class="pdf-list-item"><b>${esc(x.type)}</b>：${x.from.length} → ${x.to.length}（${signNum(x.to.length-x.from.length)}）<br>新增：${d.added.map(p=>p.employee_no).join('、')||'無'}<br>減少：${d.removed.map(p=>p.employee_no).join('、')||'無'}</div>`;
  }).join('');
- let dynamics=[
-   ['支援',data.tempCounts.support],
-   ['台北港',data.tempCounts.taipei],
-   ['東17',data.tempCounts.east17],
-   ['製造部',data.tempCounts.manufacturing],
-   ['返鄉',data.tempCounts.homeleave],
-   ['返校',data.tempCounts.school]
- ];
- let dynamicBlocks=dynamics.map(x=>`<div class="pdf-list-item"><b>${esc(x[0])}</b>：${x[1]} 人</div>`).join('');
+ let supportDetail=[
+   data.tempCounts.taipei?`台北港 ${data.tempCounts.taipei} 人`:'',
+   data.tempCounts.east17?`東17 ${data.tempCounts.east17} 人`:'',
+   data.tempCounts.manufacturing?`製造部 ${data.tempCounts.manufacturing} 人`:''
+ ].filter(Boolean).join('・')||'無';
+ let dynamicBlocks=[
+   `<div class="pdf-list-item pdf-dynamic-main"><b>支援</b>：${data.tempCounts.support} 人<div class="pdf-dynamic-sub">${esc(supportDetail)}</div></div>`,
+   `<div class="pdf-list-item"><b>返鄉</b>：${data.tempCounts.homeleave} 人</div>`,
+   `<div class="pdf-list-item"><b>返校</b>：${data.tempCounts.school} 人<div class="pdf-dynamic-sub">不列入在職總人數</div></div>`
+ ].join('');
 
  return `
  <div class="pdf-page">
@@ -4801,6 +5043,24 @@ async function exportMonthPdfReport(){
 
      // V26：真正擷取前先鎖定寬度，避免瀏覽器因長姓名或 rowspan
      // 把 table 的 intrinsic width 撐出 A4。
+     if(pageEl.querySelector('.pdf-change-log')){
+       let safe=pageEl.querySelector('.pdf-change-safe');
+       if(safe){
+         safe.style.width='660px';
+         safe.style.maxWidth='660px';
+         safe.style.minWidth='660px';
+         safe.style.margin='0 auto';
+         safe.style.overflow='hidden';
+       }
+       let changeTable=pageEl.querySelector('.pdf-change-log');
+       if(changeTable){
+         changeTable.style.width='660px';
+         changeTable.style.maxWidth='660px';
+         changeTable.style.minWidth='660px';
+         changeTable.style.tableLayout='fixed';
+       }
+     }
+
      if(pageEl.classList.contains('pdf-roster-4')){
        let safe=pageEl.querySelector('.pdf-safe');
        if(safe){
@@ -4847,6 +5107,30 @@ async function exportMonthPdfReport(){
            el.style.margin='0';
            el.style.boxSizing='border-box';
          });
+         doc.querySelectorAll('.pdf-change-safe').forEach(el=>{
+           el.style.width='660px';
+           el.style.maxWidth='660px';
+           el.style.minWidth='660px';
+           el.style.marginLeft='auto';
+           el.style.marginRight='auto';
+           el.style.overflow='hidden';
+           el.style.boxSizing='border-box';
+         });
+         doc.querySelectorAll('.pdf-change-log').forEach(el=>{
+           el.style.width='660px';
+           el.style.maxWidth='660px';
+           el.style.minWidth='660px';
+           el.style.tableLayout='fixed';
+           el.style.boxSizing='border-box';
+         });
+         doc.querySelectorAll('.pdf-change-log th,.pdf-change-log td').forEach(el=>{
+           el.style.overflow='hidden';
+           el.style.whiteSpace='normal';
+           el.style.overflowWrap='anywhere';
+           el.style.wordBreak='break-word';
+           el.style.boxSizing='border-box';
+         });
+
          // V26：匯出時強制目前 roster-4 使用真正的 A4 安全寬度。
          doc.querySelectorAll('.pdf-roster-4 .pdf-safe').forEach(el=>{
            el.style.width='660px';

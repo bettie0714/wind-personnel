@@ -2033,85 +2033,101 @@ body.change-manage-mode .change-manage-inline{
 
 
 
-/* V69 - readable monthly change log */
-.pdf-change-list{
-  width:660px!important;
-  max-width:660px!important;
-  margin:0 auto!important;
-  display:grid;
-  gap:7px;
+/* V72 - clean grouped monthly change log */
+.pdf-change-groups{
+  width:660px;
+  max-width:660px;
+  margin:0 auto;
 }
-.pdf-change-card{
-  border:1px solid #dfe7f1;
-  border-radius:8px;
-  background:#fff;
-  padding:8px 10px;
-  box-sizing:border-box;
-  break-inside:avoid;
+.pdf-change-day{
+  margin-bottom:12px;
 }
-.pdf-change-card-head{
-  display:grid;
-  grid-template-columns:72px 60px 1fr;
-  gap:8px;
+.pdf-change-day-head{
+  display:flex;
   align-items:center;
-  margin-bottom:5px;
-}
-.pdf-change-date{
+  justify-content:space-between;
+  gap:10px;
+  padding:5px 8px;
+  margin-bottom:2px;
+  background:#f3f7fd;
+  border-left:3px solid #2f63ee;
+  color:#29496f;
   font-size:9px;
-  font-weight:800;
-  color:#64748b;
+  font-weight:900;
+}
+.pdf-change-day-head small{
+  color:#7c8ba0;
+  font-size:8px;
+  font-weight:700;
+}
+.pdf-change-row{
+  display:grid;
+  grid-template-columns:62px 118px minmax(0,1fr);
+  gap:9px;
+  align-items:start;
+  padding:8px 7px;
+  border-bottom:1px solid #e7edf4;
+  box-sizing:border-box;
+}
+.pdf-change-row:last-child{
+  border-bottom:0;
 }
 .pdf-change-type{
   display:inline-flex;
-  justify-content:center;
   align-items:center;
-  min-height:21px;
-  padding:2px 7px;
+  justify-content:center;
+  min-height:20px;
+  padding:2px 6px;
   border-radius:999px;
   background:#eef4ff;
   color:#2457d6;
-  font-size:8.5px;
+  font-size:8px;
   font-weight:900;
   white-space:nowrap;
 }
 .pdf-change-person{
-  min-width:0;
-  font-size:10px;
-  font-weight:900;
+  font-size:9px;
+  line-height:1.35;
   color:#1f2f46;
+  font-weight:900;
   overflow-wrap:anywhere;
 }
 .pdf-change-person .no{
-  color:#5b6b80;
+  display:block;
+  color:#63748a;
+  font-size:8px;
   font-weight:800;
-  margin-right:6px;
+  margin-bottom:1px;
+}
+.pdf-change-content{
+  min-width:0;
 }
 .pdf-change-summary{
-  font-size:10px;
+  font-size:9.3px;
   line-height:1.45;
   color:#334155;
   font-weight:700;
 }
-.pdf-change-meta{
+.pdf-change-extra{
   display:flex;
   flex-wrap:wrap;
-  gap:6px 12px;
-  margin-top:5px;
-  font-size:8.5px;
-  line-height:1.4;
-  color:#64748b;
+  gap:5px 12px;
+  margin-top:3px;
+  color:#6f7f93;
+  font-size:8px;
+  line-height:1.35;
 }
-.pdf-change-meta b{
-  color:#475569;
+.pdf-change-extra b{
+  color:#526174;
 }
 .pdf-change-note{
-  margin-top:5px;
-  padding:5px 7px;
-  border-radius:6px;
-  background:#f8fafc;
-  font-size:8.7px;
-  line-height:1.4;
-  color:#5f6f83;
+  margin-top:4px;
+  color:#718096;
+  font-size:8px;
+  line-height:1.35;
+}
+.pdf-change-note b{
+  color:#526174;
 }
 .pdf-change-empty{
   padding:26px 12px;
@@ -2147,68 +2163,103 @@ body.change-manage-mode .change-manage-inline{
 }
 
 
-/* V68 - dashboard status actions integrated into group card */
+/* V70 - integrated group manpower + personnel status */
 .dashboard-groups-head{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
+  margin-bottom:10px!important;
 }
-.dashboard-groups-head .dashboard-status-actions{
+.group-status-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:18px;
+}
+.group-status-item{
+  appearance:none;
+  width:100%;
+  border:1px solid #e5eaf1;
+  border-radius:12px;
+  background:#f8fafc;
+  padding:11px 13px;
   display:flex;
   align-items:center;
-  gap:7px;
-  margin:0!important;
-  flex-wrap:wrap;
-}
-.dashboard-status-btn{
-  appearance:none;
-  border:1px solid #e2e8f0;
-  background:#f8fafc;
-  color:#475569;
-  border-radius:999px;
-  padding:6px 10px;
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  font-size:12px;
-  font-weight:800;
+  justify-content:space-between;
+  gap:12px;
+  text-align:left;
   cursor:pointer;
   transition:.15s ease;
 }
-.dashboard-status-btn:hover{
+.group-status-item:hover{
   transform:translateY(-1px);
-  box-shadow:0 4px 12px rgba(15,23,42,.06);
+  box-shadow:0 5px 14px rgba(15,23,42,.055);
 }
-.dashboard-status-btn .status-dot{
-  width:7px;
-  height:7px;
-  border-radius:999px;
-  flex:0 0 auto;
-}
-.dashboard-status-btn b{
-  min-width:22px;
-  padding:2px 6px;
-  border-radius:999px;
-  background:#fff;
-  color:#334155;
-  font-size:11px;
-  text-align:center;
-}
-.dashboard-status-btn.support .status-dot{background:#f59e0b}
-.dashboard-status-btn.homeleave .status-dot{background:#7c3aed}
-.dashboard-status-btn.support:hover{
+.group-status-item.support:hover{
   border-color:#f3d28a;
   background:#fffaf2;
 }
-.dashboard-status-btn.homeleave:hover{
-  border-color:#d7c4f5;
-  background:#fbf8ff;
+.group-status-item.homeleave:hover{
+  border-color:#d8c8f1;
+  background:#fbf9ff;
+}
+.group-status-copy{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+.group-status-label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#334155;
+  font-size:13px;
+  font-weight:850;
+}
+.group-status-label i{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  flex:0 0 auto;
+}
+.group-status-item.support .group-status-label i{background:#f59e0b}
+.group-status-item.homeleave .group-status-label i{background:#7c3aed}
+.group-status-hint{
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:600;
+}
+.group-status-value{
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+  color:#26344a;
+  white-space:nowrap;
+}
+.group-status-value b{
+  font-size:22px;
+  line-height:1;
+  font-weight:800;
+}
+.group-status-value small{
+  font-size:10px;
+  color:#94a3b8;
+  font-weight:600;
+}
+.group-status-arrow{
+  margin-left:5px;
+  color:#94a3b8;
+  font-size:19px;
+  line-height:1;
+}
+.group-list-label{
+  margin:0 0 5px 2px;
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
 }
 @media(max-width:720px){
-  .dashboard-groups-head{
-    align-items:flex-start!important;
-    flex-direction:column!important;
+  .group-status-summary{
+    grid-template-columns:1fr;
   }
 }
 
@@ -2264,6 +2315,101 @@ body.change-manage-mode .change-manage-inline{
   font-size:10.5px;
   letter-spacing:.01em;
   overflow-wrap:anywhere;
+}
+
+
+.dashboard-groups #groupChart{
+  margin-top:0;
+}
+
+
+/* V71 - inline personnel status, no dedicated status column */
+.person-name-cell{
+  font-weight:500;
+  color:#1f2937;
+}
+.person-inline-status{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:5px;
+}
+.person-inline-status .temp-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:20px;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:850;
+  line-height:1.2;
+}
+.person-inline-detail{
+  font-size:10px;
+  color:#7a8798;
+  white-space:nowrap;
+}
+#peopleBody tr.supporting-row td:nth-child(2),
+#peopleBody tr.homeleave-row td:nth-child(2),
+#peopleBody tr.school-row td:nth-child(2){
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+
+/* V73 - clear home-leave personnel in monthly PDF */
+.pdf-dynamic-homeleave{
+  background:#fbf9ff;
+  border-color:#e5dcf4!important;
+}
+.pdf-dynamic-head.homeleave-head b{
+  color:#6d3db2;
+}
+.pdf-dynamic-head.homeleave-head strong{
+  color:#6730a7;
+}
+.pdf-homeleave-list{
+  display:grid;
+  gap:4px;
+}
+.pdf-homeleave-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:5px 7px;
+  border-radius:6px;
+  background:#fff;
+  border:1px solid #e9e1f4;
+  font-size:10px;
+  line-height:1.35;
+}
+.pdf-homeleave-person{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  min-width:0;
+}
+.pdf-homeleave-person b{
+  color:#52327c;
+  font-size:10.5px;
+  white-space:nowrap;
+}
+.pdf-homeleave-person span{
+  color:#334155;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+.pdf-homeleave-return{
+  color:#7c6a8e;
+  font-size:9px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.pdf-homeleave-row.empty-row{
+  color:#94a3b8;
+  justify-content:flex-start;
 }
 
 </style>
@@ -2331,15 +2477,27 @@ body.change-manage-mode .change-manage-inline{
   <div class="section dashboard-groups">
    <div class="sectionhead dashboard-groups-head">
     <div><h2>組別人力</h2></div>
-    <div class="dashboard-status-actions">
-     <button type="button" class="dashboard-status-btn support" onclick="openPresenceFromDashboard('支援')">
-      <span class="status-dot"></span><span>支援</span><b id="dashboardSupportCount">0</b>
-     </button>
-     <button type="button" class="dashboard-status-btn homeleave" onclick="openPresenceFromDashboard('返鄉')">
-      <span class="status-dot"></span><span>返鄉</span><b id="dashboardHomeleaveCount">0</b>
-     </button>
-    </div>
    </div>
+
+   <div class="group-status-summary">
+    <button type="button" class="group-status-item support" onclick="openPresenceFromDashboard('支援')">
+     <div class="group-status-copy">
+      <span class="group-status-label"><i></i>支援中</span>
+      <span class="group-status-hint">查看支援人員</span>
+     </div>
+     <div class="group-status-value"><b id="dashboardSupportCount">0</b><small>人</small><span class="group-status-arrow">›</span></div>
+    </button>
+
+    <button type="button" class="group-status-item homeleave" onclick="openPresenceFromDashboard('返鄉')">
+     <div class="group-status-copy">
+      <span class="group-status-label"><i></i>返鄉中</span>
+      <span class="group-status-hint">查看返鄉人員</span>
+     </div>
+     <div class="group-status-value"><b id="dashboardHomeleaveCount">0</b><small>人</small><span class="group-status-arrow">›</span></div>
+    </button>
+   </div>
+
+   <div class="group-list-label">目前在廠組別</div>
    <div id="groupChart"></div>
   </div>
 
@@ -2418,7 +2576,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="section people-list-section">
   <div class="tablewrap">
    <table>
-    <thead><tr><th>工號</th><th>姓名</th><th>目前動態</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead>
+    <thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead>
     <tbody id="peopleBody"></tbody>
    </table>
   </div>
@@ -3181,6 +3339,31 @@ function filtered(){
      (!q||(x.employee_no+' '+x.name+' '+(x.job_title||'')+' '+(x.note||'')).toLowerCase().includes(q));
  });
 }
+
+function personInlineStatusHtml(p){
+ let st=currentTempStatus(p);
+ if(!st)return '';
+
+ let start=String(p.temporary_start_date||'').slice(0,10);
+ let back=String(p.expected_return_date||'').slice(0,10);
+ let location=String(p.support_location||'').trim();
+
+ let label='';
+ if(st==='支援')label=location?`支援 ${location}`:'支援中';
+ else if(st==='返鄉')label='返鄉中';
+ else if(st==='返校')label='返校中';
+
+ let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
+ let detail='';
+ if(back)detail=`預計 ${back} 返廠`;
+ else if(start)detail=`自 ${start}`;
+
+ return `<div class="person-inline-status">
+   <span class="temp-badge ${cls}">${esc(label)}</span>
+   ${detail?`<span class="person-inline-detail">${esc(detail)}</span>`:''}
+ </div>`;
+}
+
 function renderPeople(){
  let a=filtered();
  renderPresenceCounts();
@@ -3203,8 +3386,10 @@ function renderPeople(){
    let rowClass=st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
    return `<tr class="${rowClass}">
     <td><b>${esc(x.employee_no)}</b></td>
-    <td>${esc(x.name)}</td>
-    <td>${tempStatusHtml(x)}</td>
+    <td>
+     <div class="person-name-cell">${esc(x.name)}</div>
+     ${personInlineStatusHtml(x)}
+    </td>
     <td>${esc(x.shift||'-')}</td>
     <td>${badge(personGroup(x)||'-')}</td>
     <td>${esc(x.job_title||'-')}</td>
@@ -3214,7 +3399,7 @@ function renderPeople(){
     <td>${tenure(x.hire_date)}</td>
     ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="${isAdmin()?11:10}" class="empty">沒有符合條件的人員</td></tr>`;
+ }).join('')||`<tr><td colspan="${isAdmin()?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -4380,6 +4565,9 @@ function collectMonthExportData(tm,fm){
      .filter(p=>isSupporting(p,asOf)&&String(p.support_location||'')===location)
      .sort((a,b)=>String(a.employee_no||'').localeCompare(String(b.employee_no||'')))
  }));
+ let homeleaveDetails=mainTo
+   .filter(p=>isHomeLeave(p,asOf))
+   .sort((a,b)=>String(a.employee_no||'').localeCompare(String(b.employee_no||'')));
 
  let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p))&&!isOverseas(p));
  let local=activeTo.filter(p=>personType(p)==='台籍'&&!isOverseas(p));
@@ -4402,7 +4590,7 @@ function collectMonthExportData(tm,fm){
  }));
 
  return{
-   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,supportDetails,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
+   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,supportDetails,homeleaveDetails,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
    fromDerived:derived,
    rangeText:monthRangeText(fm,tm,derived),
    monthChanges:meaningfulMonthChanges(tm),
@@ -4771,9 +4959,15 @@ function buildMonthCountPdfPage(data){
    .filter(x=>x.people.length)
    .map(x=>`${x.location}：${x.people.map(p=>p.employee_no).join('、')}`)
    .join('　')||'—';
+ let homeleaveDetail=data.homeleaveDetails.length
+   ? data.homeleaveDetails.map(p=>{
+       let back=shortChangeDate(p.expected_return_date||'');
+       return `${p.employee_no} ${p.name||''}${back?`（預計 ${back} 返廠）`:''}`;
+     }).join('　')
+   : '—';
  let dynamics=[
    ['支援',data.tempCounts.support,supportDetail],
-   ['返鄉',data.tempCounts.homeleave,''],
+   ['返鄉',data.tempCounts.homeleave,homeleaveDetail],
    ['返校',data.tempCounts.school,'不列入在職總人數']
  ];
  let mini2=(title,rows)=>`<div class="pdf-detail-box"><h3>${esc(title)}</h3><table class="pdf-mini-table"><thead><tr><th>項目</th><th>人數</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x[0])}</td><td>${x[1]} 人</td></tr>`).join('')}</tbody></table></div>`;
@@ -4990,31 +5184,61 @@ function buildChangeLogPdfPages(data){
    </div>`];
  }
 
- // 卡片式版面每頁最多 10 筆，避免表格欄位太多、文字被擠壓。
- return splitArray(rows,10).map((part,pageIndex)=>`
+ // 依日期分組，避免一筆一張卡造成視覺碎裂。
+ let groups=[];
+ rows.forEach(c=>{
+   let date=String(c.change_date||'');
+   let g=groups.find(x=>x.date===date);
+   if(!g){g={date,rows:[]};groups.push(g)}
+   g.rows.push(c);
+ });
+
+ // 以筆數控制分頁，每頁約 13 筆，保留足夠行高。
+ let pages=[],current=[],count=0;
+ groups.forEach(g=>{
+   if(current.length && count+g.rows.length>13){
+     pages.push(current);
+     current=[];
+     count=0;
+   }
+   current.push(g);
+   count+=g.rows.length;
+ });
+ if(current.length)pages.push(current);
+
+ return pages.map((pageGroups,pageIndex)=>`
   <div class="pdf-page pdf-roster-page">
    ${pdfReportHeader(`${monthLabel(data.tm)} 人員變動紀錄`)}
    <div class="pdf-section-band">
     <span>人員變動紀錄</span>
-    <small>${rows.length} 筆${rows.length>10?`・第 ${pageIndex+1} / ${Math.ceil(rows.length/10)} 頁`:''}</small>
+    <small>${rows.length} 筆${pages.length>1?`・第 ${pageIndex+1} / ${pages.length} 頁`:''}</small>
    </div>
 
-   <div class="pdf-change-list">
-    ${part.map(c=>{
-      let detail=changeDetailText(c);
-      let note=changeNoteText(c);
-      let groupChanged=c.old_group&&c.new_group&&c.old_group!==c.new_group;
-      return `<div class="pdf-change-card">
-       <div class="pdf-change-card-head">
-        <div class="pdf-change-date">${esc(c.change_date||'')}</div>
-        <div class="pdf-change-type">${esc(c.change_type||'')}</div>
-        <div class="pdf-change-person"><span class="no">${esc(c.employee_no||'')}</span>${esc(c.employee_name||'')}</div>
-       </div>
-       <div class="pdf-change-summary">${esc(detail==='-'?'':detail)}</div>
-       ${groupChanged?`<div class="pdf-change-meta"><span><b>組別</b> ${esc(c.old_group)} → ${esc(c.new_group)}</span></div>`:''}
-       ${note!=='-'?`<div class="pdf-change-note"><b>備註：</b>${esc(note)}</div>`:''}
-      </div>`;
-    }).join('')}
+   <div class="pdf-change-groups">
+    ${pageGroups.map(g=>`
+     <div class="pdf-change-day">
+      <div class="pdf-change-day-head">
+       <span>${esc(g.date)}</span>
+       <small>${g.rows.length} 筆</small>
+      </div>
+      ${g.rows.map(c=>{
+        let detail=changeDetailText(c);
+        let note=changeNoteText(c);
+        let groupChanged=c.old_group&&c.new_group&&c.old_group!==c.new_group;
+        return `<div class="pdf-change-row">
+         <div><span class="pdf-change-type">${esc(c.change_type||'')}</span></div>
+         <div class="pdf-change-person">
+          <span class="no">${esc(c.employee_no||'')}</span>
+          ${esc(c.employee_name||'')}
+         </div>
+         <div class="pdf-change-content">
+          <div class="pdf-change-summary">${esc(detail==='-'?'':detail)}</div>
+          ${groupChanged?`<div class="pdf-change-extra"><span><b>組別</b> ${esc(c.old_group)} → ${esc(c.new_group)}</span></div>`:''}
+          ${note!=='-'?`<div class="pdf-change-note"><b>備註：</b>${esc(note)}</div>`:''}
+         </div>
+        </div>`;
+      }).join('')}
+     </div>`).join('')}
    </div>
    ${pdfFooter()}
   </div>`);
@@ -5063,7 +5287,21 @@ function buildSummaryPdfPage(data){
        </div>`).join('')||'<div class="pdf-support-row"><span>目前無支援人員</span></div>'}
      </div>
     </div>`,
-   `<div class="pdf-list-item"><b>返鄉</b>：${data.tempCounts.homeleave} 人</div>`,
+   `<div class="pdf-list-item pdf-dynamic-homeleave">
+     <div class="pdf-dynamic-head homeleave-head"><b>返鄉</b><strong>${data.tempCounts.homeleave} 人</strong></div>
+     <div class="pdf-homeleave-list">
+      ${data.homeleaveDetails.length?data.homeleaveDetails.map(p=>{
+        let back=shortChangeDate(p.expected_return_date||'');
+        return `<div class="pdf-homeleave-row">
+          <div class="pdf-homeleave-person">
+           <b>${esc(p.employee_no||'')}</b>
+           <span>${esc(p.name||'')}</span>
+          </div>
+          ${back?`<span class="pdf-homeleave-return">預計 ${esc(back)} 返廠</span>`:''}
+         </div>`;
+      }).join(''):'<div class="pdf-homeleave-row empty-row">目前無返鄉人員</div>'}
+     </div>
+    </div>`,
    `<div class="pdf-list-item"><b>返校</b>：${data.tempCounts.school} 人<div class="pdf-dynamic-sub">不列入在職總人數</div></div>`
  ].join('');
 

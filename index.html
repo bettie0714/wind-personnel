@@ -3283,6 +3283,197 @@ body.change-manage-mode .change-manage-inline{
   flex:0 0 auto;
 }
 
+
+/* V84 - compact shift distribution; no duplicated total inside donut */
+.dashboard-shift-only #shiftChart{
+  flex:1;
+  display:block!important;
+  min-height:0!important;
+  padding-top:4px;
+}
+.shift-overview-v84{
+  width:100%;
+  display:grid;
+  gap:16px;
+}
+.shift-total-line{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding:2px 0 8px;
+}
+.shift-total-line span{
+  color:#718096;
+  font-size:12px;
+  font-weight:800;
+}
+.shift-total-line b{
+  color:#1f2f46;
+  font-size:24px;
+  line-height:1;
+  font-weight:850;
+}
+.shift-total-line b small{
+  margin-left:4px;
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:700;
+}
+.shift-stacked-bar{
+  display:flex;
+  width:100%;
+  height:12px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#edf1f5;
+  box-shadow:inset 0 0 0 1px #e3e9f0;
+}
+.shift-stacked-bar span{
+  height:100%;
+  min-width:2px;
+}
+.shift-summary-list-v84{
+  display:grid;
+  gap:0;
+  border-top:1px solid #edf1f5;
+}
+.shift-summary-row-v84{
+  min-height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid #edf1f5;
+}
+.shift-summary-label-v84{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#334155;
+  font-size:14px;
+  font-weight:850;
+}
+.shift-summary-label-v84 i{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  flex:0 0 auto;
+}
+.shift-summary-value-v84{
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+}
+.shift-summary-value-v84 b{
+  color:#1f2f46;
+  font-size:26px;
+  line-height:1;
+  font-weight:850;
+}
+.shift-summary-value-v84 small{
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:700;
+}
+.shift-summary-value-v84 em{
+  margin-left:10px;
+  min-width:40px;
+  text-align:right;
+  color:#8492a6;
+  font-size:11px;
+  font-style:normal;
+  font-weight:800;
+}
+
+/* neutralize V82/V83 donut-specific layout */
+.shift-overview,
+.shift-donut-wrap,
+.shift-donut-center{
+  display:none!important;
+}
+
+
+/* V84 - PDF shift distribution mirrors dashboard */
+.pdf-dash-shift-compact{
+  display:grid;
+  gap:8px;
+  padding:4px 0 2px;
+}
+.pdf-dash-shift-total{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+}
+.pdf-dash-shift-total span{
+  color:#718096;
+  font-size:8px;
+  font-weight:800;
+}
+.pdf-dash-shift-total b{
+  color:#27384d;
+  font-size:14px;
+}
+.pdf-dash-shift-total b small{
+  margin-left:3px;
+  color:#94a3b8;
+  font-size:7px;
+}
+.pdf-dash-shift-stack{
+  display:flex;
+  height:8px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#edf1f5;
+}
+.pdf-dash-shift-stack span{height:100%}
+.pdf-dash-shift-list-v84{
+  display:grid;
+  gap:0;
+  border-top:1px solid #edf1f5;
+}
+.pdf-dash-shift-list-v84>div{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  border-bottom:1px solid #edf1f5;
+}
+.pdf-dash-shift-list-v84 .label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#4c5b6e;
+  font-size:8px;
+  font-weight:800;
+}
+.pdf-dash-shift-list-v84 .label i{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+}
+.pdf-dash-shift-list-v84 .value{
+  display:flex;
+  align-items:baseline;
+  gap:3px;
+}
+.pdf-dash-shift-list-v84 .value b{
+  color:#26364b;
+  font-size:11px;
+}
+.pdf-dash-shift-list-v84 .value small{
+  color:#94a3b8;
+  font-size:6.5px;
+}
+.pdf-dash-shift-list-v84 .value em{
+  margin-left:5px;
+  color:#8996a8;
+  font-size:7px;
+  font-style:normal;
+  font-weight:800;
+}
+
 </style>
 </head>
 <body>
@@ -4169,21 +4360,26 @@ function renderDash(){
  let gradient=parts.length?`conic-gradient(${parts.join(',')})`:'#edf1f5';
 
  $('shiftChart').innerHTML=`
-  <div class="shift-overview">
-   <div class="shift-donut-wrap">
-    <div class="donut" style="background:${gradient}"></div>
-    <div class="shift-donut-center">
-     <b>${a.length}</b><span>在廠</span>
-    </div>
+  <div class="shift-overview-v84">
+   <div class="shift-total-line">
+    <span>目前在廠</span>
+    <b>${a.length}<small>人</small></b>
    </div>
-   <div class="shift-summary-list">
+
+   <div class="shift-stacked-bar" aria-label="班別比例">
     ${entries.map(([sh,count])=>`
-     <div class="shift-summary-row">
-      <div class="shift-summary-label">
+      <span style="width:${count/total*100}%;background:${shiftColorMap[sh]||'#94a3b8'}"></span>
+    `).join('')}
+   </div>
+
+   <div class="shift-summary-list-v84">
+    ${entries.map(([sh,count])=>`
+     <div class="shift-summary-row-v84">
+      <div class="shift-summary-label-v84">
        <i style="background:${shiftColorMap[sh]||'#94a3b8'}"></i>
        <span>${esc(sh==='未設定'?'未設定':sh+'班')}</span>
       </div>
-      <div class="shift-summary-value">
+      <div class="shift-summary-value-v84">
        <b>${count}</b><small>人</small>
        <em>${Math.round(count/total*100)}%</em>
       </div>
@@ -6467,14 +6663,16 @@ function buildSummaryPdfPage(data){
 
     <div class="pdf-dash-dist-block">
      <div class="pdf-dash-section-label">班別</div>
-     <div class="pdf-dash-shift-wrap">
-      <svg class="pdf-dash-donut" viewBox="0 0 42 42" aria-hidden="true">
-       <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#edf1f5" stroke-width="7"></circle>
-       ${shiftSvg}
-       <circle cx="21" cy="21" r="10.5" fill="#fff"></circle>
-      </svg>
-      <div class="pdf-dash-shift-legend">
-       ${shiftItems.map(x=>`<div><i style="background:${shiftColors[x[0]]||'#94a3b8'}"></i><span>${esc(x[0])}班</span><b>${x[1]}</b></div>`).join('')}
+     <div class="pdf-dash-shift-compact">
+      <div class="pdf-dash-shift-total"><span>目前在廠</span><b>${onsite}<small>人</small></b></div>
+      <div class="pdf-dash-shift-stack">
+       ${shiftItems.map(x=>`<span style="width:${x[1]/shiftTotal*100}%;background:${shiftColors[x[0]]||'#94a3b8'}"></span>`).join('')}
+      </div>
+      <div class="pdf-dash-shift-list-v84">
+       ${shiftItems.map(x=>`<div>
+        <span class="label"><i style="background:${shiftColors[x[0]]||'#94a3b8'}"></i>${esc(x[0])}班</span>
+        <span class="value"><b>${x[1]}</b><small>人</small><em>${Math.round(x[1]/shiftTotal*100)}%</em></span>
+       </div>`).join('')}
       </div>
      </div>
     </div>

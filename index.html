@@ -2031,20 +2031,6 @@ body.change-manage-mode .change-manage-inline{
 }
 
 
-/* V59 - support location quick filters */
-.presence-segment .support-location-filter .presence-dot{
-  background:#f59e0b!important;
-}
-.presence-segment .support-location-filter.active{
-  background:#fffaf0!important;
-  border-color:#f4c66a!important;
-  color:#a16207!important;
-  box-shadow:0 0 0 3px rgba(245,158,11,.08)!important;
-}
-.presence-segment .support-location-filter.active b{
-  background:#fff1c7!important;
-  color:#92400e!important;
-}
 
 </style>
 </head>
@@ -2168,17 +2154,9 @@ body.change-manage-mode .change-manage-inline{
     <div class="quickbar-divider" aria-hidden="true"></div>
 
     <div class="presence-segment">
-      <button type="button" class="presence-filter support-location-filter" data-support-location="台北港" onclick="setPeopleSupportLocationFilter('台北港')">
-       <span class="presence-dot"></span><span>台北港</span>
-       <b data-support-location-count="台北港">0</b>
-      </button>
-      <button type="button" class="presence-filter support-location-filter" data-support-location="東17" onclick="setPeopleSupportLocationFilter('東17')">
-       <span class="presence-dot"></span><span>東17</span>
-       <b data-support-location-count="東17">0</b>
-      </button>
-      <button type="button" class="presence-filter support-location-filter" data-support-location="製造部" onclick="setPeopleSupportLocationFilter('製造部')">
-       <span class="presence-dot"></span><span>製造部</span>
-       <b data-support-location-count="製造部">0</b>
+      <button type="button" class="presence-filter" data-presence="支援" onclick="setPeoplePresenceFilter('支援')">
+       <span class="presence-dot"></span><span>支援</span>
+       <b data-presence-count="支援">0</b>
       </button>
       <button type="button" class="presence-filter" data-presence="返鄉" onclick="setPeoplePresenceFilter('返鄉')">
        <span class="presence-dot"></span><span>返鄉</span>
@@ -2465,7 +2443,7 @@ body.change-manage-mode .change-manage-inline{
 const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
 const cfg=window.APP_CONFIG||{};
-let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='',activeSupportLocationFilter='';
+let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='';
 let logChoiceTouched=false;
 let editingChangeId=null;
 let selectedChangeIds=new Set();
@@ -2529,7 +2507,7 @@ function tempStatusHtml(p){
  let start=String(p.temporary_start_date||'').slice(0,10);
  let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
  let location=String(p.support_location||'').trim();
- let label=st==='返鄉'?'返鄉中':st==='返校'?'返校中':location?`支援・${location}`:'支援中';
+ let label=st==='返鄉'?'返鄉中':st==='返校'?'返校中':location?`支援 ${location}`:'支援中';
  let detail=back?`預計 ${back} 返廠`:start?`自 ${start}`:'';
  return `<span class="temp-badge ${cls}">${esc(label)}</span>${detail?`<div class="temp-detail">${esc(detail)}</div>`:''}`;
 }
@@ -2913,33 +2891,22 @@ function openTypeList(type){
 }
 function syncTypeButtons(){
  document.querySelectorAll('.quick-filter').forEach(b=>{
-   b.classList.toggle('active',!activePresenceFilter&&!activeSupportLocationFilter&&b.dataset.type===activeTypeFilter);
+   b.classList.toggle('active',!activePresenceFilter&&b.dataset.type===activeTypeFilter);
  });
- document.querySelectorAll('.presence-filter[data-presence]').forEach(b=>{
+ document.querySelectorAll('.presence-filter').forEach(b=>{
    b.classList.toggle('active',!!activePresenceFilter&&b.dataset.presence===activePresenceFilter);
- });
- document.querySelectorAll('.support-location-filter').forEach(b=>{
-   b.classList.toggle('active',!!activeSupportLocationFilter&&b.dataset.supportLocation===activeSupportLocationFilter);
  });
 }
 function renderPresenceCounts(){
  let source=employmentCurrent();
- let presenceCounts={
+ let counts={
+   '支援':source.filter(x=>currentTempStatus(x)==='支援').length,
    '返鄉':source.filter(x=>currentTempStatus(x)==='返鄉').length,
    '返校':source.filter(x=>currentTempStatus(x)==='返校').length
  };
- let supportCounts={
-   '台北港':source.filter(x=>currentTempStatus(x)==='支援'&&String(x.support_location||'')==='台北港').length,
-   '東17':source.filter(x=>currentTempStatus(x)==='支援'&&String(x.support_location||'')==='東17').length,
-   '製造部':source.filter(x=>currentTempStatus(x)==='支援'&&String(x.support_location||'')==='製造部').length
- };
  document.querySelectorAll('[data-presence-count]').forEach(el=>{
    let key=el.dataset.presenceCount||'';
-   el.textContent=presenceCounts[key]||0;
- });
- document.querySelectorAll('[data-support-location-count]').forEach(el=>{
-   let key=el.dataset.supportLocationCount||'';
-   el.textContent=supportCounts[key]||0;
+   el.textContent=counts[key]||0;
  });
 }
 function filtered(){
@@ -2947,10 +2914,7 @@ function filtered(){
  let source=activePresenceFilter==='返校'?employmentCurrent():mainCurrent();
 
  return source.filter(x=>{
-   if(activeSupportLocationFilter){
-     if(currentTempStatus(x)!=='支援')return false;
-     if(String(x.support_location||'')!==activeSupportLocationFilter)return false;
-   }else if(activePresenceFilter){
+   if(activePresenceFilter){
      if(currentTempStatus(x)!==activePresenceFilter)return false;
    }else if(activeTypeFilter && personType(x)!==activeTypeFilter){
      return false;
@@ -3364,22 +3328,12 @@ window.setPeopleTypeFilter=type=>{
  resetPeopleAdvancedFilters();
  activeTypeFilter=type||'';
  activePresenceFilter='';
- activeSupportLocationFilter='';
  syncTypeButtons();
  renderPeople();
 };
 window.setPeoplePresenceFilter=presence=>{
  resetPeopleAdvancedFilters();
  activePresenceFilter=activePresenceFilter===presence?'':presence;
- activeSupportLocationFilter='';
- activeTypeFilter='';
- syncTypeButtons();
- renderPeople();
-};
-window.setPeopleSupportLocationFilter=location=>{
- resetPeopleAdvancedFilters();
- activeSupportLocationFilter=activeSupportLocationFilter===location?'':location;
- activePresenceFilter='';
  activeTypeFilter='';
  syncTypeButtons();
  renderPeople();
@@ -3390,7 +3344,6 @@ $('clearFilters').onclick=()=>{
  ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{if($(id))$(id).value=''});
  activeTypeFilter='';
  activePresenceFilter='';
- activeSupportLocationFilter='';
  syncTypeButtons();
  renderPeople();
 };

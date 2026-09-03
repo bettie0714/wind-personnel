@@ -1961,6 +1961,68 @@ body.change-manage-mode .change-manage-inline{
 <div id="resignModal" class="modalback"><div class="modal"><button id="resignClose" class="close">×</button><h2>登記離職</h2><p id="resignWho"></p><div class="formgrid"><div class="field"><label>離職日期 *</label><input id="rDate" type="date"></div><div class="field"><label>原因</label><select id="rReason"><option>個人生涯規劃</option><option>合約到期</option><option>公司調整</option><option>其他</option></select></div><div class="field full"><label>備註</label><textarea id="rNote" rows="3"></textarea></div></div><div class="modalfoot"><button id="resignCancel" class="btn">取消</button><button id="resignSave" class="btn danger">確認離職</button></div></div></div>
 
 <script src="./config.js"></script>
+
+<div id="changeEditModal" class="modalback">
+ <div class="modal">
+  <button id="changeEditClose" class="close">×</button>
+  <h2>編輯人員變動紀錄</h2>
+  <p>只修改這筆紀錄，不會更動目前的人員主檔。</p>
+
+  <div class="formgrid">
+   <div class="field">
+    <label>日期</label>
+    <input id="ceDate" type="date">
+   </div>
+   <div class="field">
+    <label>類型</label>
+    <select id="ceType">
+     <option>新增</option>
+     <option>修改</option>
+     <option>調組</option>
+     <option>工號更正</option>
+     <option>支援</option>
+     <option>支援結束</option>
+     <option>返鄉</option>
+     <option>返校</option>
+     <option>返廠</option>
+     <option>離職</option>
+     <option>其他</option>
+    </select>
+   </div>
+
+   <div class="field">
+    <label>工號</label>
+    <input id="ceNo">
+   </div>
+   <div class="field">
+    <label>姓名</label>
+    <input id="ceName">
+   </div>
+
+   <div class="field">
+    <label>原組別</label>
+    <input id="ceOldGroup">
+   </div>
+   <div class="field">
+    <label>新組別</label>
+    <input id="ceNewGroup">
+   </div>
+
+   <div class="field full">
+    <label>內容</label>
+    <textarea id="ceDetail" rows="4"></textarea>
+   </div>
+  </div>
+
+  <div class="modalfoot">
+   <button id="changeDeleteOne" class="btn soft-danger">刪除此紀錄</button>
+   <span style="flex:1"></span>
+   <button id="changeEditCancel" class="btn">取消</button>
+   <button id="changeEditSave" class="btn primary">儲存紀錄</button>
+  </div>
+ </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
       onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -4283,65 +4345,5 @@ $('importBtn').onclick=async()=>{
 init();
 </script>
 
-<div id="changeEditModal" class="modalback">
- <div class="modal">
-  <button id="changeEditClose" class="close">×</button>
-  <h2>編輯人員變動紀錄</h2>
-  <p>只修改這筆紀錄，不會更動目前的人員主檔。</p>
-
-  <div class="formgrid">
-   <div class="field">
-    <label>日期</label>
-    <input id="ceDate" type="date">
-   </div>
-   <div class="field">
-    <label>類型</label>
-    <select id="ceType">
-     <option>新增</option>
-     <option>修改</option>
-     <option>調組</option>
-     <option>工號更正</option>
-     <option>支援</option>
-     <option>支援結束</option>
-     <option>返鄉</option>
-     <option>返校</option>
-     <option>返廠</option>
-     <option>離職</option>
-     <option>其他</option>
-    </select>
-   </div>
-
-   <div class="field">
-    <label>工號</label>
-    <input id="ceNo">
-   </div>
-   <div class="field">
-    <label>姓名</label>
-    <input id="ceName">
-   </div>
-
-   <div class="field">
-    <label>原組別</label>
-    <input id="ceOldGroup">
-   </div>
-   <div class="field">
-    <label>新組別</label>
-    <input id="ceNewGroup">
-   </div>
-
-   <div class="field full">
-    <label>內容</label>
-    <textarea id="ceDetail" rows="4"></textarea>
-   </div>
-  </div>
-
-  <div class="modalfoot">
-   <button id="changeDeleteOne" class="btn soft-danger">刪除此紀錄</button>
-   <span style="flex:1"></span>
-   <button id="changeEditCancel" class="btn">取消</button>
-   <button id="changeEditSave" class="btn primary">儲存紀錄</button>
-  </div>
- </div>
-</div>
 </body>
 </html>

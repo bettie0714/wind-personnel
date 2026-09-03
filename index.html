@@ -2690,6 +2690,399 @@ body.change-manage-mode .change-manage-inline{
 }
 .pdf-change-entry-content small b{color:#59687b}
 
+
+
+
+/* V78 - nationality is independently editable */
+#mNat{
+  color:#24364f;
+  background:#fff;
+  font-weight:700;
+}
+.field-hint{
+  margin-top:5px;
+  color:#8a97a8;
+  font-size:10px;
+  line-height:1.35;
+}
+
+
+/* V79 - PDF first page mirrors dashboard information hierarchy */
+.pdf-dashboard-page{
+  width:794px;
+  height:1123px;
+  min-height:1123px;
+  padding:30px 28px 24px;
+  overflow:hidden;
+  background:#fff;
+  box-sizing:border-box;
+}
+.pdf-dashboard-page .pdf-dash-header{
+  margin-bottom:14px;
+  padding-bottom:11px;
+}
+.pdf-dashboard-page .pdf-title{font-size:23px}
+.pdf-dashboard-page .pdf-foot{margin-top:10px}
+
+/* top overview */
+.pdf-dash-overview{
+  display:grid;
+  grid-template-columns:1.38fr repeat(4,.78fr);
+  gap:8px;
+  padding:8px;
+  margin-bottom:14px;
+  border:1px solid #e4eaf1;
+  border-radius:16px;
+  background:#fff;
+}
+.pdf-dash-headcount{
+  min-height:78px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:14px;
+  padding:12px 15px;
+  border-radius:12px;
+  background:#f4f7fb;
+}
+.pdf-dash-headcount-main span,
+.pdf-dash-overview-item>span{
+  display:block;
+  color:#718096;
+  font-size:9.5px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+.pdf-dash-headcount-main strong{
+  color:#0f172a;
+  font-size:30px;
+  line-height:1;
+}
+.pdf-dash-headcount-main strong small{
+  margin-left:4px;
+  color:#94a3b8;
+  font-size:9px;
+}
+.pdf-dash-headcount-total{
+  padding-left:14px;
+  border-left:1px solid #dce4ee;
+  white-space:nowrap;
+}
+.pdf-dash-headcount-total span{
+  color:#718096;
+  font-size:8.5px;
+  font-weight:800;
+}
+.pdf-dash-headcount-total strong{
+  margin-left:5px;
+  color:#334155;
+  font-size:20px;
+}
+.pdf-dash-headcount-total small{
+  margin-left:3px;
+  color:#94a3b8;
+  font-size:8px;
+}
+.pdf-dash-overview-item{
+  min-height:78px;
+  padding:13px 12px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.pdf-dash-overview-item strong{
+  color:#2f63ee;
+  font-size:25px;
+  line-height:1;
+}
+.pdf-dash-overview-item small{
+  margin-left:3px;
+  color:#94a3b8;
+  font-size:8px;
+}
+.pdf-dash-overview-item.student strong{color:#109354}
+
+/* dashboard middle */
+.pdf-dash-main-grid{
+  display:grid;
+  grid-template-columns:minmax(0,2.15fr) minmax(0,.86fr);
+  gap:14px;
+  align-items:stretch;
+}
+.pdf-dash-panel{
+  border:1px solid #e3e9f0;
+  border-radius:15px;
+  padding:14px;
+  background:#fff;
+}
+.pdf-dash-panel-title{
+  color:#17253b;
+  font-size:15px;
+  font-weight:900;
+  margin-bottom:11px;
+}
+.pdf-dash-section-label{
+  color:#94a3b8;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.04em;
+  margin-bottom:6px;
+}
+
+/* support / home leave */
+.pdf-dash-status-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:12px;
+}
+.pdf-dash-status-card{
+  min-height:92px;
+  padding:9px 10px;
+  border:1px solid #e4e9ef;
+  border-radius:10px;
+  background:#f9fbfd;
+}
+.pdf-dash-status-card.support{
+  background:#fffaf1;
+  border-color:#f2d59d;
+}
+.pdf-dash-status-card.homeleave{
+  background:#fbf9ff;
+  border-color:#ded2f2;
+}
+.pdf-dash-status-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:7px;
+}
+.pdf-dash-status-head>span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#394b61;
+  font-size:9px;
+  font-weight:900;
+}
+.pdf-dash-status-head i{
+  width:6px;
+  height:6px;
+  border-radius:999px;
+}
+.pdf-dash-status-card.support .pdf-dash-status-head i{background:#f59e0b}
+.pdf-dash-status-card.homeleave .pdf-dash-status-head i{background:#7c3aed}
+.pdf-dash-status-head strong{
+  color:#26364b;
+  font-size:16px;
+}
+.pdf-dash-status-head strong small{
+  margin-left:3px;
+  color:#8d9aaa;
+  font-size:7px;
+}
+.pdf-dash-status-details{
+  display:grid;
+  gap:3px;
+}
+.pdf-dash-status-detail{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+  padding:3px 6px;
+  border-radius:5px;
+  background:rgba(255,255,255,.82);
+  color:#5c6c80;
+  font-size:7.4px;
+}
+.pdf-dash-status-detail span{
+  font-weight:800;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.pdf-dash-status-detail b{
+  color:#40536a;
+  font-size:7.6px;
+  white-space:nowrap;
+}
+.pdf-dash-status-empty{
+  color:#98a4b4;
+  font-size:7.5px;
+}
+
+/* group list */
+.pdf-dash-group-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0 22px;
+}
+.pdf-dash-group-row{
+  min-height:31px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid #edf1f5;
+  color:#27384d;
+  font-size:9px;
+  font-weight:800;
+}
+.pdf-dash-group-row strong{
+  color:#2f63ee;
+  font-size:15px;
+  white-space:nowrap;
+}
+.pdf-dash-group-row strong small{
+  margin-left:3px;
+  color:#9aa6b6;
+  font-size:7px;
+}
+
+/* distribution */
+.pdf-dash-distribution{
+  display:flex;
+  flex-direction:column;
+}
+.pdf-dash-dist-block{padding:2px 0}
+.pdf-dash-shift-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  min-height:125px;
+}
+.pdf-dash-donut{
+  width:92px;
+  height:92px;
+  flex:0 0 auto;
+}
+.pdf-dash-shift-legend{
+  display:grid;
+  gap:7px;
+  min-width:74px;
+}
+.pdf-dash-shift-legend>div,
+.pdf-dash-type-list>div{
+  display:grid;
+  grid-template-columns:7px 1fr auto;
+  gap:6px;
+  align-items:center;
+  color:#536176;
+  font-size:8.5px;
+}
+.pdf-dash-shift-legend i,
+.pdf-dash-type-list i{
+  width:7px;
+  height:7px;
+  border-radius:999px;
+}
+.pdf-dash-shift-legend b,
+.pdf-dash-type-list b{
+  color:#25364c;
+  font-size:9px;
+}
+.pdf-dash-divider{
+  height:1px;
+  background:#edf1f5;
+  margin:9px 0 10px;
+}
+.pdf-dash-type-stack{
+  display:flex;
+  width:100%;
+  height:8px;
+  margin:6px 0 12px;
+  overflow:hidden;
+  border-radius:999px;
+  background:#eef2f7;
+}
+.pdf-dash-type-stack span{height:100%}
+.pdf-dash-type-list{
+  display:grid;
+  gap:0;
+}
+.pdf-dash-type-list>div{
+  min-height:28px;
+  border-bottom:1px solid #edf1f5;
+}
+.pdf-dash-type-list b small{
+  margin-left:2px;
+  color:#94a3b8;
+  font-size:7px;
+}
+
+/* monthly movement compact strip */
+.pdf-dash-movement{
+  margin-top:13px;
+  border:1px solid #e3e9f0;
+  border-radius:14px;
+  padding:11px 12px;
+}
+.pdf-dash-movement-title{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+.pdf-dash-movement-title b{
+  color:#17253b;
+  font-size:13px;
+}
+.pdf-dash-movement-title span{
+  color:#8996a8;
+  font-size:7.8px;
+}
+.pdf-dash-movement-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+}
+.pdf-dash-move-cell{
+  min-height:64px;
+  padding:8px 9px;
+  border-radius:9px;
+  background:#f8fafc;
+  border:1px solid #e7ecf2;
+}
+.pdf-dash-move-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.pdf-dash-move-head b{
+  color:#334155;
+  font-size:8.5px;
+}
+.pdf-dash-move-head span{
+  font-size:8px;
+  font-weight:900;
+}
+.pdf-dash-move-head .pos{color:#15803d}
+.pdf-dash-move-head .neg{color:#b42318}
+.pdf-dash-move-head .zero{color:#94a3b8}
+.pdf-dash-move-count{
+  margin-top:5px;
+  color:#26364b;
+  font-size:12px;
+  font-weight:900;
+}
+.pdf-dash-move-count i{
+  padding:0 6px;
+  color:#a4afbd;
+  font-style:normal;
+  font-size:9px;
+}
+.pdf-dash-move-detail{
+  margin-top:4px;
+  color:#7b8899;
+  font-size:7px;
+  line-height:1.3;
+}
+
 </style>
 </head>
 <body>
@@ -2987,12 +3380,12 @@ body.change-manage-mode .change-manage-inline{
 </main>
 </div>
 
-<div id="personModal" class="modalback"><div class="modal"><button id="personClose" class="close">×</button><h2 id="personModalTitle">新增人員</h2><p>W／Z 自動判定外籍，X 自動判定建教生。海外事業部請直接到左側專屬頁面管理。</p><div class="formgrid">
+<div id="personModal" class="modalback"><div class="modal"><button id="personClose" class="close">×</button><h2 id="personModalTitle">新增人員</h2><p>「建教生」是人員身分，不是國籍。X 工號仍代表建教生；國籍請另外選擇台籍或外籍。</p><div class="formgrid">
  <div class="field"><label>工號 *</label><input id="mNo"></div><div class="field"><label>姓名 *</label><input id="mName"></div>
  <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
- <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
+ <div class="field"><label>國籍</label><select id="mNat"><option value="—">未設定</option><option value="台籍">台籍</option><option value="外籍">外籍</option></select><div class="field-hint">國籍與建教生身分分開，可獨立修改</div></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
  <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div>
  <div class="field" id="mSupportLocationField"><label>支援地點</label><select id="mSupportLocation"><option value="">請選擇</option><option>台北港</option><option>東17</option><option>製造部</option></select></div>
@@ -3193,6 +3586,13 @@ function tempStatusHtml(p){
 }
 function isAdmin(){return role==='admin'}
 function normalizeNo(v){return String(v||'').trim().toUpperCase()}
+function identityLabelFromNo(no){
+ no=normalizeNo(no);
+ if(no.startsWith('W'))return '外籍 W';
+ if(no.startsWith('Z'))return '外籍 Z';
+ if(no.startsWith('X'))return '建教生';
+ return '台籍';
+}
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
 function deriveLevel(no,job){no=normalizeNo(no);job=String(job||'');if(no.startsWith('X')||job.includes('建教生'))return'學生';return /(組長|課長|廠長|副廠長|工程師)/.test(job)?'主管':'員工'}
 function deriveGroup(no,job,existing){
@@ -3911,6 +4311,7 @@ function naturalFieldChange(label,before,after){
    if(after&&after!=='—')return `班別改為${after}班`;
  }
  if(label==='工號'&&after&&after!=='—')return `工號更正為 ${after}`;
+ if(label==='國籍'&&after&&after!=='—')return `國籍改為 ${after}`;
  if(label==='外籍合約到期'&&after&&after!=='—')return `合約到期日改為 ${shortChangeDate(after)}`;
  if(after==='—'||!after)return `${label}已清除`;
  if(before==='—'||!before)return `${label}：${after}`;
@@ -4188,7 +4589,7 @@ function openPerson(p=null,area=null){
  $('mJob').value=p?.job_title||'';
  $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);
  renderSupervisorGroupChecks(p?.supervisor_groups||'');
- $('mNat').value=p?.nationality||'台籍';
+ $('mNat').value=p?.nationality||deriveNationality(p?.employee_no||'')||'—';
  $('mArea').value=p?(isOverseas(p)?'海外事業部':'本部'):(area||'本部');
  let fc=contracts.find(c=>c.employee_no===p?.employee_no);
  $('mHire').value=p?.hire_date||'';
@@ -4202,8 +4603,39 @@ function openPerson(p=null,area=null){
  logChoiceTouched=false;
  $('mLogChange').checked=!p;
  syncTempFields();
+ syncIdentityFromEmployeeNo({fromUser:false});
  refreshChangePreview();
  $('personModal').classList.add('show');
+}
+
+function syncIdentityFromEmployeeNo({fromUser=false}={}){
+ let no=normalizeNo($('mNo').value);
+ let isStudent=no.startsWith('X');
+ let isForeignWorkNo=/^[WZ]/.test(no);
+
+ // 工號只影響「建教生 / 員工」等身分，不影響國籍。
+ if(!isStudent && $('mLevel').value==='學生'){
+   $('mLevel').value='員工';
+   syncSupervisorGroupState();
+ }
+ if(isStudent && $('mLevel').value==='員工' && fromUser){
+   $('mLevel').value='學生';
+   syncSupervisorGroupState();
+ }
+
+ // 返校只適用建教生；如果工號由 X 改成非 X，結束返校狀態。
+ if(!isStudent && $('mTempStatus').value==='返校'){
+   $('mTempStatus').value='';
+   $('mTempStart').value='';
+   $('mExpectedReturn').value='';
+   syncTempFields();
+ }
+
+ // 外籍合約到期欄仍依 W/Z 工號使用，和國籍欄位分開。
+ $('mContractEnd').disabled=!isForeignWorkNo;
+ if(!isForeignWorkNo && fromUser)$('mContractEnd').value='';
+
+ refreshChangePreview();
 }
 
 function syncTempFields(){
@@ -4239,7 +4671,7 @@ function personDraft(){
    group_name:deriveGroup(no,job,$('mGroup').value),
    level:$('mLevel').value||deriveLevel(no,job),
    supervisor_groups:$('mLevel').value==='主管'?selectedSupervisorGroups().join(','):null,
-   nationality:deriveNationality(no),
+   nationality:$('mNat').value||'—',
    area:$('mArea').value,
    hire_date:$('mHire').value||null,
    status:$('mStatus').value,
@@ -4265,6 +4697,7 @@ function personDiffs(old,draft){
    if(before!==after)diffs.push(`${label}：${before} → ${after}`);
  };
  add('工號',old.employee_no,draft.employee_no);
+ add('國籍',old.nationality||'—',draft.nationality||'—');
  add('姓名',old.name,draft.name);
  add('班別',old.shift,draft.shift);
  add('職別',old.job_title,draft.job_title);
@@ -4317,11 +4750,13 @@ function refreshChangePreview(){
    else $('mLogChange').checked=importantChange(old,draft,diffs);
  }
 }
-['mNo','mName','mShift','mGroup','mJob','mLevel','mHire','mContractEnd','mStatus','mTempStatus','mSupportLocation','mTempStart','mExpectedReturn','mNote']
+['mName','mShift','mGroup','mJob','mLevel','mNat','mHire','mContractEnd','mStatus','mTempStatus','mSupportLocation','mTempStart','mExpectedReturn','mNote']
  .forEach(id=>$(id)?.addEventListener('input',refreshChangePreview));
+$('mNo').addEventListener('input',()=>syncIdentityFromEmployeeNo({fromUser:true}));
 $('mLogChange').addEventListener('change',()=>{logChoiceTouched=true});
 
 $('personSave').onclick=async()=>{
+ syncIdentityFromEmployeeNo({fromUser:false});
  let draft=personDraft(),no=draft.employee_no,name=draft.name;
  if(!no||!name){alert('請輸入工號與姓名');return}
 
@@ -5657,87 +6092,72 @@ function buildFourPageReport(data){
 }
 
 function buildSummaryPdfPage(data){
- let fromEmployed=mainRows(data.fromRows).length,totalTo=data.mainTo.length;
- let kpis=[
-   ['目前在廠',data.onsiteTo.length,'實際廠內人力'],
-   ['在職總人數',totalTo,`${fromEmployed} → ${totalTo}　${signNum(totalTo-fromEmployed)}`],
-   ['Z',data.mainTo.filter(p=>personType(p)==='Z').length,'在職'],
-   ['W',data.mainTo.filter(p=>personType(p)==='W').length,'在職']
- ];
+ let total=data.mainTo.length;
+ let onsite=data.onsiteTo.length;
+ let taiwan=data.mainTo.filter(p=>personType(p)==='台籍').length;
+ let z=data.mainTo.filter(p=>personType(p)==='Z').length;
+ let w=data.mainTo.filter(p=>personType(p)==='W').length;
+ let student=data.mainTo.filter(p=>personType(p)==='建教生').length;
+
  let typeCounts=[
-   ['台籍',data.mainTo.filter(p=>personType(p)==='台籍').length],
-   ['Z',data.mainTo.filter(p=>personType(p)==='Z').length],
-   ['W',data.mainTo.filter(p=>personType(p)==='W').length],
-   ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length]
+   ['台籍',taiwan,'#2f80ed'],
+   ['Z',z,'#7650c7'],
+   ['W',w,'#f2992e'],
+   ['建教生',student,'#43b05c']
  ];
- let topGroups=data.groupCounts.filter(x=>x[1]>0).slice(0,8);
- let diffBlocks=`<div class="pdf-movement-list">
-  ${data.typeRows.map(x=>{
-    let d=peopleDiff(x.from,x.to);
-    let net=x.to.length-x.from.length;
-    let isStudent=x.type==='建教生';
 
-    let detail='';
-    if(d.added.length||d.removed.length){
-      let addLabel=isStudent?'進廠／返廠':'新增';
-      let removeLabel=isStudent?'返校':'減少';
-      detail=`<div class="pdf-movement-detail">
-       <div class="pdf-movement-detail-item">
-        <span>${addLabel}</span><b>${d.added.length} 人</b>
-       </div>
-       <div class="pdf-movement-detail-item">
-        <span>${removeLabel}</span><b>${d.removed.length} 人</b>
-       </div>
-       ${isStudent?'<div class="pdf-movement-more">詳細工號請見「建教生名冊」與「人員變動紀錄」</div>':''}
-      </div>`;
-    }
+ let shiftItems=data.shiftCounts.filter(x=>x[1]>0);
+ let shiftTotal=shiftItems.reduce((n,x)=>n+x[1],0)||1;
+ let shiftColors={'日':'#2f80ed','中':'#f2992e','夜':'#43b05c'};
+ let shiftOffset=0;
+ let shiftSvg=shiftItems.map(x=>{
+   let pct=x[1]/shiftTotal*100;
+   let part=`<circle cx="21" cy="21" r="15.9155" fill="none" stroke="${shiftColors[x[0]]||'#94a3b8'}" stroke-width="7" pathLength="100" stroke-dasharray="${pct} ${100-pct}" stroke-dashoffset="${-shiftOffset}" transform="rotate(-90 21 21)"></circle>`;
+   shiftOffset+=pct;
+   return part;
+ }).join('');
 
-    return `<div class="pdf-movement-row">
-     <div class="pdf-movement-main">
-      <div class="pdf-movement-type">${esc(x.type)}</div>
-      <div class="pdf-movement-count">${x.from.length}<span>→</span>${x.to.length}</div>
-      <div class="pdf-movement-net ${net>0?'pos':net<0?'neg':'zero'}">${net===0?'±0':net>0?'+'+net:String(net)}</div>
-     </div>
-     ${detail}
-    </div>`;
-  }).join('')}
- </div>`;
- let supportDetail=data.supportDetails
-   .filter(x=>x.people.length)
-   .map(x=>`${x.location}：${x.people.map(p=>p.employee_no).join('、')}`)
-   .join('　')||'—';
- let dynamicBlocks=[
-   `<div class="pdf-list-item pdf-dynamic-main">
-     <div class="pdf-dynamic-head"><b>支援</b><strong>${data.tempCounts.support} 人</strong></div>
-     <div class="pdf-dynamic-support-list">
-      ${data.supportDetails.filter(x=>x.people.length).map(x=>`
-       <div class="pdf-support-row">
-        <span>${esc(x.location)}</span>
-        <b>${esc(x.people.map(p=>p.employee_no).join('、'))}</b>
-       </div>`).join('')||'<div class="pdf-support-row"><span>目前無支援人員</span></div>'}
-     </div>
-    </div>`,
-   `<div class="pdf-list-item pdf-dynamic-homeleave">
-     <div class="pdf-dynamic-head homeleave-head"><b>返鄉</b><strong>${data.tempCounts.homeleave} 人</strong></div>
-     <div class="pdf-homeleave-list">
-      ${data.homeleaveDetails.length?data.homeleaveDetails.map(p=>{
-        let back=shortChangeDate(p.expected_return_date||'');
-        return `<div class="pdf-homeleave-row">
-          <div class="pdf-homeleave-person">
-           <b>${esc(p.employee_no||'')}</b>
-           <span>${esc(p.name||'')}</span>
-          </div>
-          ${back?`<span class="pdf-homeleave-return">預計 ${esc(back)} 返廠</span>`:''}
-         </div>`;
-      }).join(''):'<div class="pdf-homeleave-row empty-row">目前無返鄉人員</div>'}
-     </div>
-    </div>`,
-   `<div class="pdf-list-item"><b>返校</b>：${data.tempCounts.school} 人<div class="pdf-dynamic-sub">不列入在職總人數</div></div>`
- ].join('');
+ let supportRows=data.supportDetails.filter(x=>x.people.length).map(x=>`
+   <div class="pdf-dash-status-detail">
+    <span>${esc(x.location)}</span>
+    <b>${esc(x.people.map(p=>p.employee_no).join('、'))}</b>
+   </div>`).join('')||'<div class="pdf-dash-status-empty">目前無支援人員</div>';
+
+ let homeRows=data.homeleaveDetails.map(p=>{
+   let back=shortChangeDate(p.expected_return_date||'');
+   return `<div class="pdf-dash-status-detail">
+    <span>${esc(p.employee_no||'')} ${esc(p.name||'')}</span>
+    <b>${back?`預計 ${esc(back)} 返廠`:''}</b>
+   </div>`;
+ }).join('')||'<div class="pdf-dash-status-empty">目前無返鄉人員</div>';
+
+ let groups=data.groupCounts.filter(x=>x[1]>0);
+
+ let movementCells=data.typeRows.map(x=>{
+   let d=peopleDiff(x.from,x.to);
+   let net=x.to.length-x.from.length;
+   let isStudent=x.type==='建教生';
+   let detail='';
+   if(d.added.length||d.removed.length){
+     detail=isStudent
+       ? `進廠／返廠 ${d.added.length}・返校 ${d.removed.length}`
+       : `新增 ${d.added.length}・減少 ${d.removed.length}`;
+   }else{
+     detail='本月無異動';
+   }
+   return `<div class="pdf-dash-move-cell">
+    <div class="pdf-dash-move-head">
+     <b>${esc(x.type)}</b>
+     <span class="${net>0?'pos':net<0?'neg':'zero'}">${net===0?'±0':net>0?'+'+net:String(net)}</span>
+    </div>
+    <div class="pdf-dash-move-count">${x.from.length}<i>→</i>${x.to.length}</div>
+    <div class="pdf-dash-move-detail">${esc(detail)}</div>
+   </div>`;
+ }).join('');
 
  return `
- <div class="pdf-page">
-  <div class="pdf-header">
+ <div class="pdf-page pdf-dashboard-page">
+  <div class="pdf-header pdf-dash-header">
    <div>
     <div class="pdf-title">${monthLabel(data.tm)} 人員月報</div>
     <div class="pdf-sub">比較區間：${esc(data.rangeText)}</div>
@@ -5745,31 +6165,100 @@ function buildSummaryPdfPage(data){
    <div class="pdf-brand">Personnel Report</div>
   </div>
 
-  <div class="pdf-kpis">
-   ${kpis.map(x=>`<div class="pdf-kpi"><div class="k">${esc(x[0])}</div><div class="v">${x[1]} 人</div><div class="d">${esc(x[2])}</div></div>`).join('')}
+  <div class="pdf-dash-overview">
+   <div class="pdf-dash-headcount">
+    <div class="pdf-dash-headcount-main">
+     <span>目前在廠</span>
+     <strong>${onsite}<small>人</small></strong>
+    </div>
+    <div class="pdf-dash-headcount-total">
+     <span>在職總人數</span>
+     <strong>${total}</strong><small>人</small>
+    </div>
+   </div>
+
+   <div class="pdf-dash-overview-item">
+    <span>台籍</span><strong>${taiwan}</strong><small>人</small>
+   </div>
+   <div class="pdf-dash-overview-item">
+    <span>Z</span><strong>${z}</strong><small>人</small>
+   </div>
+   <div class="pdf-dash-overview-item">
+    <span>W</span><strong>${w}</strong><small>人</small>
+   </div>
+   <div class="pdf-dash-overview-item student">
+    <span>建教生</span><strong>${student}</strong><small>人</small>
+   </div>
   </div>
 
-  <div class="pdf-grid2">
-   <div class="pdf-panel">
-    <h3>在職人員結構</h3>
-    ${pdfBarRows(typeCounts,'#2563eb')}
+  <div class="pdf-dash-main-grid">
+   <div class="pdf-dash-panel pdf-dash-groups">
+    <div class="pdf-dash-panel-title">組別人力</div>
+
+    <div class="pdf-dash-status-grid">
+     <div class="pdf-dash-status-card support">
+      <div class="pdf-dash-status-head">
+       <span><i></i>支援中</span><strong>${data.tempCounts.support}<small>人</small></strong>
+      </div>
+      <div class="pdf-dash-status-details">${supportRows}</div>
+     </div>
+
+     <div class="pdf-dash-status-card homeleave">
+      <div class="pdf-dash-status-head">
+       <span><i></i>返鄉中</span><strong>${data.tempCounts.homeleave}<small>人</small></strong>
+      </div>
+      <div class="pdf-dash-status-details">${homeRows}</div>
+     </div>
+    </div>
+
+    <div class="pdf-dash-section-label">目前在廠組別</div>
+    <div class="pdf-dash-group-list">
+     ${groups.map(x=>`
+      <div class="pdf-dash-group-row">
+       <span>${esc(x[0])}</span><strong>${x[1]}<small>人</small></strong>
+      </div>`).join('')}
+    </div>
    </div>
-   <div class="pdf-panel">
-    <h3>目前在廠組別</h3>
-    ${pdfBarRows(topGroups,'#14b8a6')}
+
+   <div class="pdf-dash-panel pdf-dash-distribution">
+    <div class="pdf-dash-panel-title">人力分布</div>
+
+    <div class="pdf-dash-dist-block">
+     <div class="pdf-dash-section-label">班別</div>
+     <div class="pdf-dash-shift-wrap">
+      <svg class="pdf-dash-donut" viewBox="0 0 42 42" aria-hidden="true">
+       <circle cx="21" cy="21" r="15.9155" fill="none" stroke="#edf1f5" stroke-width="7"></circle>
+       ${shiftSvg}
+       <circle cx="21" cy="21" r="10.5" fill="#fff"></circle>
+      </svg>
+      <div class="pdf-dash-shift-legend">
+       ${shiftItems.map(x=>`<div><i style="background:${shiftColors[x[0]]||'#94a3b8'}"></i><span>${esc(x[0])}班</span><b>${x[1]}</b></div>`).join('')}
+      </div>
+     </div>
+    </div>
+
+    <div class="pdf-dash-divider"></div>
+
+    <div class="pdf-dash-dist-block">
+     <div class="pdf-dash-section-label">人員結構</div>
+     <div class="pdf-dash-type-stack">
+      ${typeCounts.map(x=>`<span style="width:${x[1]/Math.max(total,1)*100}%;background:${x[2]}"></span>`).join('')}
+     </div>
+     <div class="pdf-dash-type-list">
+      ${typeCounts.map(x=>`<div><i style="background:${x[2]}"></i><span>${esc(x[0])}</span><b>${x[1]}<small>人</small></b></div>`).join('')}
+     </div>
+    </div>
    </div>
   </div>
 
-  <div class="pdf-grid2" style="margin-top:14px">
-   <div class="pdf-panel">
-    <h3>人員動態</h3>
-    <div class="pdf-list">${dynamicBlocks}</div>
+  <div class="pdf-dash-movement">
+   <div class="pdf-dash-movement-title">
+    <b>本月人員增減</b>
+    <span>${esc(data.rangeText)}</span>
    </div>
-   <div class="pdf-panel">
-    <h3>人員增減</h3>
-    <div class="pdf-list">${diffBlocks}</div>
-   </div>
+   <div class="pdf-dash-movement-grid">${movementCells}</div>
   </div>
+
   <div class="pdf-foot">系統匯出時間：${new Date().toLocaleString('zh-TW')}</div>
  </div>`;
 }

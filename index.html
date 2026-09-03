@@ -3274,6 +3274,15 @@ body.change-manage-mode .change-manage-inline{
   display:none!important;
 }
 
+
+/* V83 - dynamic shift rows */
+.shift-summary-label i{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  flex:0 0 auto;
+}
+
 </style>
 </head>
 <body>
@@ -4147,26 +4156,38 @@ function renderDash(){
    </button>`).join('')+'</div>';
  $('groupChart').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{showPage('people');activeTypeFilter='';syncTypeButtons();$('fGroup').value=b.dataset.g;renderPeople()});
 
+ let shiftOrder=['日','中','夜','未設定'];
+ let shiftColorMap={'日':'#2f80ed','中':'#f2992e','夜':'#43b05c','未設定':'#94a3b8'};
  let sc={};a.forEach(x=>sc[x.shift||'未設定']=(sc[x.shift||'未設定']||0)+1);
- let entries=Object.entries(sc),total=entries.reduce((n,x)=>n+x[1],0)||1,colors=['#2f80ed','#43b05c','#f2992e','#7650c7','#2cb4b3','#94a3b8'],deg=0,parts=[];
- entries.forEach((x,i)=>{let d=x[1]/total*360;parts.push(`${colors[i%colors.length]} ${deg}deg ${deg+d}deg`);deg+=d});
+ let entries=shiftOrder.filter(sh=>(sc[sh]||0)>0).map(sh=>[sh,sc[sh]]);
+ let total=entries.reduce((n,x)=>n+x[1],0)||1,deg=0,parts=[];
+ entries.forEach(([sh,count])=>{
+   let d=count/total*360;
+   parts.push(`${shiftColorMap[sh]||'#94a3b8'} ${deg}deg ${deg+d}deg`);
+   deg+=d;
+ });
+ let gradient=parts.length?`conic-gradient(${parts.join(',')})`:'#edf1f5';
+
  $('shiftChart').innerHTML=`
   <div class="shift-overview">
    <div class="shift-donut-wrap">
-    <div class="donut" style="background:conic-gradient(#2f80ed 0 ${dayDeg}deg,#43b05c ${dayDeg}deg 360deg)"></div>
+    <div class="donut" style="background:${gradient}"></div>
     <div class="shift-donut-center">
      <b>${a.length}</b><span>在廠</span>
     </div>
    </div>
    <div class="shift-summary-list">
-    <div class="shift-summary-row">
-     <div class="shift-summary-label"><i class="day"></i><span>日班</span></div>
-     <div class="shift-summary-value"><b>${day}</b><small>人</small><em>${a.length?Math.round(day/a.length*100):0}%</em></div>
-    </div>
-    <div class="shift-summary-row">
-     <div class="shift-summary-label"><i class="night"></i><span>夜班</span></div>
-     <div class="shift-summary-value"><b>${night}</b><small>人</small><em>${a.length?Math.round(night/a.length*100):0}%</em></div>
-    </div>
+    ${entries.map(([sh,count])=>`
+     <div class="shift-summary-row">
+      <div class="shift-summary-label">
+       <i style="background:${shiftColorMap[sh]||'#94a3b8'}"></i>
+       <span>${esc(sh==='未設定'?'未設定':sh+'班')}</span>
+      </div>
+      <div class="shift-summary-value">
+       <b>${count}</b><small>人</small>
+       <em>${Math.round(count/total*100)}%</em>
+      </div>
+     </div>`).join('')}
    </div>
   </div>`;
 

@@ -1141,25 +1141,100 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 }
 
 
-.change-log-option{
-  margin-top:14px;
-  padding:12px 14px;
-  border:1px solid #e3e9f1;
-  border-radius:12px;
-  background:#f8fafc;
-}
-.change-log-option label{
+
+.change-log-card{
+  grid-column:1/-1;
   display:flex;
   align-items:center;
-  gap:9px;
-  font-weight:800;
-  color:#334155;
+  justify-content:space-between;
+  gap:18px;
+  padding:14px 16px;
+  margin-top:2px;
+  border:1px solid #e5eaf1;
+  border-radius:14px;
+  background:linear-gradient(180deg,#fbfdff 0%,#f8fafc 100%);
+}
+.change-log-copy{
+  min-width:0;
+  flex:1;
+}
+.change-log-title{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:13px;
+  font-weight:850;
+  color:#263244;
+  margin-bottom:5px;
+}
+.change-log-title::before{
+  content:'';
+  width:7px;
+  height:7px;
+  border-radius:999px;
+  background:#4f7cff;
+  flex:0 0 auto;
 }
 .change-log-preview{
-  margin-top:8px;
   color:#64748b;
   font-size:12px;
-  line-height:1.55;
+  line-height:1.5;
+  overflow-wrap:anywhere;
+}
+.log-switch{
+  display:flex!important;
+  align-items:center;
+  gap:9px;
+  flex:0 0 auto;
+  margin:0!important;
+  cursor:pointer;
+  user-select:none;
+  color:#475569!important;
+  font-size:12px!important;
+  font-weight:800;
+}
+.modal .log-switch input[type="checkbox"]{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:0!important;
+}
+.switch-ui{
+  position:relative;
+  width:42px;
+  height:24px;
+  border-radius:999px;
+  background:#cbd5e1;
+  transition:.18s ease;
+  box-shadow:inset 0 0 0 1px rgba(15,23,42,.05);
+}
+.switch-ui::after{
+  content:'';
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  background:#fff;
+  box-shadow:0 2px 5px rgba(15,23,42,.18);
+  transition:.18s ease;
+}
+.log-switch input:checked + .switch-ui{
+  background:#315efb;
+}
+.log-switch input:checked + .switch-ui::after{
+  transform:translateX(18px);
+}
+.log-switch input:focus-visible + .switch-ui{
+  outline:3px solid rgba(49,94,251,.18);
+  outline-offset:2px;
+}
+.log-switch-text{
+  white-space:nowrap;
 }
 .danger-zone{
   margin-right:auto;
@@ -1172,6 +1247,7 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 .btn.soft-danger:hover{
   background:#fff1f2;
 }
+
 
 </style>
 </head>
@@ -1405,16 +1481,23 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
  <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
- <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><div class="field admin-only"><label>區域</label><select id="mArea" style="display:none"><option>本部</option><option>海外事業部</option></select></div>
+ <div class="field"><label>籍別</label><select id="mNat"><option>台籍</option><option>外籍</option><option>—</option></select></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
  <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div>
  <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div>
  <div class="field"><label>預計返廠上班日</label><input id="mExpectedReturn" type="date"></div>
  <div class="temp-fields-note">建教生請用「返校」；W／Z 暫時返鄉請用「返鄉」；到預計返廠日當天，系統會自動視為已返廠。支援人員仍計入在職人數。</div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
- <div class="field full change-log-option" id="changeLogOption">
-  <label><input id="mLogChange" type="checkbox"> 記錄到「人員變動」</label>
-  <div id="mChangePreview" class="change-log-preview">尚未偵測到變更。</div>
+ <div class="change-log-card" id="changeLogOption">
+  <div class="change-log-copy">
+   <div class="change-log-title">人員變動紀錄</div>
+   <div id="mChangePreview" class="change-log-preview">尚未偵測到變更。</div>
+  </div>
+  <label class="log-switch" for="mLogChange">
+   <input id="mLogChange" type="checkbox">
+   <span class="switch-ui" aria-hidden="true"></span>
+   <span class="log-switch-text">記錄</span>
+  </label>
  </div>
  </div><div class="modalfoot">
    <div class="danger-zone"><button id="personDelete" class="btn soft-danger hidden">永久刪除資料</button></div>
@@ -1443,6 +1526,7 @@ const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","建教生","未分類"];
 const cfg=window.APP_CONFIG||{};
 let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='';
+let logChoiceTouched=false;
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -1499,19 +1583,25 @@ function normalizeNo(v){return String(v||'').trim().toUpperCase()}
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
 function deriveLevel(no,job){no=normalizeNo(no);job=String(job||'');if(no.startsWith('X')||job.includes('建教生'))return'學生';return /(組長|課長|廠長|副廠長|工程師)/.test(job)?'主管':'員工'}
 function deriveGroup(no,job,existing){
- no=normalizeNo(no);let t=String(job||'').replace(/\s+/g,'');
+ no=normalizeNo(no);
+ let manual=String(existing||'').trim();
+
+ // 只要使用者／Excel 已明確指定有效組別，就以指定值為準。
+ // 這樣建教生也可以依實際作業需要改成手焊、電焊、捲板等組別。
+ if(manual && manual!=='Z' && manual!=='W')return manual;
+
+ let t=String(job||'').replace(/\s+/g,'');
  if(no.startsWith('X')||t.includes('建教生'))return'建教生';
  if(t.includes('廠務'))return'廠務';
- if(t.includes('文管'))return'文管';if(t.includes('焊接協調')||t.includes('銲接協調'))return'焊接協調';
+ if(t.includes('文管'))return'文管';
+ if(t.includes('焊接協調')||t.includes('銲接協調'))return'焊接協調';
  if(t.includes('設備焊接')||t.includes('設備銲接')||t.includes('電銲')||t.includes('電焊'))return'電焊';
  if(t.includes('6GR焊工')||t.includes('手焊')||t.includes('焊工'))return'手焊';
  if(t.includes('捲板'))return'捲板';
  if(t.includes('清根'))return'清根';
  if(t.includes('研磨'))return'研磨';
  if(t.includes('廠長')||t.includes('副廠長')||t.includes('銲接工程師')||t.includes('焊接工程師'))return'主管';
- // 舊資料若組別曾被存成 Z / W，不再把它當真正組別。
- if(existing==='Z'||existing==='W'||!existing)return'未分類';
- return existing;
+ return'未分類';
 }
 function personGroup(p){return deriveGroup(p.employee_no,p.job_title,p.group_name)}
 const SUPERVISOR_GROUPS=['捲板','清根','研磨','手焊','電焊','焊接協調','文管','廠務'];
@@ -2195,6 +2285,7 @@ function openPerson(p=null,area=null){
  $('mExpectedReturn').value=p?.expected_return_date||'';
  $('mNote').value=p?.note||'';
  $('personDelete').classList.toggle('hidden',!p);
+ logChoiceTouched=false;
  $('mLogChange').checked=!p;
  syncTempFields();
  refreshChangePreview();
@@ -2286,13 +2377,19 @@ function refreshChangePreview(){
  let old=employees.find(x=>x.employee_no===editNo);
  let draft=personDraft();
  let diffs=personDiffs(old,draft);
- $('mChangePreview').textContent=diffs.length?`本次變更：${diffs.join('｜')}`:'沒有欄位變更，不會建立人員變動紀錄。';
- $('mLogChange').disabled=!diffs.length;
- if(!diffs.length)$('mLogChange').checked=false;
- else if(old)$('mLogChange').checked=importantChange(old,draft,diffs);
+
+ $('mChangePreview').textContent=diffs.length
+   ? `本次變更：${diffs.join('｜')}`
+   : '目前沒有欄位變更；即使開啟「記錄」，儲存時也不會產生空白紀錄。';
+
+ if(!logChoiceTouched){
+   if(!old)$('mLogChange').checked=true;
+   else $('mLogChange').checked=importantChange(old,draft,diffs);
+ }
 }
 ['mNo','mName','mShift','mGroup','mJob','mLevel','mHire','mContractEnd','mStatus','mTempStatus','mTempStart','mExpectedReturn','mNote']
  .forEach(id=>$(id)?.addEventListener('input',refreshChangePreview));
+$('mLogChange').addEventListener('change',()=>{logChoiceTouched=true});
 
 $('personSave').onclick=async()=>{
  let draft=personDraft(),no=draft.employee_no,name=draft.name;

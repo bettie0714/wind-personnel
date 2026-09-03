@@ -3160,6 +3160,120 @@ body.change-manage-mode .change-manage-inline{
   .recent-summary{font-size:11px}
 }
 
+
+/* V82 - remove duplicated identity structure from right panel */
+.dashboard-shift-only{
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+.dashboard-shift-only .sectionhead{
+  margin-bottom:18px!important;
+}
+.dashboard-shift-only #shiftChart{
+  flex:1;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  min-height:315px!important;
+}
+.shift-overview{
+  width:100%;
+  display:grid;
+  gap:24px;
+  justify-items:center;
+}
+.shift-donut-wrap{
+  position:relative;
+  width:156px;
+  height:156px;
+}
+.shift-donut-wrap .donut{
+  width:156px!important;
+  height:156px!important;
+}
+.shift-donut-center{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.shift-donut-center b{
+  color:#1f2f46;
+  font-size:28px;
+  line-height:1;
+  font-weight:850;
+}
+.shift-donut-center span{
+  margin-top:5px;
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:700;
+}
+.shift-summary-list{
+  width:100%;
+  display:grid;
+  gap:0;
+  border-top:1px solid #edf1f5;
+}
+.shift-summary-row{
+  min-height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  border-bottom:1px solid #edf1f5;
+}
+.shift-summary-label{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:#334155;
+  font-size:13px;
+  font-weight:800;
+}
+.shift-summary-label i{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+}
+.shift-summary-label i.day{background:#2f80ed}
+.shift-summary-label i.night{background:#43b05c}
+.shift-summary-value{
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+}
+.shift-summary-value b{
+  color:#1f2f46;
+  font-size:21px;
+  font-weight:850;
+}
+.shift-summary-value small{
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:700;
+}
+.shift-summary-value em{
+  margin-left:8px;
+  min-width:38px;
+  text-align:right;
+  color:#8a97a8;
+  font-size:10px;
+  font-style:normal;
+  font-weight:700;
+}
+
+/* old duplicated structure UI is no longer used */
+.dashboard-distribution .distribution-divider,
+.dashboard-distribution .distribution-title,
+#typeChart{
+  display:none!important;
+}
+
 </style>
 </head>
 <body>
@@ -3249,20 +3363,9 @@ body.change-manage-mode .change-manage-inline{
    <div id="groupChart"></div>
   </div>
 
-  <div class="section dashboard-distribution">
-   <div class="sectionhead"><div><h2>人力分布</h2></div></div>
-
-   <div class="distribution-block">
-    <div class="distribution-title">班別</div>
-    <div id="shiftChart" class="donutwrap"></div>
-   </div>
-
-   <div class="distribution-divider"></div>
-
-   <div class="distribution-block">
-    <div class="distribution-title">人員結構</div>
-    <div id="typeChart"></div>
-   </div>
+  <div class="section dashboard-distribution dashboard-shift-only">
+   <div class="sectionhead"><div><h2>班別分布</h2></div></div>
+   <div id="shiftChart" class="donutwrap"></div>
   </div>
  </div>
  <div class="section recent-changes-section">
@@ -4047,11 +4150,27 @@ function renderDash(){
  let sc={};a.forEach(x=>sc[x.shift||'未設定']=(sc[x.shift||'未設定']||0)+1);
  let entries=Object.entries(sc),total=entries.reduce((n,x)=>n+x[1],0)||1,colors=['#2f80ed','#43b05c','#f2992e','#7650c7','#2cb4b3','#94a3b8'],deg=0,parts=[];
  entries.forEach((x,i)=>{let d=x[1]/total*360;parts.push(`${colors[i%colors.length]} ${deg}deg ${deg+d}deg`);deg+=d});
- $('shiftChart').innerHTML=`<div class="donut" style="background:conic-gradient(${parts.join(',')})"></div><div class="legend">${entries.map((x,i)=>`<div class="legendrow"><span class="dot" style="background:${colors[i%colors.length]}"></span>${esc(x[0])}班 <b>${x[1]}</b></div>`).join('')}</div>`;
+ $('shiftChart').innerHTML=`
+  <div class="shift-overview">
+   <div class="shift-donut-wrap">
+    <div class="donut" style="background:conic-gradient(#2f80ed 0 ${dayDeg}deg,#43b05c ${dayDeg}deg 360deg)"></div>
+    <div class="shift-donut-center">
+     <b>${a.length}</b><span>在廠</span>
+    </div>
+   </div>
+   <div class="shift-summary-list">
+    <div class="shift-summary-row">
+     <div class="shift-summary-label"><i class="day"></i><span>日班</span></div>
+     <div class="shift-summary-value"><b>${day}</b><small>人</small><em>${a.length?Math.round(day/a.length*100):0}%</em></div>
+    </div>
+    <div class="shift-summary-row">
+     <div class="shift-summary-label"><i class="night"></i><span>夜班</span></div>
+     <div class="shift-summary-value"><b>${night}</b><small>人</small><em>${a.length?Math.round(night/a.length*100):0}%</em></div>
+    </div>
+   </div>
+  </div>`;
 
- let types=[['台籍',employed.filter(x=>personType(x)==='台籍').length,'#2f80ed'],['Z',employed.filter(x=>personType(x)==='Z').length,'#7650c7'],['W',employed.filter(x=>personType(x)==='W').length,'#f2992e'],['建教生',employed.filter(x=>personType(x)==='建教生').length,'#43b05c']],sum=types.reduce((n,x)=>n+x[1],0)||1;
- $('typeChart').innerHTML=`<div style="display:flex;height:25px;border-radius:4px;overflow:hidden;margin:25px 0">${types.map(x=>`<span style="width:${x[1]/sum*100}%;background:${x[2]}"></span>`).join('')}</div>${types.map(x=>`<button data-type="${x[0]}" style="display:grid;grid-template-columns:14px 1fr 50px 55px;gap:8px;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:transparent;width:100%;text-align:left;cursor:pointer;font-size:13px"><span class="dot" style="background:${x[2]}"></span><span>${x[0]}</span><b>${x[1]}人</b><span class="mini">${(x[1]/sum*100).toFixed(1)}%</span></button>`).join('')}`;
- $('typeChart').querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>openTypeList(b.dataset.type));
+
 
  $('recentBody').innerHTML=changes.slice(0,7).map(c=>{
    let detail=changeDetailText(c);

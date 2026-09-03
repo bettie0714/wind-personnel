@@ -1249,6 +1249,103 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 }
 
 
+
+/* V44 - editable personnel change log */
+.change-log-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:10px 0 12px;
+  flex-wrap:wrap;
+}
+.change-log-toolbar .left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#64748b;
+  font-size:12px;
+}
+.change-select{
+  width:16px!important;
+  height:16px!important;
+  min-width:16px!important;
+  padding:0!important;
+  margin:0!important;
+  accent-color:#315efb;
+}
+.change-action-wrap{
+  display:flex;
+  gap:6px;
+  white-space:nowrap;
+}
+.change-action-wrap .btn{
+  padding:5px 9px;
+  font-size:11px;
+  border-radius:8px;
+}
+.change-edit-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.change-edit-grid .field.full{
+  grid-column:1/-1;
+}
+@media(max-width:720px){
+  .change-edit-grid{grid-template-columns:1fr}
+  .change-edit-grid .field.full{grid-column:auto}
+}
+
+
+/* V46 - top KPI: total / local / Z / W / students */
+.grid5{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:14px;
+}
+.grid5 .stat{
+  position:relative;
+  overflow:hidden;
+  min-height:126px;
+}
+.grid5 .stat::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:3px;
+  background:#dbe4f0;
+}
+.grid5 .stat.kpi-click::before{background:#7aa2ff}
+.grid5 .stat.student-kpi::before{background:#37b26c}
+.grid5 .stat.student-kpi .num{color:#178a4d}
+.grid5 .stat .kpi-icon{
+  position:absolute;
+  right:16px;
+  top:15px;
+  width:28px;
+  height:28px;
+  border-radius:9px;
+  display:grid;
+  place-items:center;
+  background:#f4f7fb;
+  color:#64748b;
+  font-size:13px;
+  font-weight:900;
+}
+.grid5 .stat.student-kpi .kpi-icon{
+  background:#eefaf3;
+  color:#178a4d;
+}
+@media(max-width:1180px){
+  .grid5{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:760px){
+  .grid5{grid-template-columns:repeat(2,1fr)}
+}
+
 </style>
 </head>
 <body>
@@ -1309,9 +1406,9 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 </header>
 
 <section id="dashboard" class="page active">
- <div id="kpis" class="grid4"></div>
+ <div id="kpis" class="grid5"></div>
  <div class="chartgrid">
-  <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">點擊組別即可查看該組人員</div></div></div><div id="groupChart"></div></div>
+  <div class="section"><div class="sectionhead"><div><h2>組別人力一覽</h2><div class="mini">僅顯示實際工作組別；建教生請由上方獨立入口查看</div></div></div><div id="groupChart"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>班別分布</h2><div class="mini">本部在職</div></div></div><div id="shiftChart" class="donutwrap"></div></div>
   <div class="section"><div class="sectionhead"><div><h2>人員結構</h2><div class="mini">台籍／W／Z／建教生</div></div></div><div id="typeChart"></div></div>
  </div>
@@ -1355,7 +1452,7 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
     </div>
 
     <div class="filter-block">
-     <div class="filter-block-title">目前動態</div>
+     <div class="filter-block-title">目前動態・點一下直接查看名單</div>
      <div class="presence-cards">
       <button class="presence-filter presence-card active" data-presence="">
        <span class="presence-top"><span class="presence-dot"></span>全部</span>
@@ -1430,7 +1527,14 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 
  <div class="section">
   <div class="sectionhead"><div><h2>人員變動紀錄</h2><div class="mini">V34 之後的修改會顯示欄位前後差異；更早的舊版紀錄若當時未保存差異，會明確標示。</div></div><button id="openResignPickerBtn" class="btn danger admin-only">辦理離職</button></div>
-  <div class="tablewrap"><table><thead><tr><th>日期</th><th>類型</th><th>工號</th><th>姓名</th><th>原組別</th><th>新組別</th><th>內容</th><th>備註</th></tr></thead><tbody id="changesBody"></tbody></table></div>
+<div class="change-log-toolbar admin-only">
+ <div class="left">
+  <span>勾選不要保留的紀錄，再批次刪除。</span>
+  <span id="changeSelectedCount">已選 0 筆</span>
+ </div>
+ <button id="deleteSelectedChanges" class="btn soft-danger">刪除選取</button>
+</div>
+  <div class="tablewrap"><table><thead><tr><th class="admin-only"><input id="selectAllChanges" class="change-select" type="checkbox" aria-label="全選人員變動紀錄"></th><th>日期</th><th>類型</th><th>工號</th><th>姓名</th><th>原組別</th><th>新組別</th><th>內容</th><th>備註</th><th class="admin-only">操作</th></tr></thead><tbody id="changesBody"></tbody></table></div>
  </div>
 </section>
 
@@ -1523,10 +1627,12 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","建教生","未分類"];
+const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
 const cfg=window.APP_CONFIG||{};
 let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='';
 let logChoiceTouched=false;
+let editingChangeId=null;
+let selectedChangeIds=new Set();
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -1586,12 +1692,18 @@ function deriveGroup(no,job,existing){
  no=normalizeNo(no);
  let manual=String(existing||'').trim();
 
- // 只要使用者／Excel 已明確指定有效組別，就以指定值為準。
- // 這樣建教生也可以依實際作業需要改成手焊、電焊、捲板等組別。
+ // 「建教生」是身份 / 職別，不是組別。
+ // 舊資料若 group_name 曾存成「建教生」，畫面上視為沒有設定組別。
+ if(manual==='建教生')manual='';
+
+ // 只要有人工指定真正的工作組別，就尊重人工設定。
  if(manual && manual!=='Z' && manual!=='W')return manual;
 
  let t=String(job||'').replace(/\s+/g,'');
- if(no.startsWith('X')||t.includes('建教生'))return'建教生';
+
+ // X / 建教生職別本身不自動產生組別。
+ if(no.startsWith('X')||t.includes('建教生'))return'';
+
  if(t.includes('廠務'))return'廠務';
  if(t.includes('文管'))return'文管';
  if(t.includes('焊接協調')||t.includes('銲接協調'))return'焊接協調';
@@ -1769,20 +1881,97 @@ async function loadAll(){
  }else{
    contracts=fc.data||[];
  }
+ selectedChangeIds=new Set([...selectedChangeIds].filter(id=>changes.some(c=>String(c.id)===String(id))));
  populateFilters();
  renderAll();
 }
 function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','查看 W／Z 合約到期日與剩餘天數']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(b.dataset.page==='admin'&&!isAdmin())return;showPage(b.dataset.page)});
 function populateFilters(){
- let gs=[...new Set([...GROUPS,...employees.map(personGroup).filter(Boolean)])].filter(x=>x!=='Z'&&x!=='W');
- $('fGroup').innerHTML='<option value="">全部</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');
+ let gs=[...new Set([...GROUPS,...employees.map(personGroup).filter(Boolean)])]
+   .filter(x=>x!=='Z'&&x!=='W'&&x!=='建教生');
+ $('fGroup').innerHTML='<option value="">全部組別</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');
  let ss=['日','中','夜'];
- $('fShift').innerHTML='<option value="">全部</option>'+ss.map(x=>`<option>${esc(x)}</option>`).join('');
+ $('fShift').innerHTML='<option value="">全部班別</option>'+ss.map(x=>`<option>${esc(x)}</option>`).join('');
  let jobs=[...new Set(employees.map(x=>x.job_title).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'zh-Hant'));
  $('fJob').innerHTML='<option value="">全部</option>'+jobs.map(x=>`<option>${esc(x)}</option>`).join('');
- $('mGroup').innerHTML=gs.map(x=>`<option>${esc(x)}</option>`).join('');
+ $('mGroup').innerHTML='<option value="">— 不設定組別 —</option>'+gs.map(x=>`<option>${esc(x)}</option>`).join('');
 }
+
+window.openChangeEditor=id=>{
+ if(!isAdmin())return;
+ let c=changes.find(x=>Number(x.id)===Number(id));
+ if(!c)return alert('找不到這筆人員變動紀錄。');
+ editingChangeId=c.id;
+ $('ceDate').value=c.change_date||todayISO();
+ $('ceType').value=[...$('ceType').options].some(o=>o.value===c.change_type)?c.change_type:'其他';
+ $('ceNo').value=c.employee_no||'';
+ $('ceName').value=c.employee_name||'';
+ $('ceOldGroup').value=c.old_group||'';
+ $('ceNewGroup').value=c.new_group||'';
+ $('ceDetail').value=c.detail||'';
+ $('changeEditModal').classList.add('show');
+};
+function closeChangeEditor(){
+ editingChangeId=null;
+ $('changeEditModal').classList.remove('show');
+}
+$('changeEditClose').onclick=$('changeEditCancel').onclick=closeChangeEditor;
+
+$('changeEditSave').onclick=async()=>{
+ if(!isAdmin()||!editingChangeId)return;
+ let payload={
+   change_date:$('ceDate').value||todayISO(),
+   change_type:$('ceType').value||'其他',
+   employee_no:normalizeNo($('ceNo').value)||null,
+   employee_name:$('ceName').value.trim()||null,
+   old_group:$('ceOldGroup').value.trim()||null,
+   new_group:$('ceNewGroup').value.trim()||null,
+   detail:$('ceDetail').value.trim()||null
+ };
+ let {error}=await db.from('personnel_changes').update(payload).eq('id',editingChangeId);
+ if(error){alert('紀錄儲存失敗：'+error.message);return}
+ closeChangeEditor();
+ await loadAll();
+};
+
+window.deleteChangeRecord=async id=>{
+ if(!isAdmin())return;
+ let c=changes.find(x=>Number(x.id)===Number(id));
+ if(!c)return;
+ if(!confirm(`刪除這筆人員變動紀錄？\n${c.change_date}｜${c.employee_no||''}｜${c.employee_name||''}\n\n只會刪除紀錄，不會刪除人員資料。`))return;
+ let {error}=await db.from('personnel_changes').delete().eq('id',id);
+ if(error){alert('刪除失敗：'+error.message);return}
+ selectedChangeIds.delete(String(id));
+ await loadAll();
+};
+
+$('changeDeleteOne').onclick=async()=>{
+ if(!editingChangeId)return;
+ let id=editingChangeId;
+ closeChangeEditor();
+ await deleteChangeRecord(id);
+};
+
+$('selectAllChanges').onchange=()=>{
+ if(!isAdmin())return;
+ if($('selectAllChanges').checked)changes.forEach(c=>selectedChangeIds.add(String(c.id)));
+ else changes.forEach(c=>selectedChangeIds.delete(String(c.id)));
+ renderChanges();
+};
+
+$('deleteSelectedChanges').onclick=async()=>{
+ if(!isAdmin())return;
+ let ids=[...selectedChangeIds].map(Number).filter(Number.isFinite);
+ if(!ids.length)return alert('請先勾選要刪除的紀錄。');
+ if(!confirm(`確定刪除選取的 ${ids.length} 筆人員變動紀錄？\n\n只會刪除紀錄，不會刪除人員資料。`))return;
+
+ let {error}=await db.from('personnel_changes').delete().in('id',ids);
+ if(error){alert('批次刪除失敗：'+error.message);return}
+ selectedChangeIds.clear();
+ await loadAll();
+};
+
 function renderAll(){
  const jobs=[
    ['總覽',renderDash],
@@ -1798,18 +1987,25 @@ function renderAll(){
 function renderDash(){
  let a=mainCurrent();
  let k=[
-   ['總人數',a.length,''],
-   ['台籍',a.filter(x=>personType(x)==='台籍').length,'台籍'],
-   ['Z',a.filter(x=>personType(x)==='Z').length,'Z'],
-   ['W',a.filter(x=>personType(x)==='W').length,'W']
+   ['總人數',a.length,'','總'],
+   ['台籍',a.filter(x=>personType(x)==='台籍').length,'台籍','台'],
+   ['Z',a.filter(x=>personType(x)==='Z').length,'Z','Z'],
+   ['W',a.filter(x=>personType(x)==='W').length,'W','W'],
+   ['建教生',a.filter(x=>personType(x)==='建教生').length,'建教生','學']
  ];
- $('kpis').innerHTML=k.map(x=>`<div class="stat ${x[2]?'kpi-click':''}" ${x[2]?`data-type="${x[2]}"`:''}><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b;font-weight:500">人</span></div>${x[2]?'<div class="mini">點擊查看名單</div>':''}</div>`).join('');
+ $('kpis').innerHTML=k.map(x=>`<div class="stat ${x[2]?'kpi-click':''} ${x[2]==='建教生'?'student-kpi':''}" ${x[2]?`data-type="${x[2]}"`:''}>
+   <span class="kpi-icon">${x[3]}</span>
+   <div class="label">${x[0]}</div>
+   <div class="num">${x[1]} <span style="font-size:14px;color:#64748b;font-weight:500">人</span></div>
+   ${x[2]?'<div class="mini">點擊查看名單</div>':'<div class="mini">目前廠內人力</div>'}
+ </div>`).join('');
  $('kpis').querySelectorAll('[data-type]').forEach(card=>card.onclick=()=>openTypeList(card.dataset.type));
 
  // 組別卡片：真正組別 + 該組的 Z/W 人數
  let gc={};
- a.forEach(x=>{
+ a.filter(x=>personType(x)!=='建教生').forEach(x=>{
    let g=personGroup(x);
+   if(!g||g==='建教生')return;
    gc[g]=(gc[g]||0)+1;
  });
  let groups=Object.entries(gc).sort((a,b)=>b[1]-a[1]);
@@ -1873,8 +2069,10 @@ function renderPeople(){
  let a=filtered();
  renderPresenceCounts();
  $('peopleCount').textContent=activePresenceFilter
-   ? `目前篩選：${activePresenceFilter}｜共 ${a.length} 人`
-   : `目前顯示 ${a.length} 人`;
+   ? `目前動態：${activePresenceFilter}｜共 ${a.length} 人`
+   : activeTypeFilter
+     ? `身份：${activeTypeFilter}｜共 ${a.length} 人`
+     : `目前顯示 ${a.length} 人`;
 
  let local=a.filter(x=>personType(x)==='台籍').length,
      z=a.filter(x=>personType(x)==='Z').length,
@@ -2100,24 +2298,30 @@ function changeDetailText(c){
 }
 function changeNoteText(c){
  let detail=String(c.detail||'').trim();
-
- // V34 之後：detail 可能包含「備註：原本 → 新內容」
  let m=detail.match(/(?:^|｜)備註：([^｜]*)→\s*([^｜]*)/);
  if(m){
    let latest=String(m[2]||'').trim();
    return latest&&latest!=='—'?latest:'-';
  }
-
- // 若是離職紀錄，detail 可能是「原因｜備註文字」
  if(c.change_type==='離職' && detail.includes('｜')){
    let parts=detail.split('｜').map(x=>x.trim()).filter(Boolean);
    if(parts.length>1)return parts.slice(1).join('｜');
  }
-
  return '-';
+}
+function syncChangeSelectionUI(){
+ if(!$('changeSelectedCount'))return;
+ $('changeSelectedCount').textContent=`已選 ${selectedChangeIds.size} 筆`;
+ let allIds=changes.map(c=>String(c.id));
+ let selectedVisible=allIds.filter(id=>selectedChangeIds.has(id)).length;
+ if($('selectAllChanges')){
+   $('selectAllChanges').checked=allIds.length>0&&selectedVisible===allIds.length;
+   $('selectAllChanges').indeterminate=selectedVisible>0&&selectedVisible<allIds.length;
+ }
 }
 function renderChanges(){
  $('changesBody').innerHTML=changes.map(c=>`<tr>
+  ${isAdmin()?`<td><input class="change-select change-row-select" type="checkbox" data-change-id="${c.id}" ${selectedChangeIds.has(String(c.id))?'checked':''}></td>`:''}
   <td>${esc(c.change_date)}</td>
   <td>${changeBadge(c.change_type)}</td>
   <td>${esc(c.employee_no||'-')}</td>
@@ -2126,7 +2330,17 @@ function renderChanges(){
   <td>${esc(c.new_group||'-')}</td>
   <td>${esc(changeDetailText(c))}</td>
   <td>${esc(changeNoteText(c))}</td>
- </tr>`).join('')||'<tr><td colspan="8" class="empty">目前沒有變動紀錄</td></tr>';
+  ${isAdmin()?`<td><div class="change-action-wrap"><button class="btn" onclick="openChangeEditor(${c.id})">編輯</button><button class="btn soft-danger" onclick="deleteChangeRecord(${c.id})">刪除</button></div></td>`:''}
+ </tr>`).join('')||`<tr><td colspan="${isAdmin()?10:8}" class="empty">目前沒有變動紀錄</td></tr>`;
+
+ document.querySelectorAll('.change-row-select').forEach(cb=>{
+   cb.onchange=()=>{
+     let id=String(cb.dataset.changeId);
+     if(cb.checked)selectedChangeIds.add(id);else selectedChangeIds.delete(id);
+     syncChangeSelectionUI();
+   };
+ });
+ syncChangeSelectionUI();
  renderMonthComparison();
 }
 
@@ -2243,12 +2457,16 @@ function renderOverseas(){
  if(el)el.addEventListener('input',renderPeople);
 });
 document.querySelectorAll('.quick-filter').forEach(b=>b.onclick=()=>{
+ // 身份與「目前動態」是兩種快速入口，不要求使用者同時選兩邊。
  activeTypeFilter=b.dataset.type;
+ activePresenceFilter='';
  syncTypeButtons();
  renderPeople();
 });
 document.querySelectorAll('.presence-filter').forEach(b=>b.onclick=()=>{
+ // 點支援 / 返鄉 / 返校就直接跳到該名單，不受左側身份篩選限制。
  activePresenceFilter=b.dataset.presence;
+ activeTypeFilter='';
  syncTypeButtons();
  renderPeople();
 });
@@ -2807,7 +3025,11 @@ function collectMonthExportData(tm,fm){
  let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p)));
  let local=activeTo.filter(p=>personType(p)==='台籍'&&!isOverseas(p));
  let overseas=activeTo.filter(p=>personType(p)==='台籍'&&isOverseas(p));
- let groups={};mainTo.forEach(p=>groups[personGroup(p)]=(groups[personGroup(p)]||0)+1);
+ let groups={};
+ mainTo.filter(p=>personType(p)!=='建教生').forEach(p=>{
+   let g=personGroup(p);
+   if(g&&g!=='建教生')groups[g]=(groups[g]||0)+1;
+ });
  let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
  let groupCounts=Object.entries(groups).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]);
  let shiftCounts=['日','中','夜'].map(sh=>[sh,mainTo.filter(p=>p.shift===sh).length]);
@@ -3679,5 +3901,38 @@ $('importBtn').onclick=async()=>{
 
 init();
 </script>
+
+<div id="changeEditModal" class="modal">
+ <div class="modalbox">
+  <div class="modalhead">
+   <div><b>編輯人員變動紀錄</b><div class="mini">這裡只修改紀錄，不會改動目前人員資料。</div></div>
+   <button id="changeEditClose" class="iconbtn">×</button>
+  </div>
+  <div class="modalbody">
+   <div class="change-edit-grid">
+    <div class="field"><label>日期</label><input id="ceDate" type="date"></div>
+    <div class="field"><label>類型</label>
+     <select id="ceType">
+      <option>新增</option><option>修改</option><option>調組</option><option>工號更正</option>
+      <option>支援</option><option>支援結束</option><option>返鄉</option><option>返校</option>
+      <option>返廠</option><option>離職</option><option>其他</option>
+     </select>
+    </div>
+    <div class="field"><label>工號</label><input id="ceNo"></div>
+    <div class="field"><label>姓名</label><input id="ceName"></div>
+    <div class="field"><label>原組別</label><input id="ceOldGroup"></div>
+    <div class="field"><label>新組別</label><input id="ceNewGroup"></div>
+    <div class="field full"><label>內容</label><textarea id="ceDetail" rows="4"></textarea></div>
+   </div>
+  </div>
+  <div class="modalfoot">
+   <button id="changeDeleteOne" class="btn soft-danger">刪除此紀錄</button>
+   <span style="flex:1"></span>
+   <button id="changeEditCancel" class="btn">取消</button>
+   <button id="changeEditSave" class="btn primary">儲存紀錄</button>
+  </div>
+ </div>
+</div>
+
 </body>
 </html>

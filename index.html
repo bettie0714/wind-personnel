@@ -4030,9 +4030,9 @@ function renderDash(){
  `;
  $('kpis').querySelectorAll('[data-type]').forEach(card=>card.onclick=()=>openTypeList(card.dataset.type));
 
- // 組別卡片：真正組別 + 該組的 Z/W 人數
+ // 組別人力：建教生不是「組別」，但若有實際工作組別，仍要計入該組。
  let gc={};
- a.filter(x=>personType(x)!=='建教生').forEach(x=>{
+ a.forEach(x=>{
    let g=personGroup(x);
    if(!g||g==='建教生')return;
    gc[g]=(gc[g]||0)+1;
@@ -5279,7 +5279,7 @@ function createMonthCountSheet(rows,month){
  aoa.push(['返校',tc.school,'不列入在職總人數']);
  aoa.push([]);
  aoa.push(['目前在廠組別','人數']);
- let counts={};onsite.filter(p=>personType(p)!=='建教生').forEach(p=>{let g=personGroup(p);if(g)counts[g]=(counts[g]||0)+1});
+ let counts={};onsite.forEach(p=>{let g=personGroup(p);if(g&&g!=='建教生')counts[g]=(counts[g]||0)+1});
  let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
  Object.entries(counts).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]).forEach(x=>aoa.push(x));
  aoa.push([]);
@@ -5394,7 +5394,7 @@ function collectMonthExportData(tm,fm){
  let overseas=activeTo.filter(p=>personType(p)==='台籍'&&isOverseas(p));
 
  let groups={};
- onsiteTo.filter(p=>personType(p)!=='建教生').forEach(p=>{
+ onsiteTo.forEach(p=>{
    let g=personGroup(p);
    if(g&&g!=='建教生')groups[g]=(groups[g]||0)+1;
  });

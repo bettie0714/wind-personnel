@@ -2412,6 +2412,203 @@ body.change-manage-mode .change-manage-inline{
   justify-content:flex-start;
 }
 
+
+/* V74 - clean personnel movement summary */
+.pdf-movement-list{
+  width:100%;
+  border-top:1px solid #e4eaf1;
+}
+.pdf-movement-row{
+  display:grid;
+  grid-template-columns:82px 82px 42px;
+  gap:8px;
+  align-items:center;
+  padding:7px 2px;
+  border-bottom:1px solid #e8edf3;
+  position:relative;
+}
+.pdf-movement-row.changed{
+  padding-bottom:23px;
+}
+.pdf-movement-type{
+  color:#334155;
+  font-size:9.3px;
+  font-weight:900;
+}
+.pdf-movement-count{
+  color:#475569;
+  font-size:9.3px;
+  font-weight:800;
+  text-align:center;
+}
+.pdf-movement-count span{
+  color:#a0aabd;
+  padding:0 3px;
+}
+.pdf-movement-net{
+  text-align:right;
+  font-size:9.5px;
+  font-weight:900;
+}
+.pdf-movement-net.pos{color:#15803d}
+.pdf-movement-net.neg{color:#b42318}
+.pdf-movement-net.zero{color:#94a3b8}
+.pdf-movement-detail{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:5px;
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  color:#65758a;
+  font-size:7.8px;
+  line-height:1.3;
+}
+.pdf-movement-detail b{
+  color:#475569;
+}
+
+/* V74 - flat change ledger, no cards/date blocks */
+.pdf-change-ledger{
+  width:660px;
+  max-width:660px;
+  margin:0 auto;
+  border-top:1px solid #dfe6ef;
+  border-bottom:1px solid #dfe6ef;
+}
+.pdf-change-ledger-head,
+.pdf-change-ledger-row{
+  display:grid;
+  grid-template-columns:74px 58px 122px minmax(0,1fr);
+  gap:8px;
+  align-items:start;
+}
+.pdf-change-ledger-head{
+  padding:6px 8px;
+  background:#f5f8fc;
+  color:#62738a;
+  font-size:8px;
+  font-weight:900;
+}
+.pdf-change-ledger-row{
+  padding:8px 8px;
+  border-top:1px solid #edf1f5;
+  font-size:8.7px;
+  line-height:1.4;
+}
+.pdf-change-ledger-date{
+  color:#63748a;
+  font-weight:800;
+}
+.pdf-change-ledger-type{
+  color:#2457d6;
+  font-weight:900;
+}
+.pdf-change-ledger-person{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  min-width:0;
+}
+.pdf-change-ledger-person b{
+  color:#334155;
+  font-size:8.8px;
+}
+.pdf-change-ledger-person span{
+  color:#64748b;
+  overflow-wrap:anywhere;
+}
+.pdf-change-ledger-content{
+  color:#334155;
+  font-size:9px;
+  font-weight:700;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.pdf-change-ledger-content small{
+  display:block;
+  margin-top:3px;
+  color:#7a8798;
+  font-size:7.7px;
+  font-weight:600;
+}
+.pdf-change-ledger-content small b{
+  color:#59687b;
+}
+
+/* V74 - separate student roster */
+.pdf-student-summary{
+  display:flex;
+  gap:8px;
+  margin:8px 0 10px;
+}
+.pdf-student-summary span{
+  flex:1;
+  padding:7px 9px;
+  border-radius:7px;
+  background:#f7f9fc;
+  border:1px solid #e4eaf1;
+  color:#64748b;
+  font-size:9px;
+  text-align:center;
+}
+.pdf-student-summary b{
+  color:#0f766e;
+  font-size:11px;
+}
+.pdf-student-table{
+  width:660px!important;
+  max-width:660px!important;
+  min-width:660px!important;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:8.5px;
+  line-height:1.3;
+}
+.pdf-student-table th,
+.pdf-student-table td{
+  border:1px solid #e1e7ef;
+  padding:5px 5px;
+  vertical-align:middle;
+  overflow-wrap:anywhere;
+  box-sizing:border-box;
+}
+.pdf-student-table th{
+  background:#f3f7fb;
+  color:#46617f;
+  font-weight:900;
+  text-align:center;
+}
+.pdf-student-table th:nth-child(1),.pdf-student-table td:nth-child(1){width:36px}
+.pdf-student-table th:nth-child(2),.pdf-student-table td:nth-child(2){width:44px}
+.pdf-student-table th:nth-child(3),.pdf-student-table td:nth-child(3){width:128px}
+.pdf-student-table th:nth-child(4),.pdf-student-table td:nth-child(4){width:70px}
+.pdf-student-table th:nth-child(5),.pdf-student-table td:nth-child(5){width:118px}
+.pdf-student-table th:nth-child(6),.pdf-student-table td:nth-child(6){width:64px}
+.pdf-student-table th:nth-child(7),.pdf-student-table td:nth-child(7){width:92px}
+.pdf-student-table th:nth-child(8),.pdf-student-table td:nth-child(8){width:108px}
+.student-away-row td{
+  background:#faf9ff;
+}
+.student-status{
+  display:inline-block;
+  min-width:38px;
+  padding:2px 6px;
+  border-radius:999px;
+  font-size:7.8px;
+  font-weight:900;
+  text-align:center;
+}
+.student-status.onsite{
+  background:#eaf8f1;
+  color:#15803d;
+}
+.student-status.away{
+  background:#f1ecff;
+  color:#6d3cc2;
+}
+
 </style>
 </head>
 <body>
@@ -4569,6 +4766,11 @@ function collectMonthExportData(tm,fm){
    .filter(p=>isHomeLeave(p,asOf))
    .sort((a,b)=>String(a.employee_no||'').localeCompare(String(b.employee_no||'')));
 
+ // 建教生獨立名冊：包含目前在廠與返校中的建教生，因返校不是離職。
+ let studentAll=employmentCurrentForRows(toRows,asOf)
+   .filter(p=>personType(p)==='建教生')
+   .sort((a,b)=>String(a.employee_no||'').localeCompare(String(b.employee_no||'')));
+
  let foreign=activeTo.filter(p=>['Z','W'].includes(personType(p))&&!isOverseas(p));
  let local=activeTo.filter(p=>personType(p)==='台籍'&&!isOverseas(p));
  let overseas=activeTo.filter(p=>personType(p)==='台籍'&&isOverseas(p));
@@ -4590,7 +4792,7 @@ function collectMonthExportData(tm,fm){
  }));
 
  return{
-   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,supportDetails,homeleaveDetails,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
+   tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,supportDetails,homeleaveDetails,studentAll,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
    fromDerived:derived,
    rangeText:monthRangeText(fm,tm,derived),
    monthChanges:meaningfulMonthChanges(tm),
@@ -4709,6 +4911,70 @@ function buildExcelTaiwanSheet(workbook,data){
  }
  return ws;
 }
+
+function buildExcelStudentSheet(workbook,data){
+ let ws=workbook.addWorksheet('建教生');
+ ws.columns=[
+   {width:8},
+   {width:10},
+   {width:18},
+   {width:14},
+   {width:22},
+   {width:14},
+   {width:14},
+   {width:16}
+ ];
+ addStyledTitle(ws,`${monthLabel(data.tm)} 建教生名冊`,8);
+ ws.addRow([]);
+
+ let inPlant=data.studentAll.filter(p=>!isSchoolAway(p,data.asOf));
+ let schoolAway=data.studentAll.filter(p=>isSchoolAway(p,data.asOf));
+
+ let summary=ws.addRow([
+   `名冊 ${data.studentAll.length} 人`,
+   `目前在廠 ${inPlant.length} 人`,
+   `返校 ${schoolAway.length} 人`
+ ]);
+ ws.mergeCells(summary.number,1,summary.number,2);
+ ws.mergeCells(summary.number,3,summary.number,5);
+ ws.mergeCells(summary.number,6,summary.number,8);
+ styleRow(summary,{});
+ summary.eachCell(c=>{
+   c.font={name:'Microsoft JhengHei',size:11,bold:true,color:{argb:'FF334155'}};
+   c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF8FAFC'}};
+   c.alignment={vertical:'middle',horizontal:'center'};
+ });
+ ws.addRow([]);
+
+ addStyledHeader(ws,['NO.','班別','姓名','工號','職別','目前狀態','返校日','預計返廠']);
+ if(!data.studentAll.length){
+   let row=ws.addRow(['目前沒有建教生資料']);
+   ws.mergeCells(row.number,1,row.number,8);
+   styleRow(row,{});
+   row.getCell(1).alignment={vertical:'middle',horizontal:'center'};
+   return ws;
+ }
+
+ data.studentAll.forEach((p,i)=>{
+   let away=isSchoolAway(p,data.asOf);
+   let row=ws.addRow([
+     i+1,
+     p.shift||'',
+     p.name||'',
+     p.employee_no||'',
+     p.job_title||'建教生',
+     away?'返校':'在廠',
+     away?(p.temporary_start_date||''):'',
+     p.expected_return_date||''
+   ]);
+   styleRow(row,{});
+   if(away){
+     row.eachCell(c=>c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF6F8FF'}});
+   }
+ });
+ return ws;
+}
+
 function buildExcelCountSheet(workbook,data){
  let ws=workbook.addWorksheet('月份人數');
  ws.columns=[{width:28},{width:14}];
@@ -4821,6 +5087,7 @@ async function exportMonthExcelStyled(){
  workbook.created=new Date();
  workbook.properties.defaultRowHeight=20;
  buildExcelForeignSheet(workbook,data);
+ buildExcelStudentSheet(workbook,data);
  buildExcelTaiwanSheet(workbook,data);
  buildExcelCountSheet(workbook,data);
  buildExcelDiffSheet(workbook,data);
@@ -5107,6 +5374,47 @@ function buildForeignRosterPages(data){
  let [p2,p3]=splitForeignBlocksForTwoPages(foreignRosterBlocks(data));
  return[buildForeignRosterPage(data,p2),buildForeignRosterPage(data,p3)];
 }
+
+function buildStudentRosterPage(data){
+ let people=data.studentAll||[];
+ let inPlant=people.filter(p=>!isSchoolAway(p,data.asOf));
+ let schoolAway=people.filter(p=>isSchoolAway(p,data.asOf));
+
+ let rows=people.length?people.map((p,i)=>{
+   let away=isSchoolAway(p,data.asOf);
+   let returnDate=shortChangeDate(p.expected_return_date||'');
+   let schoolDate=shortChangeDate(p.temporary_start_date||'');
+   return `<tr class="${away?'student-away-row':''}">
+    <td class="center">${i+1}</td>
+    <td class="center">${esc(p.shift||'-')}</td>
+    <td class="person-name">${esc(p.name||'')}</td>
+    <td class="employee-no">${esc(p.employee_no||'')}</td>
+    <td>${esc(p.job_title||'建教生')}</td>
+    <td class="center"><span class="student-status ${away?'away':'onsite'}">${away?'返校':'在廠'}</span></td>
+    <td>${away?esc(schoolDate||'-'):'-'}</td>
+    <td>${returnDate?esc(returnDate):'-'}</td>
+   </tr>`;
+ }).join(''):`<tr><td colspan="8" class="center">目前沒有建教生資料</td></tr>`;
+
+ return `<div class="pdf-page pdf-roster-4">
+  <div class="pdf-safe">
+   ${pdfReportHeader(`${monthLabel(data.tm)} 建教生名冊`)}
+   <div class="pdf-student-summary">
+    <span>名冊 <b>${people.length}</b> 人</span>
+    <span>目前在廠 <b>${inPlant.length}</b> 人</span>
+    <span>返校 <b>${schoolAway.length}</b> 人</span>
+   </div>
+   <table class="pdf-student-table">
+    <thead>
+     <tr><th>NO.</th><th>班別</th><th>姓名</th><th>工號</th><th>職別</th><th>狀態</th><th>返校日</th><th>預計返廠</th></tr>
+    </thead>
+    <tbody>${rows}</tbody>
+   </table>
+  </div>
+  ${pdfFooter()}
+ </div>`;
+}
+
 function buildTaiwanRosterOnePage(data){
  const windOrder=['廠長','副廠長','廠務','捲板','清根','電焊','手焊','焊接協調','文管'];
  const overseasOrder=['總經理','副廠長','財務','行政'];
@@ -5184,29 +5492,9 @@ function buildChangeLogPdfPages(data){
    </div>`];
  }
 
- // 依日期分組，避免一筆一張卡造成視覺碎裂。
- let groups=[];
- rows.forEach(c=>{
-   let date=String(c.change_date||'');
-   let g=groups.find(x=>x.date===date);
-   if(!g){g={date,rows:[]};groups.push(g)}
-   g.rows.push(c);
- });
+ let pages=splitArray(rows,16);
 
- // 以筆數控制分頁，每頁約 13 筆，保留足夠行高。
- let pages=[],current=[],count=0;
- groups.forEach(g=>{
-   if(current.length && count+g.rows.length>13){
-     pages.push(current);
-     current=[];
-     count=0;
-   }
-   current.push(g);
-   count+=g.rows.length;
- });
- if(current.length)pages.push(current);
-
- return pages.map((pageGroups,pageIndex)=>`
+ return pages.map((part,pageIndex)=>`
   <div class="pdf-page pdf-roster-page">
    ${pdfReportHeader(`${monthLabel(data.tm)} 人員變動紀錄`)}
    <div class="pdf-section-band">
@@ -5214,31 +5502,25 @@ function buildChangeLogPdfPages(data){
     <small>${rows.length} 筆${pages.length>1?`・第 ${pageIndex+1} / ${pages.length} 頁`:''}</small>
    </div>
 
-   <div class="pdf-change-groups">
-    ${pageGroups.map(g=>`
-     <div class="pdf-change-day">
-      <div class="pdf-change-day-head">
-       <span>${esc(g.date)}</span>
-       <small>${g.rows.length} 筆</small>
-      </div>
-      ${g.rows.map(c=>{
-        let detail=changeDetailText(c);
-        let note=changeNoteText(c);
-        let groupChanged=c.old_group&&c.new_group&&c.old_group!==c.new_group;
-        return `<div class="pdf-change-row">
-         <div><span class="pdf-change-type">${esc(c.change_type||'')}</span></div>
-         <div class="pdf-change-person">
-          <span class="no">${esc(c.employee_no||'')}</span>
-          ${esc(c.employee_name||'')}
-         </div>
-         <div class="pdf-change-content">
-          <div class="pdf-change-summary">${esc(detail==='-'?'':detail)}</div>
-          ${groupChanged?`<div class="pdf-change-extra"><span><b>組別</b> ${esc(c.old_group)} → ${esc(c.new_group)}</span></div>`:''}
-          ${note!=='-'?`<div class="pdf-change-note"><b>備註：</b>${esc(note)}</div>`:''}
-         </div>
-        </div>`;
-      }).join('')}
-     </div>`).join('')}
+   <div class="pdf-change-ledger">
+    <div class="pdf-change-ledger-head">
+     <span>日期</span><span>類型</span><span>人員</span><span>異動內容</span>
+    </div>
+    ${part.map((c,idx)=>{
+      let detail=changeDetailText(c);
+      let note=changeNoteText(c);
+      let prev=idx>0?part[idx-1]:null;
+      let showDate=!prev||String(prev.change_date||'')!==String(c.change_date||'');
+      return `<div class="pdf-change-ledger-row">
+       <div class="pdf-change-ledger-date">${showDate?esc(c.change_date||''):''}</div>
+       <div class="pdf-change-ledger-type">${esc(c.change_type||'')}</div>
+       <div class="pdf-change-ledger-person"><b>${esc(c.employee_no||'')}</b><span>${esc(c.employee_name||'')}</span></div>
+       <div class="pdf-change-ledger-content">
+        <div>${esc(detail==='-'?'':detail)}</div>
+        ${note!=='-'?`<small><b>備註</b> ${esc(note)}</small>`:''}
+       </div>
+      </div>`;
+    }).join('')}
    </div>
    ${pdfFooter()}
   </div>`);
@@ -5249,6 +5531,7 @@ function buildFourPageReport(data){
    buildSummaryPdfPage(data),
    ...buildChangeLogPdfPages(data),
    ...buildForeignRosterPages(data),
+   buildStudentRosterPage(data),
    buildTaiwanRosterOnePage(data)
  ];
 }
@@ -5268,10 +5551,31 @@ function buildSummaryPdfPage(data){
    ['建教生',data.mainTo.filter(p=>personType(p)==='建教生').length]
  ];
  let topGroups=data.groupCounts.filter(x=>x[1]>0).slice(0,8);
- let diffBlocks=data.typeRows.map(x=>{
-   let d=peopleDiff(x.from,x.to);
-   return `<div class="pdf-list-item"><b>${esc(x.type)}</b>：${x.from.length} → ${x.to.length}（${signNum(x.to.length-x.from.length)}）<br>新增：${d.added.map(p=>p.employee_no).join('、')||'無'}<br>減少：${d.removed.map(p=>p.employee_no).join('、')||'無'}</div>`;
- }).join('');
+ let diffBlocks=`<div class="pdf-movement-list">
+  ${data.typeRows.map(x=>{
+    let d=peopleDiff(x.from,x.to);
+    let net=x.to.length-x.from.length;
+    let netText=net>0?`+${net}`:`${net}`;
+    let isStudent=x.type==='建教生';
+
+    let detail='';
+    if(d.added.length||d.removed.length){
+      let addLabel=isStudent?'進廠／返廠':'新增';
+      let removeLabel=isStudent?'返校':'減少';
+      detail=`<div class="pdf-movement-detail">
+       ${d.added.length?`<span><b>${addLabel}</b> ${esc(d.added.map(p=>p.employee_no).join('、'))}</span>`:''}
+       ${d.removed.length?`<span><b>${removeLabel}</b> ${esc(d.removed.map(p=>p.employee_no).join('、'))}</span>`:''}
+      </div>`;
+    }
+
+    return `<div class="pdf-movement-row ${net!==0?'changed':''}">
+     <div class="pdf-movement-type">${esc(x.type)}</div>
+     <div class="pdf-movement-count">${x.from.length} <span>→</span> ${x.to.length}</div>
+     <div class="pdf-movement-net ${net>0?'pos':net<0?'neg':'zero'}">${net===0?'±0':netText}</div>
+     ${detail}
+    </div>`;
+  }).join('')}
+ </div>`;
  let supportDetail=data.supportDetails
    .filter(x=>x.people.length)
    .map(x=>`${x.location}：${x.people.map(p=>p.employee_no).join('、')}`)

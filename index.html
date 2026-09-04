@@ -3474,6 +3474,35 @@ body.change-manage-mode .change-manage-inline{
   font-weight:800;
 }
 
+
+/* V85 - PDF employee numbers use fixed-width glyphs for true vertical alignment */
+.pdf-foreign-table-v24 .employee-no,
+.pdf-taiwan-table-v24 .employee-no,
+.pdf-student-table-v75 .employee-no,
+.pdf-change-ledger-person b,
+.pdf-change-entry-person b,
+.pdf-homeleave-person b,
+.pdf-support-row b{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1 !important;
+  letter-spacing: 0 !important;
+}
+
+/* roster tables: keep each 4-char employee number centered in the same fixed-width column */
+.pdf-foreign-table-v24 .employee-no,
+.pdf-taiwan-table-v24 .employee-no,
+.pdf-student-table-v75 .employee-no{
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+
+/* Taiwan roster gets a little breathing room so the code column reads as one straight vertical line */
+.pdf-taiwan-table-v24 td.employee-no{
+  padding-left:8px !important;
+  padding-right:8px !important;
+}
+
 </style>
 </head>
 <body>

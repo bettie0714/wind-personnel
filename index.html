@@ -3503,6 +3503,63 @@ body.change-manage-mode .change-manage-inline{
   padding-right:8px !important;
 }
 
+
+/* V86 - clickable shift distribution */
+.shift-clickable{
+  appearance:none;
+  width:100%;
+  border:0;
+  background:transparent;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.shift-total-line.shift-clickable{
+  padding:8px 10px;
+  margin:0 -10px;
+  width:calc(100% + 20px);
+  border-radius:9px;
+  transition:.15s ease;
+}
+.shift-total-line.shift-clickable:hover{
+  background:#f6f9fd;
+}
+.shift-summary-row-v84.shift-clickable{
+  padding-left:8px;
+  padding-right:8px;
+  transition:.15s ease;
+}
+.shift-summary-row-v84.shift-clickable:hover{
+  background:#f7f9fc;
+}
+.shift-arrow{
+  margin-left:8px;
+  color:#9aa8ba;
+  font-size:18px;
+  font-style:normal;
+  font-weight:700;
+  line-height:1;
+}
+.shift-stacked-bar{
+  gap:1px;
+  background:#edf1f5;
+}
+.shift-stack-segment{
+  appearance:none;
+  height:100%;
+  min-width:2px;
+  border:0;
+  padding:0;
+  cursor:pointer;
+  transition:filter .15s ease, opacity .15s ease;
+}
+.shift-stack-segment:hover{
+  filter:brightness(.92);
+}
+.shift-summary-value-v84{
+  min-width:0;
+}
+
 </style>
 </head>
 <body>
@@ -3935,7 +3992,7 @@ body.change-manage-mode .change-manage-inline{
 const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
 const cfg=window.APP_CONFIG||{};
-let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='';
+let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='',activeOnsiteOnly=false;
 let logChoiceTouched=false;
 let editingChangeId=null;
 let selectedChangeIds=new Set();
@@ -4390,20 +4447,24 @@ function renderDash(){
 
  $('shiftChart').innerHTML=`
   <div class="shift-overview-v84">
-   <div class="shift-total-line">
+   <button type="button" class="shift-total-line shift-clickable" onclick="openOnsiteFromDashboard()">
     <span>目前在廠</span>
-    <b>${a.length}<small>人</small></b>
-   </div>
+    <b>${a.length}<small>人</small><i class="shift-arrow">›</i></b>
+   </button>
 
    <div class="shift-stacked-bar" aria-label="班別比例">
     ${entries.map(([sh,count])=>`
-      <span style="width:${count/total*100}%;background:${shiftColorMap[sh]||'#94a3b8'}"></span>
+      <button type="button"
+       class="shift-stack-segment"
+       title="${esc(sh==='未設定'?'未設定':sh+'班')} ${count} 人"
+       style="width:${count/total*100}%;background:${shiftColorMap[sh]||'#94a3b8'}"
+       onclick="openShiftFromDashboard('${esc(sh)}')"></button>
     `).join('')}
    </div>
 
    <div class="shift-summary-list-v84">
     ${entries.map(([sh,count])=>`
-     <div class="shift-summary-row-v84">
+     <button type="button" class="shift-summary-row-v84 shift-clickable" onclick="openShiftFromDashboard('${esc(sh)}')">
       <div class="shift-summary-label-v84">
        <i style="background:${shiftColorMap[sh]||'#94a3b8'}"></i>
        <span>${esc(sh==='未設定'?'未設定':sh+'班')}</span>
@@ -4411,8 +4472,9 @@ function renderDash(){
       <div class="shift-summary-value-v84">
        <b>${count}</b><small>人</small>
        <em>${Math.round(count/total*100)}%</em>
+       <i class="shift-arrow">›</i>
       </div>
-     </div>`).join('')}
+     </button>`).join('')}
    </div>
   </div>`;
 
@@ -4441,6 +4503,27 @@ window.openPresenceFromDashboard=presence=>{
  setPeoplePresenceFilter(presence);
 };
 
+window.openOnsiteFromDashboard=()=>{
+ showPage('people');
+ resetPeopleAdvancedFilters();
+ activeTypeFilter='';
+ activePresenceFilter='';
+ activeOnsiteOnly=true;
+ syncTypeButtons();
+ renderPeople();
+};
+
+window.openShiftFromDashboard=shift=>{
+ showPage('people');
+ resetPeopleAdvancedFilters();
+ activeTypeFilter='';
+ activePresenceFilter='';
+ activeOnsiteOnly=true;
+ if($('fShift') && ['日','中','夜'].includes(shift))$('fShift').value=shift;
+ syncTypeButtons();
+ renderPeople();
+};
+
 function openTypeList(type){
  showPage('people');
  setPeopleTypeFilter(type);
@@ -4467,7 +4550,11 @@ function renderPresenceCounts(){
 }
 function filtered(){
  let q=$('fSearch').value.trim().toLowerCase();
- let source=activePresenceFilter==='返校'?employmentCurrent():mainCurrent();
+ let source=activePresenceFilter==='返校'
+   ? employmentCurrent()
+   : activeOnsiteOnly
+     ? onsiteCurrent()
+     : mainCurrent();
 
  return source.filter(x=>{
    if(activePresenceFilter){
@@ -5024,6 +5111,7 @@ window.setPeopleTypeFilter=type=>{
  resetPeopleAdvancedFilters();
  activeTypeFilter=type||'';
  activePresenceFilter='';
+ activeOnsiteOnly=false;
  syncTypeButtons();
  renderPeople();
 };
@@ -5031,6 +5119,7 @@ window.setPeoplePresenceFilter=presence=>{
  resetPeopleAdvancedFilters();
  activePresenceFilter=activePresenceFilter===presence?'':presence;
  activeTypeFilter='';
+ activeOnsiteOnly=false;
  syncTypeButtons();
  renderPeople();
 };
@@ -5040,6 +5129,7 @@ $('clearFilters').onclick=()=>{
  ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{if($(id))$(id).value=''});
  activeTypeFilter='';
  activePresenceFilter='';
+ activeOnsiteOnly=false;
  syncTypeButtons();
  renderPeople();
 };

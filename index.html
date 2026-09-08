@@ -3560,17 +3560,253 @@ body.change-manage-mode .change-manage-inline{
   min-width:0;
 }
 
+
+/* V87 - ceremonial opening page */
+.wind-opening{
+  min-height:100vh;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 74% 25%,rgba(255,215,154,.30),transparent 24%),
+    linear-gradient(135deg,#f9fcff 0%,#eff6fe 52%,#e8f1fb 100%);
+  color:#10243f;
+}
+.wind-opening-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.wind-line{
+  position:absolute;height:1px;border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(65,117,190,.23),transparent);
+  transform-origin:left center;
+}
+.wind-line.line-1{width:54%;top:24%;left:-8%;transform:rotate(-8deg)}
+.wind-line.line-2{width:48%;top:39%;right:-9%;transform:rotate(-7deg)}
+.wind-line.line-3{width:65%;bottom:18%;left:12%;transform:rotate(-5deg)}
+.wind-orbit{position:absolute;border:1px solid rgba(79,128,195,.11);border-radius:50%}
+.wind-orbit.orbit-1{width:620px;height:620px;right:-280px;top:-260px}
+.wind-orbit.orbit-2{width:480px;height:480px;left:-210px;bottom:-230px}
+
+.wind-opening-shell{
+  position:relative;z-index:1;min-height:100vh;
+  display:flex;flex-direction:column;
+  padding:34px clamp(28px,5vw,78px) 26px;box-sizing:border-box
+}
+.wind-opening-top{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.wind-opening-brand{display:flex;align-items:center;gap:13px}
+.wind-opening-brand b{display:block;color:#17365d;font-size:18px;letter-spacing:.04em}
+.wind-opening-brand small{
+  display:block;margin-top:2px;color:#8b9db4;font-size:8px;font-weight:800;letter-spacing:.22em
+}
+.wind-mark{
+  position:relative;width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.72);box-shadow:0 10px 28px rgba(53,96,157,.10)
+}
+.wind-mark::after{
+  content:"";position:absolute;left:16px;top:16px;width:4px;height:4px;
+  border-radius:50%;background:#2f63ee
+}
+.wind-mark span{
+  position:absolute;left:17px;top:5px;width:2px;height:12px;border-radius:999px;
+  background:#376ba8;transform-origin:1px 13px
+}
+.wind-mark span:nth-child(2){transform:rotate(120deg)}
+.wind-mark span:nth-child(3){transform:rotate(240deg)}
+.wind-internal-badge{
+  padding:8px 11px;border:1px solid rgba(82,115,156,.18);border-radius:999px;
+  color:#768ba6;background:rgba(255,255,255,.52);font-size:8px;font-weight:900;letter-spacing:.15em
+}
+
+.wind-opening-main{
+  flex:1;display:grid;grid-template-columns:minmax(0,1.03fr) minmax(390px,.97fr);
+  align-items:center;gap:clamp(32px,5vw,80px);padding:42px 0 24px
+}
+.wind-opening-copy{max-width:660px}
+.wind-opening-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;
+  color:#5680b5;font-size:12px;font-weight:900;letter-spacing:.12em
+}
+.wind-opening-eyebrow::before{
+  content:"";width:28px;height:2px;border-radius:999px;background:#2f63ee
+}
+.wind-opening-copy h1{
+  margin:0;color:#102a4c;font-size:clamp(42px,5.1vw,74px);
+  line-height:1.08;letter-spacing:-.04em
+}
+.wind-opening-copy h1 span{color:#2f63ee}
+.wind-opening-copy p{
+  margin:24px 0 0;color:#6b7f98;font-size:15px;line-height:1.9;font-weight:600
+}
+.wind-opening-actions{display:flex;align-items:center;gap:22px;margin-top:34px}
+.wind-start-btn{
+  appearance:none;border:0;min-width:180px;height:54px;border-radius:14px;
+  padding:0 18px 0 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  color:#fff;background:linear-gradient(135deg,#2f6ff0,#2459d8);
+  box-shadow:0 14px 32px rgba(47,99,238,.23);
+  cursor:pointer;font-size:14px;font-weight:900;transition:.18s ease
+}
+.wind-start-btn:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(47,99,238,.28)}
+.wind-start-btn:disabled{opacity:.65;cursor:wait;transform:none}
+.wind-start-btn i{
+  width:28px;height:28px;border-radius:9px;display:grid;place-items:center;
+  background:rgba(255,255,255,.16);font-style:normal;font-size:17px
+}
+.wind-opening-date{display:flex;flex-direction:column;gap:3px}
+.wind-opening-date b{color:#344d6c;font-size:13px}
+.wind-opening-date span{color:#91a0b3;font-size:10px;font-weight:700}
+
+.wind-opening-visual{
+  position:relative;min-height:480px;border:1px solid rgba(126,157,197,.24);
+  border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(255,255,255,.44)),
+             linear-gradient(155deg,#eaf4ff,#dce9f8);
+  box-shadow:0 28px 70px rgba(58,91,133,.13);overflow:hidden
+}
+.wind-opening-visual::before{
+  content:"";position:absolute;left:-8%;right:-8%;bottom:-12%;height:42%;
+  background:radial-gradient(ellipse at 25% 15%,rgba(82,133,177,.18),transparent 46%),
+             linear-gradient(180deg,rgba(180,207,231,.18),rgba(104,154,194,.16));
+  border-radius:50% 50% 0 0
+}
+.wind-sun{
+  position:absolute;width:92px;height:92px;right:18%;top:15%;border-radius:50%;
+  background:radial-gradient(circle,#ffd89a 0%,rgba(255,213,148,.55) 45%,rgba(255,215,149,0) 72%)
+}
+.wind-horizon{
+  position:absolute;left:0;right:0;bottom:25%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(76,122,174,.22),transparent)
+}
+.turbine{position:absolute;bottom:21%}
+.turbine.t1{right:17%;transform:scale(1.05)}
+.turbine.t2{right:44%;bottom:20%;transform:scale(.64);opacity:.68}
+.turbine-pole{
+  position:absolute;left:-2px;top:0;width:4px;height:170px;border-radius:4px;
+  background:linear-gradient(#7a9abb,#426f9f)
+}
+.turbine-hub{
+  position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;
+  background:#3e6c9f;z-index:2
+}
+.blade{
+  position:absolute;left:-2px;top:-64px;width:4px;height:64px;border-radius:999px 999px 3px 3px;
+  background:linear-gradient(#7ea3c6,#416f9f);transform-origin:2px 64px;
+  animation:windBlade 9s linear infinite
+}
+.blade.b2{transform:rotate(120deg)}
+.blade.b3{transform:rotate(240deg)}
+@keyframes windBlade{from{rotate:0deg}to{rotate:360deg}}
+
+.wind-opening-card{
+  position:absolute;left:28px;bottom:28px;width:min(300px,58%);
+  padding:17px 19px;border:1px solid rgba(119,151,191,.22);border-radius:17px;
+  background:rgba(255,255,255,.80);backdrop-filter:blur(10px);
+  box-shadow:0 15px 34px rgba(54,85,123,.10)
+}
+.wind-opening-card span{display:block;color:#8292a6;font-size:9px;font-weight:800}
+.wind-opening-card strong{display:block;margin-top:6px;color:#17365d;font-size:28px}
+.wind-opening-card small{
+  display:block;margin-top:7px;color:#6f84a0;font-size:9px;font-weight:700;letter-spacing:.06em
+}
+.wind-opening-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding-top:16px;border-top:1px solid rgba(111,145,187,.16);
+  color:#8394a8;font-size:9px;font-weight:700
+}
+#openingStatus.ready{color:#4f7b62}
+
+@media(max-width:900px){
+  .wind-opening-main{grid-template-columns:1fr;padding-top:48px}
+  .wind-opening-visual{min-height:320px}
+}
+@media(max-width:620px){
+  .wind-opening-shell{padding:24px 20px 18px}
+  .wind-internal-badge{display:none}
+  .wind-opening-copy h1{font-size:42px}
+  .wind-opening-copy p br{display:none}
+  .wind-opening-actions{align-items:flex-start;flex-direction:column}
+  .wind-start-btn{width:100%}
+  .wind-opening-visual{min-height:300px;border-radius:22px}
+  .wind-opening-card{left:18px;bottom:18px;width:70%}
+  .wind-opening-footer{align-items:flex-start;flex-direction:column}
+}
+
 </style>
 </head>
 <body>
-<div id="loginView" class="login-shell">
+
+<div id="openingView" class="wind-opening">
+  <div class="wind-opening-bg" aria-hidden="true">
+    <span class="wind-line line-1"></span>
+    <span class="wind-line line-2"></span>
+    <span class="wind-line line-3"></span>
+    <span class="wind-orbit orbit-1"></span>
+    <span class="wind-orbit orbit-2"></span>
+  </div>
+
+  <div class="wind-opening-shell">
+    <header class="wind-opening-top">
+      <div class="wind-opening-brand">
+        <div class="wind-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <b>風力人員統計系統</b>
+          <small>PERSONNEL SYSTEM</small>
+        </div>
+      </div>
+      <div class="wind-internal-badge">INTERNAL USE ONLY</div>
+    </header>
+
+    <main class="wind-opening-main">
+      <div class="wind-opening-copy">
+        <div id="openingGreeting" class="wind-opening-eyebrow">今天，也從掌握開始</div>
+        <h1>把每天的人力狀態，<br><span>看得更清楚。</span></h1>
+        <p>掌握在廠人力、支援返鄉、班別與人員變動，<br>讓每一次調度都有依據。</p>
+
+        <div class="wind-opening-actions">
+          <button id="startSystemBtn" class="wind-start-btn" type="button">
+            <span>進入系統</span><i>→</i>
+          </button>
+          <div class="wind-opening-date">
+            <b id="openingDate"></b>
+            <span id="openingWeekday"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="wind-opening-visual" aria-hidden="true">
+        <div class="wind-sun"></div>
+        <div class="wind-horizon"></div>
+
+        <div class="turbine t1">
+          <div class="turbine-pole"></div>
+          <div class="turbine-hub"></div>
+          <div class="blade b1"></div><div class="blade b2"></div><div class="blade b3"></div>
+        </div>
+
+        <div class="turbine t2">
+          <div class="turbine-pole"></div>
+          <div class="turbine-hub"></div>
+          <div class="blade b1"></div><div class="blade b2"></div><div class="blade b3"></div>
+        </div>
+
+        <div class="wind-opening-card">
+          <span>今天，也從掌握開始</span>
+          <strong id="openingHello">早安</strong>
+          <small>風起 · 人聚 · 共創永續</small>
+        </div>
+      </div>
+    </main>
+
+    <footer class="wind-opening-footer">
+      <span>內部系統 · 僅供授權人員使用</span>
+      <span id="openingStatus">系統初始化中…</span>
+    </footer>
+  </div>
+</div>
+<div id="loginView" class="login-shell hidden">
   <div class="login-card login-card-wide">
     <div class="login-head">
       <div>
         <h1>風力人員統計系統</h1>
         <p>請依身分選擇登入方式。</p>
       </div>
-      
+      <button id="backOpeningBtn" class="btn compact" type="button">返回開頭</button>
     </div>
 
     <div id="connectionStatus" class="connection-status">正在連接 Supabase…</div>
@@ -3993,6 +4229,7 @@ const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
 const cfg=window.APP_CONFIG||{};
 let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='',activeOnsiteOnly=false;
+let pendingSession=null;
 let logChoiceTouched=false;
 let editingChangeId=null;
 let selectedChangeIds=new Set();
@@ -4166,6 +4403,46 @@ async function ensureDbClient(){
  return db;
 }
 
+function updateOpeningClock(){
+ let now=new Date(),h=now.getHours();
+ $('openingHello').textContent=h<11?'早安':h<17?'午安':'晚安';
+ $('openingGreeting').textContent=h<11?'今天，也從掌握開始':h<17?'持續掌握今天的人力狀態':'收好今天的人力狀態';
+ $('openingDate').textContent=`${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日`;
+ $('openingWeekday').textContent=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'][now.getDay()];
+}
+function showOpening(){
+ $('openingView').classList.remove('hidden');
+ $('loginView').classList.add('hidden');
+ $('appView').classList.add('hidden');
+ updateOpeningClock();
+}
+function showLoginFromOpening(){
+ $('openingView').classList.add('hidden');
+ $('loginView').classList.remove('hidden');
+ $('appView').classList.add('hidden');
+}
+async function startSystemFromOpening(){
+ $('startSystemBtn').disabled=true;
+ try{
+   if(pendingSession?.user){
+     $('openingStatus').textContent='正在載入人員資料…';
+     await enter(pendingSession.user);
+     pendingSession=null;
+   }else{
+     showLoginFromOpening();
+   }
+ }catch(e){
+   console.error(e);
+   $('openingStatus').textContent='進入系統失敗，請重新登入';
+   showLoginFromOpening();
+ }finally{
+   $('startSystemBtn').disabled=false;
+ }
+}
+$('startSystemBtn').onclick=startSystemFromOpening;
+$('backOpeningBtn').onclick=showOpening;
+updateOpeningClock();
+
 async function init(){
  const status=$('connectionStatus');
  try{
@@ -4175,16 +4452,13 @@ async function init(){
    status.textContent='✓ Supabase 已連線，可以登入';
    status.classList.remove('bad');
    status.classList.add('ok');
-   if(session){
-     try{await enter(session.user)}
-     catch(appErr){
-       console.error('載入系統資料失敗',appErr);
-       status.textContent='✓ 已登入，但部分資料載入失敗';
-     }
-   }
+   pendingSession=session||null;
+   $('openingStatus').textContent=session?'已偵測登入狀態，可直接進入系統':'系統已就緒';
+   $('openingStatus').classList.add('ready');
+
    db.auth.onAuthStateChange(async(_,session)=>{
      try{
-       if(session&&!user)await enter(session.user);
+       pendingSession=session||null;
        if(!session&&user)leave();
      }catch(e){console.error('登入狀態更新失敗',e)}
    });
@@ -4240,8 +4514,18 @@ $('loginBtn').onclick=async()=>{
   await doLogin(email,password);
 };
 $('logoutBtn').onclick=()=>db.auth.signOut();
-async function enter(u){user=u;await ensureDbClient();let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
-function leave(){user=null;role='viewer';employees=[];changes=[];contracts=[];snapshots=[];snapshotReady=false;snapshotError='';$('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('viewerPassword').value='';$('loginPassword').value=''}
+async function enter(u){user=u;await ensureDbClient();let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('openingView').classList.add('hidden');$('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
+function leave(){
+ user=null;role='viewer';pendingSession=null;
+ employees=[];changes=[];contracts=[];snapshots=[];snapshotReady=false;snapshotError='';
+ $('appView').classList.add('hidden');
+ $('loginView').classList.add('hidden');
+ $('viewerPassword').value='';
+ $('loginPassword').value='';
+ $('openingStatus').textContent='系統已就緒';
+ $('openingStatus').classList.add('ready');
+ showOpening();
+}
 async function loadAll(){
  let client=await ensureDbClient();
  let [e,c,sm]=await Promise.all([

@@ -4952,6 +4952,118 @@ body.change-manage-mode .change-manage-inline{
   }
 }
 
+
+
+/* ===== V97：修正沉浸式場景層級｜確保風車、風流、地景可見 ===== */
+.wind-opening-main-v88::before{
+  z-index:0 !important;
+  pointer-events:none;
+}
+.wind-opening-copy-v88.wind-animation-only{
+  z-index:2 !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:none;
+}
+.wind-motion-scene{
+  z-index:1;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.wind-access-card{
+  z-index:7 !important;
+}
+
+/* 風的線條要看得到，但不要搶登入 */
+.wind-flow-lines{
+  z-index:2;
+  opacity:.78 !important;
+}
+.wind-flow-lines .flow{
+  stroke:rgba(82,137,187,.72) !important;
+  stroke-width:1.55 !important;
+  opacity:.34 !important;
+}
+.wind-flow-lines .flow-1{opacity:.40 !important}
+.wind-flow-lines .flow-2{opacity:.31 !important}
+.wind-flow-lines .flow-3{opacity:.27 !important}
+.wind-flow-lines .flow-4{opacity:.24 !important}
+
+/* 風車提升一階對比；仍維持柔和藍灰色 */
+.hero-turbine{
+  z-index:5 !important;
+  opacity:1;
+  filter:drop-shadow(0 10px 13px rgba(39,79,117,.16));
+}
+.turbine-main{
+  left:31% !important;
+  right:auto !important;
+  bottom:8% !important;
+  transform:scale(1.14) !important;
+  opacity:.96 !important;
+}
+.turbine-mid{
+  left:13% !important;
+  bottom:6% !important;
+  transform:scale(.72) !important;
+  opacity:.72 !important;
+}
+.turbine-far{
+  left:3.5% !important;
+  bottom:5% !important;
+  transform:scale(.43) !important;
+  opacity:.43 !important;
+}
+.hero-pole{
+  background:linear-gradient(180deg,#7f9fbd 0%,#537b9f 60%,#315f87 100%) !important;
+}
+.hero-hub{
+  background:#3f729f !important;
+  box-shadow:0 0 0 3px rgba(255,255,255,.72),0 4px 12px rgba(44,84,120,.16) !important;
+}
+.hero-blade{
+  background:linear-gradient(180deg,#8eabc3 0%,#6388a7 60%,#426f95 100%) !important;
+  opacity:.96 !important;
+}
+
+/* 地景重新放到風車後方，不被過渡層蓋掉 */
+.wind-horizon{z-index:3 !important}
+.horizon-back{
+  opacity:.88 !important;
+  background:linear-gradient(180deg,rgba(111,157,199,.20),rgba(74,122,166,.09)) !important;
+}
+.horizon-front{
+  opacity:.82 !important;
+  background:linear-gradient(180deg,rgba(82,130,173,.15),rgba(53,99,143,.20)) !important;
+}
+.wind-particle{z-index:4 !important;opacity:.48 !important}
+.wind-orb-core{z-index:3 !important}
+.wind-glow{z-index:1 !important}
+
+/* 右側登入區仍保持乾淨：場景往右淡出而不是整層蓋白 */
+.wind-opening-main-v88::after{
+  content:"";
+  position:absolute;
+  z-index:4;
+  top:0;
+  right:0;
+  bottom:0;
+  width:52%;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent 0%,rgba(247,251,255,.20) 18%,rgba(250,253,255,.56) 55%,rgba(250,253,255,.78) 100%);
+}
+
+@media(max-width:1180px){
+  .turbine-main{left:27% !important;transform:scale(1.02) !important}
+  .turbine-mid{left:10% !important;transform:scale(.64) !important}
+}
+@media(max-width:980px){
+  .wind-opening-main-v88::after{width:100%;background:rgba(248,252,255,.26)}
+  .turbine-main{left:68% !important;bottom:4% !important;transform:scale(.78) !important;opacity:.48 !important}
+  .turbine-mid{left:12% !important;bottom:4% !important;transform:scale(.53) !important;opacity:.38 !important}
+  .turbine-far{display:none !important}
+}
+
 </style>
 </head>
 <body>

@@ -4236,6 +4236,158 @@ body.change-manage-mode .change-manage-inline{
 @media(prefers-reduced-motion:reduce){
   .hero-rotor,.wind-flow-lines .flow,.wind-glow,.wind-orb-core,.orbit-ring,.orbit-dot,.wind-particle{animation:none!important}
 }
+
+
+/* ===== V92：開場動畫＋登入整合成同一個主視覺面板 ===== */
+.wind-opening-main-v88{
+  position:relative;
+  grid-template-columns:minmax(0,1.18fr) minmax(390px,.82fr);
+  gap:0;
+  min-height:560px;
+  padding:0;
+  overflow:hidden;
+  isolation:isolate;
+  border:1px solid rgba(93,133,181,.14);
+  border-radius:34px;
+  background:
+    radial-gradient(circle at 34% 20%,rgba(255,224,177,.24),transparent 30%),
+    linear-gradient(118deg,#fbfdff 0%,#edf6ff 49%,rgba(246,250,255,.98) 67%,#ffffff 100%);
+  box-shadow:0 30px 82px rgba(57,92,134,.12);
+  animation:windOpeningIn .55s ease-out both;
+}
+.wind-opening-main-v88::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  top:0;
+  bottom:0;
+  left:54%;
+  width:190px;
+  transform:translateX(-50%);
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.36) 48%,rgba(255,255,255,.62) 76%,transparent);
+  filter:blur(13px);
+}
+.wind-opening-copy-v88.wind-animation-only{
+  z-index:1;
+  min-height:560px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  animation:none;
+  overflow:visible;
+}
+.wind-motion-scene{
+  right:-120px;
+  border-radius:0;
+  background:
+    radial-gradient(circle at 18% 15%,rgba(255,255,255,.94),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.12),rgba(198,221,241,.08));
+}
+.wind-motion-scene::after{
+  background:
+    linear-gradient(90deg,transparent 0%,transparent 70%,rgba(255,255,255,.22) 82%,rgba(255,255,255,.66) 100%),
+    linear-gradient(115deg,rgba(255,255,255,.34),transparent 32%,transparent 74%,rgba(255,255,255,.18));
+}
+.wind-access-card{
+  z-index:2;
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+  padding:34px clamp(26px,2.8vw,42px);
+  border:0;
+  border-radius:0;
+  background:linear-gradient(90deg,rgba(255,255,255,.66),rgba(255,255,255,.92) 34%,rgba(255,255,255,.97));
+  box-shadow:none;
+  backdrop-filter:blur(12px);
+  animation:none;
+}
+.wind-access-card::before{
+  top:0;
+  left:0;
+  right:auto;
+  width:100%;
+  height:3px;
+  border-radius:0;
+  background:linear-gradient(90deg,transparent,#2f63ee 18%,#75a6ff 56%,transparent 92%);
+  opacity:.78;
+}
+.wind-access-card::after{
+  content:"";
+  position:absolute;
+  left:0;
+  top:9%;
+  bottom:9%;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(103,145,192,.14) 22%,rgba(103,145,192,.14) 78%,transparent);
+}
+.wind-login-block{
+  background:rgba(255,255,255,.48);
+  border-color:rgba(119,150,186,.18);
+  box-shadow:0 8px 24px rgba(56,91,132,.025);
+}
+.wind-login-block.viewer{
+  background:rgba(248,251,255,.58);
+  border-color:rgba(112,153,204,.22);
+}
+.wind-login-block.admin{
+  background:rgba(255,255,255,.42);
+}
+.wind-connection-status{
+  background:rgba(238,250,244,.82)!important;
+}
+
+@media(max-width:1180px){
+  .wind-opening-main-v88{
+    grid-template-columns:minmax(0,1fr) minmax(380px,.84fr);
+    gap:0;
+  }
+}
+@media(max-width:980px){
+  .wind-opening-main-v88{
+    grid-template-columns:1fr;
+    gap:0;
+    padding:0;
+    min-height:0;
+    border-radius:28px;
+  }
+  .wind-opening-main-v88::before{
+    top:300px;
+    bottom:auto;
+    left:0;
+    width:100%;
+    height:90px;
+    transform:none;
+    background:linear-gradient(180deg,transparent,rgba(255,255,255,.55),rgba(255,255,255,.78),transparent);
+  }
+  .wind-opening-copy-v88.wind-animation-only{
+    min-height:360px;
+    border-radius:0;
+  }
+  .wind-motion-scene{right:0}
+  .wind-access-card{
+    padding:28px clamp(22px,5vw,38px) 32px;
+    background:linear-gradient(180deg,rgba(255,255,255,.66),rgba(255,255,255,.96) 24%);
+  }
+  .wind-access-card::after{
+    top:0;
+    bottom:auto;
+    left:8%;
+    right:8%;
+    width:auto;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(103,145,192,.14),transparent);
+  }
+}
+@media(max-width:620px){
+  .wind-opening-main-v88{border-radius:24px}
+  .wind-opening-copy-v88.wind-animation-only{min-height:285px;border-radius:0}
+  .wind-access-card{padding:22px 15px 24px}
+}
+
 </style>
 </head>
 <body>

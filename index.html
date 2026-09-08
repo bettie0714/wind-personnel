@@ -4036,6 +4036,206 @@ body.change-manage-mode .change-manage-inline{
   .blade{animation:none}
 }
 
+
+
+/* ===== V91: 開場主視覺改為純動畫（無文字） ===== */
+.wind-opening-copy-v88.wind-animation-only{
+  min-height:560px;
+  padding:0;
+  overflow:hidden;
+  isolation:isolate;
+  border:1px solid rgba(93,133,181,.14);
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 72% 23%,rgba(255,218,163,.46) 0 8%,rgba(255,218,163,.13) 18%,transparent 36%),
+    linear-gradient(155deg,#fbfdff 0%,#edf6ff 45%,#dcecf8 100%);
+  box-shadow:0 28px 80px rgba(57,92,134,.11);
+}
+.wind-opening-copy-v88.wind-animation-only::before,
+.wind-opening-copy-v88.wind-animation-only::after{display:none}
+.wind-motion-scene{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 18% 15%,rgba(255,255,255,.95),transparent 34%),
+    linear-gradient(180deg,rgba(255,255,255,.20),rgba(198,221,241,.10));
+}
+.wind-motion-scene::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.40),transparent 32%,transparent 74%,rgba(255,255,255,.20));
+}
+.wind-glow{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(2px);
+  opacity:.7;
+  animation:windGlowFloat 8s ease-in-out infinite alternate;
+}
+.wind-glow.glow-a{
+  width:290px;height:290px;
+  right:8%;top:1%;
+  background:radial-gradient(circle,rgba(255,213,148,.48),rgba(255,213,148,.08) 54%,transparent 72%);
+}
+.wind-glow.glow-b{
+  width:380px;height:380px;
+  left:-16%;bottom:-24%;
+  background:radial-gradient(circle,rgba(101,165,224,.22),rgba(101,165,224,.06) 56%,transparent 74%);
+  animation-delay:-3s;
+}
+.wind-flow-lines{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+.wind-flow-lines .flow{
+  fill:none;
+  stroke-linecap:round;
+  stroke-width:1.6;
+  stroke-dasharray:10 8;
+  stroke-dashoffset:0;
+  opacity:.26;
+  animation:windFlowDash 8s linear infinite;
+}
+.wind-flow-lines .flow-1{stroke:#4a81bd;animation-duration:9s}
+.wind-flow-lines .flow-2{stroke:#6a99c8;animation-duration:11s;animation-delay:-2.5s;opacity:.22}
+.wind-flow-lines .flow-3{stroke:#3e79b5;animation-duration:8s;animation-delay:-4s;opacity:.18}
+.wind-flow-lines .flow-4{stroke:#7fa6cb;animation-duration:12s;animation-delay:-6s;opacity:.20}
+.wind-orb-core{
+  position:absolute;
+  right:11%;top:13%;
+  width:180px;height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,232,194,.82) 0 11%,rgba(255,222,167,.28) 28%,rgba(255,222,167,.06) 48%,transparent 70%);
+  animation:windOrbBreathe 6s ease-in-out infinite;
+}
+.orbit-ring{
+  position:absolute;
+  border:1px solid rgba(93,135,177,.17);
+  border-radius:50%;
+  animation:windRingPulse 6s ease-in-out infinite;
+}
+.ring-1{inset:24px}
+.ring-2{inset:2px;animation-delay:-2s}
+.ring-3{inset:-28px;animation-delay:-4s;opacity:.55}
+.orbit-dot{
+  position:absolute;
+  width:6px;height:6px;
+  border-radius:50%;
+  background:#5c89ba;
+  box-shadow:0 0 0 5px rgba(92,137,186,.07);
+}
+.dot-1{left:21px;top:87px;animation:windDotFloat 4.5s ease-in-out infinite}
+.dot-2{right:4px;bottom:54px;animation:windDotFloat 5.4s -2s ease-in-out infinite}
+.hero-turbine{
+  position:absolute;
+  z-index:4;
+  transform-origin:50% 100%;
+  filter:drop-shadow(0 9px 10px rgba(46,80,116,.11));
+}
+.hero-pole{
+  position:absolute;
+  left:-3px;top:0;
+  width:6px;height:208px;
+  border-radius:8px;
+  background:linear-gradient(180deg,#7da2c3 0%,#527ca5 62%,#315f8e 100%);
+  clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);
+}
+.hero-hub{
+  position:absolute;
+  left:-7px;top:-7px;
+  width:14px;height:14px;
+  z-index:3;
+  border-radius:50%;
+  background:#426f9d;
+  box-shadow:0 0 0 3px rgba(255,255,255,.5);
+}
+.hero-rotor{
+  position:absolute;
+  left:0;top:0;
+  width:0;height:0;
+  z-index:2;
+  animation:windRotorSpin 9.5s linear infinite;
+}
+.hero-blade{
+  position:absolute;
+  left:-2px;top:-78px;
+  width:5px;height:80px;
+  transform-origin:50% 100%;
+  border-radius:100% 100% 26% 26%;
+  background:linear-gradient(180deg,#8eafca,#557fa7 62%,#3d6d9b);
+  opacity:.92;
+}
+.hero-blade.blade-a{transform:rotate(0deg)}
+.hero-blade.blade-b{transform:rotate(120deg)}
+.hero-blade.blade-c{transform:rotate(240deg)}
+.turbine-main{right:23%;bottom:22%;transform:scale(1.15)}
+.turbine-main .hero-rotor{animation-duration:8.5s}
+.turbine-mid{left:27%;bottom:20%;transform:scale(.77);opacity:.78}
+.turbine-mid .hero-rotor{animation-duration:11.5s;animation-direction:reverse}
+.turbine-far{left:11%;bottom:18%;transform:scale(.47);opacity:.50}
+.turbine-far .hero-rotor{animation-duration:14s}
+.wind-horizon{
+  position:absolute;
+  left:-8%;right:-8%;
+  border-radius:50% 50% 0 0 / 100% 100% 0 0;
+  transform-origin:center bottom;
+}
+.horizon-back{
+  bottom:2%;height:31%;
+  background:linear-gradient(180deg,rgba(111,157,199,.16),rgba(74,122,166,.07));
+  transform:rotate(-2deg);
+}
+.horizon-front{
+  left:-18%;right:-18%;bottom:-11%;height:31%;
+  background:linear-gradient(180deg,rgba(82,130,173,.12),rgba(53,99,143,.18));
+  transform:rotate(2.5deg);
+}
+.wind-particle{
+  position:absolute;
+  z-index:2;
+  width:4px;height:4px;
+  border-radius:50%;
+  background:rgba(80,131,180,.46);
+  box-shadow:0 0 0 4px rgba(80,131,180,.055);
+  animation:windParticleDrift 10s linear infinite;
+}
+.p1{left:4%;top:24%;animation-delay:-1s}
+.p2{left:18%;top:46%;animation-delay:-4s;animation-duration:12s}
+.p3{left:36%;top:17%;animation-delay:-7s;animation-duration:9s}
+.p4{left:52%;top:38%;animation-delay:-2s;animation-duration:13s}
+.p5{left:70%;top:53%;animation-delay:-6s;animation-duration:11s}
+@keyframes windRotorSpin{to{transform:rotate(360deg)}}
+@keyframes windFlowDash{to{stroke-dashoffset:-100}}
+@keyframes windGlowFloat{from{transform:translate3d(-7px,-4px,0) scale(.98)}to{transform:translate3d(10px,8px,0) scale(1.04)}}
+@keyframes windOrbBreathe{0%,100%{transform:scale(.96);opacity:.76}50%{transform:scale(1.05);opacity:1}}
+@keyframes windRingPulse{0%,100%{transform:scale(.94);opacity:.28}50%{transform:scale(1.05);opacity:.72}}
+@keyframes windDotFloat{0%,100%{transform:translateY(-5px)}50%{transform:translateY(7px)}}
+@keyframes windParticleDrift{0%{transform:translate3d(-40px,14px,0);opacity:0}15%{opacity:.55}85%{opacity:.45}100%{transform:translate3d(620px,-42px,0);opacity:0}}
+@media(max-width:980px){
+  .wind-opening-copy-v88.wind-animation-only{min-height:360px;padding:0;background:linear-gradient(155deg,#fbfdff,#e7f3fc)}
+  .wind-orb-core{right:10%;top:7%;transform:scale(.82)}
+  .turbine-main{right:26%;bottom:19%;transform:scale(.84)}
+  .turbine-mid{left:29%;bottom:17%;transform:scale(.60)}
+  .turbine-far{left:10%;bottom:16%;transform:scale(.38)}
+}
+@media(max-width:620px){
+  .wind-opening-copy-v88.wind-animation-only{min-height:285px;border-radius:24px}
+  .wind-orb-core{right:5%;top:0;transform:scale(.62)}
+  .turbine-main{right:24%;bottom:15%;transform:scale(.63)}
+  .turbine-mid{left:28%;bottom:13%;transform:scale(.43)}
+  .turbine-far{left:7%;bottom:12%;transform:scale(.28)}
+  .wind-flow-lines .flow{stroke-width:2}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero-rotor,.wind-flow-lines .flow,.wind-glow,.wind-orb-core,.orbit-ring,.orbit-dot,.wind-particle{animation:none!important}
+}
 </style>
 </head>
 <body>
@@ -4059,39 +4259,67 @@ body.change-manage-mode .change-manage-inline{
     </header>
 
     <main class="wind-opening-main-v88">
-      <section class="wind-opening-copy-v88">
-        <div id="openingGreeting" class="wind-opening-eyebrow">人力狀態 · 即時掌握</div>
+      <section class="wind-opening-copy-v88 wind-animation-only" aria-label="風力動畫主視覺">
+        <span id="openingGreeting" hidden></span>
+        <span id="openingDate" hidden></span>
+        <span id="openingWeekday" hidden></span>
 
-        <h1>從人力開始，<br><span>掌握現場。</span></h1>
+        <div class="wind-motion-scene" aria-hidden="true">
+          <div class="wind-glow glow-a"></div>
+          <div class="wind-glow glow-b"></div>
 
-        <p>
-          人員、班別、返鄉與異動，都集中在同一個畫面。
-        </p>
+          <svg class="wind-flow-lines" viewBox="0 0 900 560" preserveAspectRatio="none">
+            <path class="flow flow-1" pathLength="100" d="M-80 160 C140 80 270 220 485 145 S780 70 980 150" />
+            <path class="flow flow-2" pathLength="100" d="M-110 230 C95 155 260 285 475 220 S775 135 995 215" />
+            <path class="flow flow-3" pathLength="100" d="M-100 300 C120 250 265 350 500 292 S800 230 990 290" />
+            <path class="flow flow-4" pathLength="100" d="M-80 372 C150 320 300 402 515 365 S805 305 980 355" />
+          </svg>
 
-        <div class="wind-opening-meta">
-          <div class="wind-opening-date">
-            <b id="openingDate"></b>
-            <span id="openingWeekday"></span>
+          <div class="wind-orb-core">
+            <span class="orbit-ring ring-1"></span>
+            <span class="orbit-ring ring-2"></span>
+            <span class="orbit-ring ring-3"></span>
+            <span class="orbit-dot dot-1"></span>
+            <span class="orbit-dot dot-2"></span>
           </div>
 
-          <div class="wind-opening-motto">
-            <span>PERSONNEL OVERVIEW</span>
-            <b>現場人力，一眼掌握</b>
+          <div class="hero-turbine turbine-far">
+            <span class="hero-pole"></span>
+            <span class="hero-hub"></span>
+            <span class="hero-rotor">
+              <i class="hero-blade blade-a"></i>
+              <i class="hero-blade blade-b"></i>
+              <i class="hero-blade blade-c"></i>
+            </span>
           </div>
-        </div>
 
-        <div class="wind-hero-decoration" aria-hidden="true">
-          <div class="wind-sun"></div>
-          <div class="turbine t1">
-            <div class="turbine-pole"></div>
-            <div class="turbine-hub"></div>
-            <div class="blade b1"></div><div class="blade b2"></div><div class="blade b3"></div>
+          <div class="hero-turbine turbine-mid">
+            <span class="hero-pole"></span>
+            <span class="hero-hub"></span>
+            <span class="hero-rotor">
+              <i class="hero-blade blade-a"></i>
+              <i class="hero-blade blade-b"></i>
+              <i class="hero-blade blade-c"></i>
+            </span>
           </div>
-          <div class="turbine t2">
-            <div class="turbine-pole"></div>
-            <div class="turbine-hub"></div>
-            <div class="blade b1"></div><div class="blade b2"></div><div class="blade b3"></div>
+
+          <div class="hero-turbine turbine-main">
+            <span class="hero-pole"></span>
+            <span class="hero-hub"></span>
+            <span class="hero-rotor">
+              <i class="hero-blade blade-a"></i>
+              <i class="hero-blade blade-b"></i>
+              <i class="hero-blade blade-c"></i>
+            </span>
           </div>
+
+          <div class="wind-horizon horizon-back"></div>
+          <div class="wind-horizon horizon-front"></div>
+          <div class="wind-particle p1"></div>
+          <div class="wind-particle p2"></div>
+          <div class="wind-particle p3"></div>
+          <div class="wind-particle p4"></div>
+          <div class="wind-particle p5"></div>
         </div>
       </section>
 

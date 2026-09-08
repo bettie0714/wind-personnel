@@ -5136,7 +5136,7 @@ body.change-manage-mode .change-manage-inline{
 
 
 
-/* ===== V99：風車獨立舞台｜完全脫離舊動畫容器，避免被任何舊層級吃掉 ===== */
+/* ===== V100：小風車遠景版｜沿用獨立舞台，縮小風車並置於左下地景 ===== */
 .wind-opening-main-v88{
   isolation:isolate !important;
 }
@@ -5177,7 +5177,7 @@ body.change-manage-mode .change-manage-inline{
 .v99-wind-stage .v99-windline{
   fill:none;
   stroke:#79a7cf;
-  stroke-width:2.1;
+  stroke-width:1.8;
   stroke-linecap:round;
   stroke-dasharray:28 22;
   opacity:.38;
@@ -5262,7 +5262,7 @@ body.change-manage-mode .change-manage-inline{
           <path d="M-100 720 C170 665 390 668 625 710 C825 746 1015 708 1210 712 L1210 810 L-100 810 Z" fill="#6b9fc8" opacity=".28"/>
 
           <!-- far turbine -->
-          <g opacity=".55">
+          <g opacity=".46" transform="translate(60 470) scale(.36)">
             <path d="M118 510 L108 744 L136 744 L126 510 Z" fill="#7697b4"/>
             <g>
               <path d="M120 510 C116 475 112 431 119 392 C133 428 134 473 128 510 Z" fill="#89a8c1"/>
@@ -5274,7 +5274,7 @@ body.change-manage-mode .change-manage-inline{
           </g>
 
           <!-- middle turbine -->
-          <g opacity=".78">
+          <g opacity=".62" transform="translate(140 370) scale(.48)">
             <path d="M270 455 L255 755 L294 755 L279 455 Z" fill="#668bab"/>
             <g>
               <path d="M272 455 C267 408 261 350 270 300 C287 345 289 406 281 455 Z" fill="#789dbb"/>
@@ -5286,7 +5286,7 @@ body.change-manage-mode .change-manage-inline{
           </g>
 
           <!-- main turbine -->
-          <g opacity=".98">
+          <g opacity=".78" transform="translate(130 250) scale(.58)">
             <path d="M470 365 L446 775 L509 775 L483 365 Z" fill="#416f98"/>
             <g>
               <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa"/>

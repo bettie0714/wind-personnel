@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>風力人員統計系統</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2716%27 fill=%27%23143b66%27/%3E%3Cg stroke=%27white%27 stroke-width=%275%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M32 30 L32 10%27/%3E%3Cpath d=%27M32 30 L49 40%27/%3E%3Cpath d=%27M32 30 L15 40%27/%3E%3C/g%3E%3Ccircle cx=%2732%27 cy=%2730%27 r=%275%27 fill=%27%23dbeafe%27/%3E%3Cpath d=%27M32 35 L28 57 H36 Z%27 fill=%27%23dbeafe%27/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="128x128" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAADX0lEQVR42u2d0XHbMBBECQxLiDpIE5moCTcRpaRYTaQJa9yEO5B6cD4yniSMSIEgAOJu337aHou4fVgcQIkKQ0V9+vrtfUCbdbucQ63/HTBcG4iA8dogBIzXBiFgvDYIEfP9KMebqG7+9eVZGoKgPOv/Nv9wPEkuCVHVfJaEBAA8mz+Nfm9LQaqHUXFmzJntFYIsAIh+jRSI6tGvkgJznkbM14ZAsgdAMwAw+/VSgAQgAej6lXcFJAAJwOxXTgESgARAACCgtbd7Pd4evgsA6792H8ASwBKAAAABAAIABAAIABAAIABAAIAAwJlSz/dV7gOQAAgAAAABAAIABAAIABAAIABAAIAAAAGARz0651e6D0ACIAAAAAQACACQqEbVgb9d//9M7OdDIAFUzV/6OQA40uvPH5t+DwCOzVeEIGK+NgTsAtgGIgBwLsUvgpA/Byhh+vXl2f3dweDlKWEphq/Z5987FPIIg2kA1s7yw/GU1N2nngh6AMIcAFuj/REEucfBVmEwAUDJJu7DqHsQlLoXYAmGLgGo3bVPDar5er3D0A0ALbZqS7O/ZAJYgmH0bvqawr9d36tCMB1vD0CMHg3fUuSPv29xrT18efXo0fQSBW0Jwp4wVO0BepzxKecAX56+7z6WVhBEL+YfjqeqRWsd0a3q5+JmUCtzakO2h6JlevcypNXrtqhjtHjRvczEFtdRu57R0sX2GsGWISi2C7BwnLrmfX73dgJe6mCqCbTWdFlrFGOvs996x13j2mvUOfZ2UZ62WjXGUrreY0nSt1yc5/felThWrlWfscZA1w5W5bEsa0FoUZcm7weYG3BL43M+6ZO7E7BSk+IJkJoMag9iepQGe9Yj7jVw1Ec9+GiYuAAAABAAOFfuZ/0VnhFAApAACAAQACAAQACAAIAtoNRWkAQgARAAIABAAIAAgB2A2k6ABCABEAAgXQBul3OgDJq6Xc6BBGAJYAegvBMgAUiA32sBpdBb/0kA9AcAUkBv9pMA6F8AvKRArY7dw05g6jEJQAIsE4J8rv2LCQAEGuYPwzAsGu3lOwUxf35C0wPQA+SRg+zP/qQEAAK/5j/sAegJ/Bqf1QOQBr7Mz2oCgcCP+auXAJYEP8YXAQAQ7BpfFABAsGd8FQAAon/Dp/oFu4SFs/KIIawAAAAASUVORK5CYII=">
+<link rel="shortcut icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAADX0lEQVR42u2d0XHbMBBECQxLiDpIE5moCTcRpaRYTaQJa9yEO5B6cD4yniSMSIEgAOJu337aHou4fVgcQIkKQ0V9+vrtfUCbdbucQ63/HTBcG4iA8dogBIzXBiFgvDYIEfP9KMebqG7+9eVZGoKgPOv/Nv9wPEkuCVHVfJaEBAA8mz+Nfm9LQaqHUXFmzJntFYIsAIh+jRSI6tGvkgJznkbM14ZAsgdAMwAw+/VSgAQgAej6lXcFJAAJwOxXTgESgARAACCgtbd7Pd4evgsA6792H8ASwBKAAAABAAIABAAIABAAIABAAIAAwJlSz/dV7gOQAAgAAAABAAIABAAIABAAIABAAIAAAAGARz0651e6D0ACIAAAAAQACACQqEbVgb9d//9M7OdDIAFUzV/6OQA40uvPH5t+DwCOzVeEIGK+NgTsAtgGIgBwLsUvgpA/Byhh+vXl2f3dweDlKWEphq/Z5987FPIIg2kA1s7yw/GU1N2nngh6AMIcAFuj/REEucfBVmEwAUDJJu7DqHsQlLoXYAmGLgGo3bVPDar5er3D0A0ALbZqS7O/ZAJYgmH0bvqawr9d36tCMB1vD0CMHg3fUuSPv29xrT18efXo0fQSBW0Jwp4wVO0BepzxKecAX56+7z6WVhBEL+YfjqeqRWsd0a3q5+JmUCtzakO2h6JlevcypNXrtqhjtHjRvczEFtdRu57R0sX2GsGWISi2C7BwnLrmfX73dgJe6mCqCbTWdFlrFGOvs996x13j2mvUOfZ2UZ62WjXGUrreY0nSt1yc5/felThWrlWfscZA1w5W5bEsa0FoUZcm7weYG3BL43M+6ZO7E7BSk+IJkJoMag9iepQGe9Yj7jVw1Ec9+GiYuAAAABAAOFfuZ/0VnhFAApAACAAQACAAQACAAIAtoNRWkAQgARAAIABAAIAAgB2A2k6ABCABEAAgXQBul3OgDJq6Xc6BBGAJYAegvBMgAUiA32sBpdBb/0kA9AcAUkBv9pMA6F8AvKRArY7dw05g6jEJQAIsE4J8rv2LCQAEGuYPwzAsGu3lOwUxf35C0wPQA+SRg+zP/qQEAAK/5j/sAegJ/Bqf1QOQBr7Mz2oCgcCP+auXAJYEP8YXAQAQ7BpfFABAsGd8FQAAon/Dp/oFu4SFs/KIIawAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" sizes="128x128" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAADX0lEQVR42u2d0XHbMBBECQxLiDpIE5moCTcRpaRYTaQJa9yEO5B6cD4yniSMSIEgAOJu337aHou4fVgcQIkKQ0V9+vrtfUCbdbucQ63/HTBcG4iA8dogBIzXBiFgvDYIEfP9KMebqG7+9eVZGoKgPOv/Nv9wPEkuCVHVfJaEBAA8mz+Nfm9LQaqHUXFmzJntFYIsAIh+jRSI6tGvkgJznkbM14ZAsgdAMwAw+/VSgAQgAej6lXcFJAAJwOxXTgESgARAACCgtbd7Pd4evgsA6792H8ASwBKAAAABAAIABAAIABAAIABAAIAAwJlSz/dV7gOQAAgAAAABAAIABAAIABAAIABAAIAAAAGARz0651e6D0ACIAAAAAQACACQqEbVgb9d//9M7OdDIAFUzV/6OQA40uvPH5t+DwCOzVeEIGK+NgTsAtgGIgBwLsUvgpA/Byhh+vXl2f3dweDlKWEphq/Z5987FPIIg2kA1s7yw/GU1N2nngh6AMIcAFuj/REEucfBVmEwAUDJJu7DqHsQlLoXYAmGLgGo3bVPDar5er3D0A0ALbZqS7O/ZAJYgmH0bvqawr9d36tCMB1vD0CMHg3fUuSPv29xrT18efXo0fQSBW0Jwp4wVO0BepzxKecAX56+7z6WVhBEL+YfjqeqRWsd0a3q5+JmUCtzakO2h6JlevcypNXrtqhjtHjRvczEFtdRu57R0sX2GsGWISi2C7BwnLrmfX73dgJe6mCqCbTWdFlrFGOvs996x13j2mvUOfZ2UZ62WjXGUrreY0nSt1yc5/felThWrlWfscZA1w5W5bEsa0FoUZcm7weYG3BL43M+6ZO7E7BSk+IJkJoMag9iepQGe9Yj7jVw1Ec9+GiYuAAAABAAOFfuZ/0VnhFAApAACAAQACAAQACAAIAtoNRWkAQgARAAIABAAIAAgB2A2k6ABCABEAAgXQBul3OgDJq6Xc6BBGAJYAegvBMgAUiA32sBpdBb/0kA9AcAUkBv9pMA6F8AvKRArY7dw05g6jEJQAIsE4J8rv2LCQAEGuYPwzAsGu3lOwUxf35C0wPQA+SRg+zP/qQEAAK/5j/sAegJ/Bqf1QOQBr7Mz2oCgcCP+auXAJYEP8YXAQAQ7BpfFABAsGd8FQAAon/Dp/oFu4SFs/KIIawAAAAASUVORK5CYII=">
+<meta name="theme-color" content="#143b66">
 <style>
 :root{--bg:#f6f8fc;--card:#fff;--text:#13213a;--muted:#64748b;--line:#e6ebf2;--primary:#2563eb;--green:#16a34a;--purple:#6d3fc2;--orange:#f59e0b;--red:#dc2626;--nav:#0b1b33;--shadow:0 7px 24px rgba(15,23,42,.07)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
@@ -5267,37 +5270,16 @@ body.change-manage-mode .change-manage-inline{
           <path d="M-80 620 C165 535 350 545 555 598 C770 654 960 602 1160 606 L1160 800 L-80 800 Z" fill="#b9d2e7" opacity=".46"/>
           <path d="M-90 675 C150 603 365 607 590 659 C785 706 975 660 1180 665 L1180 810 L-90 810 Z" fill="#8fb8d8" opacity=".36"/>
           <path d="M-100 720 C170 665 390 668 625 710 C825 746 1015 708 1210 712 L1210 810 L-100 810 Z" fill="#6b9fc8" opacity=".28"/>
-          <!-- V102 layered turbines: large / medium / small -->
-          <g opacity=".72" transform="translate(185 590) scale(.56)">
-            <path d="M0 -8 L-20 190 L20 190 L8 -8 Z" fill="#6d93b2" opacity=".92"/>
-            <g>
-              <path d="M-4 0 C-10 -48 -18 -104 -8 -162 C16 -122 20 -56 8 0 Z" fill="#89a9c2"/>
-              <path d="M-4 0 C-10 -48 -18 -104 -8 -162 C16 -122 20 -56 8 0 Z" fill="#89a9c2" transform="rotate(120 0 0)"/>
-              <path d="M-4 0 C-10 -48 -18 -104 -8 -162 C16 -122 20 -56 8 0 Z" fill="#89a9c2" transform="rotate(240 0 0)"/>
-              <circle cx="0" cy="0" r="12" fill="#6287aa" stroke="#f8fbff" stroke-width="5"/>
-              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="17.2s" repeatCount="indefinite"/>
-            </g>
-          </g>
 
-          <g opacity=".98" transform="translate(410 398) scale(1.02)">
-            <path d="M0 0 L-26 378 L30 378 L10 0 Z" fill="#416f98"/>
-            <g filter="drop-shadow(0 12px 14px rgba(47,83,117,.16))">
-              <path d="M-5 0 C-15 -66 -28 -152 -12 -228 C24 -178 28 -82 10 0 Z" fill="#5f89ad"/>
-              <path d="M-5 0 C-15 -66 -28 -152 -12 -228 C24 -178 28 -82 10 0 Z" fill="#5f89ad" transform="rotate(120 0 0)"/>
-              <path d="M-5 0 C-15 -66 -28 -152 -12 -228 C24 -178 28 -82 10 0 Z" fill="#5f89ad" transform="rotate(240 0 0)"/>
-              <circle cx="0" cy="0" r="16" fill="#32668f" stroke="#f8fbff" stroke-width="7"/>
-              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="14.4s" repeatCount="indefinite"/>
-            </g>
-          </g>
-
-          <g opacity=".84" transform="translate(600 520) scale(.76)">
-            <path d="M0 -4 L-22 274 L23 274 L8 -4 Z" fill="#517da3"/>
+          <!-- V101 single main turbine -->
+          <g opacity=".98" transform="translate(-42 -6) scale(1.08)">
+            <path d="M470 365 L446 775 L509 775 L483 365 Z" fill="#416f98"/>
             <g>
-              <path d="M-4 0 C-11 -56 -20 -126 -10 -192 C20 -148 24 -70 8 0 Z" fill="#7398b8"/>
-              <path d="M-4 0 C-11 -56 -20 -126 -10 -192 C20 -148 24 -70 8 0 Z" fill="#7398b8" transform="rotate(120 0 0)"/>
-              <path d="M-4 0 C-11 -56 -20 -126 -10 -192 C20 -148 24 -70 8 0 Z" fill="#7398b8" transform="rotate(240 0 0)"/>
-              <circle cx="0" cy="0" r="13" fill="#46739b" stroke="#f8fbff" stroke-width="6"/>
-              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="15.8s" repeatCount="indefinite"/>
+              <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa"/>
+              <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa" transform="rotate(120 478 365)"/>
+              <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa" transform="rotate(240 478 365)"/>
+              <circle cx="478" cy="365" r="15" fill="#32668f" stroke="#f8fbff" stroke-width="7"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 478 365" to="360 478 365" dur="14.5s" repeatCount="indefinite"/>
             </g>
           </g>
         </svg>

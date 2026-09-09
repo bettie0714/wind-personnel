@@ -4,22 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>風力人員統計系統</title>
-<link rel="icon" type="image/png" sizes="64x64" href="./windmill-tab-v104.png">
-<link rel="icon" type="image/png" sizes="32x32" href="./windmill-tab-v104-32.png">
-<link rel="shortcut icon" href="./windmill-tab-v104.ico" type="image/x-icon">
-<link rel="apple-touch-icon" sizes="180x180" href="./windmill-touch-v104.png">
-<link rel="mask-icon" href="./windmill-mask-v104.svg" color="#1f5e52">
-<link rel="manifest" href="./site-v104.webmanifest">
-<meta name="theme-color" content="#1f5e52">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=105">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png?v=105">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=105">
+<link rel="mask-icon" href="safari-pinned-tab.svg?v=105" color="#1f5e52">
+<link rel="manifest" href="site.webmanifest?v=105">
 <meta name="apple-mobile-web-app-title" content="風力人員統計系統">
-<script>
-// Safari 會長時間快取 favicon；V104 使用全新實體檔名，並在載入後再次指定。
-window.addEventListener('DOMContentLoaded',()=>{
-  const icon=document.querySelector('link[rel="icon"][sizes="64x64"]');
-  if(icon) icon.href='./windmill-tab-v104.png';
-});
-</script>
 <meta name="theme-color" content="#143b66">
+<script>
+(function(){
+  const base = new URL('.', location.href).href;
+  const stamp = 'v105-' + Date.now();
+  const defs = [
+    {rel:'icon', href: base + 'favicon.ico?' + stamp, sizes:'any'},
+    {rel:'shortcut icon', href: base + 'favicon.ico?' + stamp, type:'image/x-icon'},
+    {rel:'icon', href: base + 'favicon-32x32.png?' + stamp, type:'image/png', sizes:'32x32'},
+    {rel:'icon', href: base + 'favicon-64x64.png?' + stamp, type:'image/png', sizes:'64x64'},
+    {rel:'apple-touch-icon', href: base + 'apple-touch-icon.png?' + stamp, sizes:'180x180'},
+    {rel:'mask-icon', href: base + 'safari-pinned-tab.svg?' + stamp, color:'#1f5e52'}
+  ];
+  defs.forEach(def => {
+    const link = document.createElement('link');
+    Object.entries(def).forEach(([k,v]) => link.setAttribute(k, v));
+    document.head.appendChild(link);
+  });
+})();
+</script>
 <style>
 :root{--bg:#f6f8fc;--card:#fff;--text:#13213a;--muted:#64748b;--line:#e6ebf2;--primary:#2563eb;--green:#16a34a;--purple:#6d3fc2;--orange:#f59e0b;--red:#dc2626;--nav:#0b1b33;--shadow:0 7px 24px rgba(15,23,42,.07)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}

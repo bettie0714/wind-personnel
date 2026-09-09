@@ -4,13 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>風力人員統計系統</title>
-<link rel="icon" href="./favicon.ico?v=103" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=103">
-<link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png?v=103">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=103">
-<link rel="mask-icon" href="./safari-pinned-tab.svg?v=103" color="#1f5e52">
+<link rel="icon" type="image/png" sizes="64x64" href="./windmill-tab-v104.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./windmill-tab-v104-32.png">
+<link rel="shortcut icon" href="./windmill-tab-v104.ico" type="image/x-icon">
+<link rel="apple-touch-icon" sizes="180x180" href="./windmill-touch-v104.png">
+<link rel="mask-icon" href="./windmill-mask-v104.svg" color="#1f5e52">
+<link rel="manifest" href="./site-v104.webmanifest">
 <meta name="theme-color" content="#1f5e52">
 <meta name="apple-mobile-web-app-title" content="風力人員統計系統">
+<script>
+// Safari 會長時間快取 favicon；V104 使用全新實體檔名，並在載入後再次指定。
+window.addEventListener('DOMContentLoaded',()=>{
+  const icon=document.querySelector('link[rel="icon"][sizes="64x64"]');
+  if(icon) icon.href='./windmill-tab-v104.png';
+});
+</script>
 <meta name="theme-color" content="#143b66">
 <style>
 :root{--bg:#f6f8fc;--card:#fff;--text:#13213a;--muted:#64748b;--line:#e6ebf2;--primary:#2563eb;--green:#16a34a;--purple:#6d3fc2;--orange:#f59e0b;--red:#dc2626;--nav:#0b1b33;--shadow:0 7px 24px rgba(15,23,42,.07)}

@@ -4,34 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>風力人員統計系統</title>
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=105">
-<link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png?v=105">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=105">
-<link rel="mask-icon" href="safari-pinned-tab.svg?v=105" color="#1f5e52">
-<link rel="manifest" href="site.webmanifest?v=105">
-<meta name="apple-mobile-web-app-title" content="風力人員統計系統">
-<meta name="theme-color" content="#143b66">
-<script>
-(function(){
-  const base = new URL('.', location.href).href;
-  const stamp = 'v105-' + Date.now();
-  const defs = [
-    {rel:'icon', href: base + 'favicon.ico?' + stamp, sizes:'any'},
-    {rel:'shortcut icon', href: base + 'favicon.ico?' + stamp, type:'image/x-icon'},
-    {rel:'icon', href: base + 'favicon-32x32.png?' + stamp, type:'image/png', sizes:'32x32'},
-    {rel:'icon', href: base + 'favicon-64x64.png?' + stamp, type:'image/png', sizes:'64x64'},
-    {rel:'apple-touch-icon', href: base + 'apple-touch-icon.png?' + stamp, sizes:'180x180'},
-    {rel:'mask-icon', href: base + 'safari-pinned-tab.svg?' + stamp, color:'#1f5e52'}
-  ];
-  defs.forEach(def => {
-    const link = document.createElement('link');
-    Object.entries(def).forEach(([k,v]) => link.setAttribute(k, v));
-    document.head.appendChild(link);
-  });
-})();
-</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2716%27 fill=%27%23143b66%27/%3E%3Cg stroke=%27white%27 stroke-width=%275%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M32 30 L32 10%27/%3E%3Cpath d=%27M32 30 L49 40%27/%3E%3Cpath d=%27M32 30 L15 40%27/%3E%3C/g%3E%3Ccircle cx=%2732%27 cy=%2730%27 r=%275%27 fill=%27%23dbeafe%27/%3E%3Cpath d=%27M32 35 L28 57 H36 Z%27 fill=%27%23dbeafe%27/%3E%3C/svg%3E">
 <style>
 :root{--bg:#f6f8fc;--card:#fff;--text:#13213a;--muted:#64748b;--line:#e6ebf2;--primary:#2563eb;--green:#16a34a;--purple:#6d3fc2;--orange:#f59e0b;--red:#dc2626;--nav:#0b1b33;--shadow:0 7px 24px rgba(15,23,42,.07)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
@@ -5294,16 +5267,37 @@ body.change-manage-mode .change-manage-inline{
           <path d="M-80 620 C165 535 350 545 555 598 C770 654 960 602 1160 606 L1160 800 L-80 800 Z" fill="#b9d2e7" opacity=".46"/>
           <path d="M-90 675 C150 603 365 607 590 659 C785 706 975 660 1180 665 L1180 810 L-90 810 Z" fill="#8fb8d8" opacity=".36"/>
           <path d="M-100 720 C170 665 390 668 625 710 C825 746 1015 708 1210 712 L1210 810 L-100 810 Z" fill="#6b9fc8" opacity=".28"/>
-
-          <!-- V101 single main turbine -->
-          <g opacity=".98" transform="translate(-42 -6) scale(1.08)">
-            <path d="M470 365 L446 775 L509 775 L483 365 Z" fill="#416f98"/>
+          <!-- V102 layered turbines: large / medium / small -->
+          <g opacity=".72" transform="translate(185 590) scale(.56)">
+            <path d="M0 -8 L-20 190 L20 190 L8 -8 Z" fill="#6d93b2" opacity=".92"/>
             <g>
-              <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa"/>
-              <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa" transform="rotate(120 478 365)"/>
-              <path d="M473 365 C465 303 454 221 469 155 C495 213 498 299 486 365 Z" fill="#5c86aa" transform="rotate(240 478 365)"/>
-              <circle cx="478" cy="365" r="15" fill="#32668f" stroke="#f8fbff" stroke-width="7"/>
-              <animateTransform attributeName="transform" type="rotate" from="0 478 365" to="360 478 365" dur="14.5s" repeatCount="indefinite"/>
+              <path d="M-4 0 C-10 -48 -18 -104 -8 -162 C16 -122 20 -56 8 0 Z" fill="#89a9c2"/>
+              <path d="M-4 0 C-10 -48 -18 -104 -8 -162 C16 -122 20 -56 8 0 Z" fill="#89a9c2" transform="rotate(120 0 0)"/>
+              <path d="M-4 0 C-10 -48 -18 -104 -8 -162 C16 -122 20 -56 8 0 Z" fill="#89a9c2" transform="rotate(240 0 0)"/>
+              <circle cx="0" cy="0" r="12" fill="#6287aa" stroke="#f8fbff" stroke-width="5"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="17.2s" repeatCount="indefinite"/>
+            </g>
+          </g>
+
+          <g opacity=".98" transform="translate(410 398) scale(1.02)">
+            <path d="M0 0 L-26 378 L30 378 L10 0 Z" fill="#416f98"/>
+            <g filter="drop-shadow(0 12px 14px rgba(47,83,117,.16))">
+              <path d="M-5 0 C-15 -66 -28 -152 -12 -228 C24 -178 28 -82 10 0 Z" fill="#5f89ad"/>
+              <path d="M-5 0 C-15 -66 -28 -152 -12 -228 C24 -178 28 -82 10 0 Z" fill="#5f89ad" transform="rotate(120 0 0)"/>
+              <path d="M-5 0 C-15 -66 -28 -152 -12 -228 C24 -178 28 -82 10 0 Z" fill="#5f89ad" transform="rotate(240 0 0)"/>
+              <circle cx="0" cy="0" r="16" fill="#32668f" stroke="#f8fbff" stroke-width="7"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="14.4s" repeatCount="indefinite"/>
+            </g>
+          </g>
+
+          <g opacity=".84" transform="translate(600 520) scale(.76)">
+            <path d="M0 -4 L-22 274 L23 274 L8 -4 Z" fill="#517da3"/>
+            <g>
+              <path d="M-4 0 C-11 -56 -20 -126 -10 -192 C20 -148 24 -70 8 0 Z" fill="#7398b8"/>
+              <path d="M-4 0 C-11 -56 -20 -126 -10 -192 C20 -148 24 -70 8 0 Z" fill="#7398b8" transform="rotate(120 0 0)"/>
+              <path d="M-4 0 C-11 -56 -20 -126 -10 -192 C20 -148 24 -70 8 0 Z" fill="#7398b8" transform="rotate(240 0 0)"/>
+              <circle cx="0" cy="0" r="13" fill="#46739b" stroke="#f8fbff" stroke-width="6"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="15.8s" repeatCount="indefinite"/>
             </g>
           </g>
         </svg>
@@ -5655,7 +5649,7 @@ body.change-manage-mode .change-manage-inline{
 <section id="changes" class="page">
  <div class="section">
   <div class="sectionhead">
-   <div><h2>人員月報</h2><div class="mini">包含月份人數、人員增減與本月保留的人員變動紀錄。</div></div>
+   <div><h2>人員月報</h2><div class="mini">匯出只包含所選月份的人數、增減與人員變動；完整歷史紀錄保留在後台可隨時查詢。</div></div>
    <div style="display:flex;gap:8px;flex-wrap:wrap">
     <button id="exportMonthBtn" class="btn success">匯出月份 Excel</button>
     <button id="exportMonthPdfBtn" class="btn">匯出圖表 PDF</button>
@@ -5788,7 +5782,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div>
  <div class="field" id="mSupportLocationField"><label>支援地點</label><select id="mSupportLocation"><option value="">請選擇</option><option>台北港</option><option>東17</option><option>製造部</option></select></div>
  <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div>
- <div class="field"><label>預計返廠上班日</label><input id="mExpectedReturn" type="date"></div>
+ <div class="field"><label>預計返廠／復職日</label><input id="mExpectedReturn" type="date"></div>
  <div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職，但不列入目前在廠；支援到台北港或東17時，也不列入目前在廠。</div>
  <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
  <div class="change-log-card" id="changeLogOption">
@@ -6649,6 +6643,16 @@ function meaningfulMonthChanges(month){
    .filter(c=>monthKey(c.change_date)===month)
    .filter(c=>!['Excel匯入','匯入'].includes(String(c.change_type||'')));
 }
+
+// V104：月報匯出的人員變動紀錄只取「報表月份」本身。
+// 完整歷史仍保留在 personnel_changes 後台，不會因匯出而刪除。
+function reportMonthChanges(month){
+ let target=String(month||'').trim();
+ if(!/^\d{4}-\d{2}$/.test(target))return [];
+ return changes
+   .filter(c=>String(c.change_date||'').slice(0,7)===target)
+   .filter(c=>!['Excel匯入','匯入'].includes(String(c.change_type||'')));
+}
 function employeeForChange(c){
  let p=employees.find(e=>e.employee_no===c.employee_no);
  if(p)return {...p};
@@ -7160,8 +7164,9 @@ function syncIdentityFromEmployeeNo({fromUser=false}={}){
 
 function syncTempFields(){
  let st=$('mTempStatus').value;
- $('mTempStartLabel').textContent=st==='返校'?'返校日':st==='返鄉'?'返鄉日':st==='支援'?'開始支援日':'開始日';
- let enabled=!!st;
+ let isLeave=$('mStatus').value==='留停';
+ $('mTempStartLabel').textContent=st==='返校'?'返校日':st==='返鄉'?'返鄉日':st==='支援'?'開始支援日':isLeave?'留停開始日':'開始日';
+ let enabled=!!st||isLeave;
  $('mTempStart').disabled=!enabled;
  $('mExpectedReturn').disabled=!enabled;
  $('mSupportLocationField').classList.toggle('hidden',st!=='支援');
@@ -7173,6 +7178,7 @@ function syncTempFields(){
  }
 }
 $('mTempStatus').addEventListener('change',syncTempFields);
+$('mStatus').addEventListener('change',syncTempFields);
 $('mLevel').addEventListener('change',syncSupervisorGroupState);
 window.editPerson=no=>{
  let p=employees.find(x=>x.employee_no===no);
@@ -7198,8 +7204,8 @@ function personDraft(){
    note:$('mNote').value.trim()||null,
    temporary_status:tempStatus,
    support_location:tempStatus==='支援'?($('mSupportLocation').value||null):null,
-   temporary_start_date:tempStatus?($('mTempStart').value||null):null,
-   expected_return_date:tempStatus?($('mExpectedReturn').value||null):null,
+   temporary_start_date:(tempStatus||$('mStatus').value==='留停')?($('mTempStart').value||null):null,
+   expected_return_date:(tempStatus||$('mStatus').value==='留停')?($('mExpectedReturn').value||null):null,
    contract_end_date:$('mContractEnd').value||null
  };
 }
@@ -7743,15 +7749,17 @@ function buildExcelChangeLogSheet(workbook,data){
    {width:54},  // 內容
    {width:34}   // 備註
  ];
- addStyledTitle(ws,`${monthLabel(data.tm)} 人員變動紀錄`,8);
+ addStyledTitle(ws,`${monthLabel(data.tm)} 人員變動紀錄`,8); // V104：僅本報表月份
  ws.addRow([]);
 
  addStyledHeader(ws,['日期','類型','工號','姓名','原組別','新組別','內容','備註']);
 
- let rows=[...(data.monthChanges||[])].sort((a,b)=>
-   String(a.change_date||'').localeCompare(String(b.change_date||'')) ||
-   String(a.employee_no||'').localeCompare(String(b.employee_no||''))
- );
+ let rows=[...(data.monthChanges||[])]
+   .filter(c=>String(c.change_date||'').slice(0,7)===String(data.tm||''))
+   .sort((a,b)=>
+     String(a.change_date||'').localeCompare(String(b.change_date||'')) ||
+     String(a.employee_no||'').localeCompare(String(b.employee_no||''))
+   );
 
  if(!rows.length){
    let row=ws.addRow(['本月份沒有保留的人員變動紀錄']);
@@ -7831,7 +7839,7 @@ function collectMonthExportData(tm,fm){
    tm,fm,toRows,fromRows,activeTo,mainTo,onsiteTo,tempCounts,supportDetails,homeleaveDetails,studentAll,foreign,local,overseas,groupCounts,shiftCounts,typeRows,
    fromDerived:derived,
    rangeText:monthRangeText(fm,tm,derived),
-   monthChanges:meaningfulMonthChanges(tm),
+   monthChanges:reportMonthChanges(tm),
    asOf
  };
 }
@@ -8528,10 +8536,12 @@ function buildTaiwanRosterOnePage(data){
 }
 
 function buildChangeLogPdfPages(data){
- let rows=[...(data.monthChanges||[])].sort((a,b)=>
-   String(a.change_date||'').localeCompare(String(b.change_date||'')) ||
-   String(a.employee_no||'').localeCompare(String(b.employee_no||''))
- );
+ let rows=[...(data.monthChanges||[])]
+   .filter(c=>String(c.change_date||'').slice(0,7)===String(data.tm||''))
+   .sort((a,b)=>
+     String(a.change_date||'').localeCompare(String(b.change_date||'')) ||
+     String(a.employee_no||'').localeCompare(String(b.employee_no||''))
+   );
 
  if(!rows.length){
    return [`<div class="pdf-page pdf-roster-page">

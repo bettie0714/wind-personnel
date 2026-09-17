@@ -5774,7 +5774,9 @@ body.change-manage-mode .change-manage-inline{
 
 <div id="personModal" class="modalback"><div class="modal"><button id="personClose" class="close">×</button><h2 id="personModalTitle">新增人員</h2><p>「建教生」是人員身分，不是國籍。X 工號仍代表建教生；國籍請另外選擇台籍或外籍。</p><div class="formgrid">
  <div class="field"><label>工號 *</label><input id="mNo"></div><div class="field"><label>姓名 *</label><input id="mName"></div>
- <div class="field"><label>班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
+ <div class="field"><label>目前班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
+ <div class="field"><label>預排班別</label><select id="mPendingShift"><option value="">無</option><option>日</option><option>中</option><option>夜</option></select><div class="mini">可先排未來換班；生效日前仍顯示目前班別。</div></div>
+ <div class="field"><label>班別生效日</label><input id="mShiftEffectiveDate" type="date"><div class="mini">到生效日後，統計、篩選與名單會自動使用新班別。</div></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
  <div class="field"><label>國籍</label><select id="mNat"><option value="—">未設定</option><option value="台籍">台籍</option><option value="外籍">外籍</option></select><div class="field-hint">國籍與建教生身分分開，可獨立修改</div></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
@@ -5920,6 +5922,30 @@ function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function todayISO(){
  let d=new Date();
  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function effectiveShift(p,asOf=todayISO()){
+ let current=String(p?.shift||'').trim();
+ let pending=String(p?.pending_shift||'').trim();
+ let effective=String(p?.shift_effective_date||'').slice(0,10);
+ if(pending&&effective&&asOf>=effective)return pending;
+ return current||pending||'';
+}
+function editableShiftState(p){
+ let current=String(p?.shift||'').trim();
+ let pending=String(p?.pending_shift||'').trim();
+ let effective=String(p?.shift_effective_date||'').slice(0,10);
+ if(pending&&effective&&effective<=todayISO()){
+   return{shift:pending,pending_shift:null,shift_effective_date:null,matured:true};
+ }
+ return{shift:current||'日',pending_shift:pending||null,shift_effective_date:effective||null,matured:false};
+}
+function shiftPlanHintHtml(p){
+ if(!isAdmin())return '';
+ let pending=String(p?.pending_shift||'').trim();
+ let effective=String(p?.shift_effective_date||'').slice(0,10);
+ if(!pending||!effective||effective<=todayISO())return '';
+ let [y,m,d]=effective.split('-');
+ return `<div class="mini" style="margin-top:3px;color:#6b7f9a">${Number(m)}/${Number(d)} → ${esc(pending)}</div>`;
 }
 function isActiveAsOf(p,asOf=todayISO()){
  let resign=String(p?.resigned_at||'').slice(0,10);
@@ -6112,6 +6138,7 @@ async function resumeSystemFromOpening(){
 }
 $('resumeSystemBtn').onclick=resumeSystemFromOpening;
 updateOpeningClock();
+setInterval(updateOpeningClock,60000);
 
 async function init(){
  const status=$('connectionStatus');
@@ -6392,7 +6419,7 @@ function renderDash(){
 
  let shiftOrder=['日','中','夜','未設定'];
  let shiftColorMap={'日':'#2f80ed','中':'#f2992e','夜':'#43b05c','未設定':'#94a3b8'};
- let sc={};a.forEach(x=>sc[x.shift||'未設定']=(sc[x.shift||'未設定']||0)+1);
+ let sc={};a.forEach(x=>{let sh=effectiveShift(x)||'未設定';sc[sh]=(sc[sh]||0)+1});
  let entries=shiftOrder.filter(sh=>(sc[sh]||0)>0).map(sh=>[sh,sc[sh]]);
  let total=entries.reduce((n,x)=>n+x[1],0)||1,deg=0,parts=[];
  entries.forEach(([sh,count])=>{
@@ -6521,7 +6548,7 @@ function filtered(){
    }
 
    return (!$('fGroup').value||personGroup(x)===$('fGroup').value)&&
-     (!$('fShift').value||x.shift===$('fShift').value)&&
+     (!$('fShift').value||effectiveShift(x)===$('fShift').value)&&
      (!$('fJob').value||x.job_title===$('fJob').value)&&
      (!$('fNat').value||x.nationality===$('fNat').value)&&
      (!$('fLevel').value||x.level===$('fLevel').value)&&
@@ -6579,7 +6606,7 @@ function renderPeople(){
      <div class="person-name-cell">${esc(x.name)}</div>
      ${personInlineStatusHtml(x)}
     </td>
-    <td>${esc(x.shift||'-')}</td>
+    <td>${esc(effectiveShift(x)||'-')}${shiftPlanHintHtml(x)}</td>
     <td>${badge(personGroup(x)||'-')}</td>
     <td>${esc(x.job_title||'-')}</td>
     <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
@@ -6993,7 +7020,7 @@ function renderContracts(){
     <td>${esc(e.name)}</td>
     <td>${e.employee_no[0]}</td>
     <td>${badge(personGroup(e)||'-')}</td>
-    <td>${esc(e.shift||'-')}</td>
+    <td>${esc(effectiveShift(e)||'-')}${shiftPlanHintHtml(e)}</td>
     <td>${esc(e.hire_date||'-')}</td>
     <td><b>${esc(e.contract_end_date)}</b></td>
     <td><span class="badge ${cls}">${txt}</span></td>
@@ -7026,7 +7053,7 @@ async function exportContractExcel(){
  rows.forEach((e,i)=>{
    let d=contractDays(e.contract_end_date);
    let remain=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
-   ws.addRow([i+1,e.employee_no,e.name,e.employee_no[0],personGroup(e)||'-',e.shift||'-',e.hire_date||'-',e.contract_end_date||'-',remain]);
+   ws.addRow([i+1,e.employee_no,e.name,e.employee_no[0],personGroup(e)||'-',effectiveShift(e)||'-',e.hire_date||'-',e.contract_end_date||'-',remain]);
  });
 
  ws.getRow(3).eachCell(cell=>{
@@ -7055,7 +7082,7 @@ function renderOverseas(){
  $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}">
   <td><b>${esc(x.employee_no)}</b></td>
   <td>${esc(x.name)}${currentTempStatus(x)?tempStatusHtml(x):''}</td>
-  <td>${esc(x.shift||'-')}</td>
+  <td>${esc(effectiveShift(x)||'-')}${shiftPlanHintHtml(x)}</td>
   <td>${badge(personGroup(x)||'-')}</td>
   <td>${esc(x.job_title||'-')}</td>
   <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
@@ -7108,7 +7135,10 @@ function openPerson(p=null,area=null){
  $('mNo').value=p?.employee_no||'';
  $('mNo').disabled=false;
  $('mName').value=p?.name||'';
- $('mShift').value=['日','中','夜'].includes(p?.shift)?p.shift:'日';
+ let shiftState=editableShiftState(p||{});
+ $('mShift').value=['日','中','夜'].includes(shiftState.shift)?shiftState.shift:'日';
+ $('mPendingShift').value=['日','中','夜'].includes(shiftState.pending_shift)?shiftState.pending_shift:'';
+ $('mShiftEffectiveDate').value=shiftState.shift_effective_date||'';
  $('mGroup').value=personGroup(p||{})||'捲板';
  $('mJob').value=p?.job_title||'';
  $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);
@@ -7193,6 +7223,8 @@ function personDraft(){
    employee_no:no,
    name,
    shift:$('mShift').value,
+   pending_shift:$('mPendingShift').value||null,
+   shift_effective_date:$('mShiftEffectiveDate').value||null,
    job_title:job,
    group_name:deriveGroup(no,job,$('mGroup').value),
    level:$('mLevel').value||deriveLevel(no,job),
@@ -7217,6 +7249,7 @@ function personDiffs(old,draft){
  };
  const normalizeGroups=v=>String(v||'').split(',').map(x=>x.trim()).filter(Boolean).sort().join('、');
  let oldContract=contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null;
+ let oldShiftState=editableShiftState(old);
  let diffs=[];
  const add=(label,b,a,formatter=null)=>{
    let before=formatter?formatter(b):show(b),after=formatter?formatter(a):show(a);
@@ -7225,7 +7258,9 @@ function personDiffs(old,draft){
  add('工號',old.employee_no,draft.employee_no);
  add('國籍',old.nationality||'—',draft.nationality||'—');
  add('姓名',old.name,draft.name);
- add('班別',old.shift,draft.shift);
+ add('班別',oldShiftState.shift,draft.shift);
+ add('預排班別',oldShiftState.pending_shift,draft.pending_shift);
+ add('班別生效日',oldShiftState.shift_effective_date,draft.shift_effective_date);
  add('職別',old.job_title,draft.job_title);
  add('組別',old.group_name,draft.group_name);
  add('職級',old.level,draft.level);
@@ -7245,7 +7280,10 @@ function importantChange(old,draft,diffs){
  if(!diffs.length)return false;
  if(old.employee_no!==draft.employee_no)return true;
  if(old.group_name!==draft.group_name)return true;
- if(old.shift!==draft.shift)return true;
+ let oldShiftState=editableShiftState(old);
+ if(oldShiftState.shift!==draft.shift)return true;
+ if(String(oldShiftState.pending_shift||'')!==String(draft.pending_shift||''))return true;
+ if(String(oldShiftState.shift_effective_date||'')!==String(draft.shift_effective_date||''))return true;
  if(String(old.temporary_status||'')!==String(draft.temporary_status||''))return true;
  let oldContract=contracts.find(c=>c.employee_no===old.employee_no)?.contract_end_date||null;
  if(String(oldContract||'')!==String(draft.contract_end_date||''))return true;
@@ -7264,6 +7302,8 @@ function refreshChangePreview(){
    if(label==='動態開始日')return after&&after!=='—'?`開始日：${shortChangeDate(after)}`:'';
    if(label==='預計返廠上班日')return after&&after!=='—'?`預計返廠：${shortChangeDate(after)}`:'';
    if(label==='支援地點')return after&&after!=='—'?`支援地點：${after}`:'';
+   if(label==='預排班別')return after&&after!=='—'?`預排班別：${after}`:'取消預排班別';
+   if(label==='班別生效日')return after&&after!=='—'?`班別生效：${shortChangeDate(after)}`:'';
    return naturalFieldChange(label,before,after)||`${label}：${after}`;
  }).filter(Boolean).join('，');
 
@@ -7276,7 +7316,7 @@ function refreshChangePreview(){
    else $('mLogChange').checked=importantChange(old,draft,diffs);
  }
 }
-['mName','mShift','mGroup','mJob','mLevel','mNat','mHire','mContractEnd','mStatus','mTempStatus','mSupportLocation','mTempStart','mExpectedReturn','mNote']
+['mName','mShift','mPendingShift','mShiftEffectiveDate','mGroup','mJob','mLevel','mNat','mHire','mContractEnd','mStatus','mTempStatus','mSupportLocation','mTempStart','mExpectedReturn','mNote']
  .forEach(id=>$(id)?.addEventListener('input',refreshChangePreview));
 $('mNo').addEventListener('input',()=>syncIdentityFromEmployeeNo({fromUser:true}));
 $('mLogChange').addEventListener('change',()=>{logChoiceTouched=true});
@@ -7289,7 +7329,17 @@ $('personSave').onclick=async()=>{
  let old=employees.find(x=>x.employee_no===editNo);
  let oldNo=old?.employee_no||null;
  let tempStatus=draft.temporary_status,tempStart=draft.temporary_start_date,expectedReturn=draft.expected_return_date;
+ let pendingShift=draft.pending_shift,shiftEffectiveDate=draft.shift_effective_date;
 
+ if((pendingShift&&!shiftEffectiveDate)||(!pendingShift&&shiftEffectiveDate))return alert('預排班別與班別生效日需要一起設定。');
+ if(pendingShift&&pendingShift===draft.shift)return alert('預排班別與目前班別相同，不需要建立預排。');
+ if(pendingShift&&shiftEffectiveDate&&shiftEffectiveDate<=todayISO()){
+   draft.shift=pendingShift;
+   draft.pending_shift=null;
+   draft.shift_effective_date=null;
+   pendingShift=null;
+   shiftEffectiveDate=null;
+ }
  if(tempStatus==='返校'&&!no.startsWith('X'))return alert('「返校」只適用建教生（X 工號）。');
  if(tempStatus==='返鄉'&&!/^[WZ]/.test(no))return alert('「返鄉」只適用 W／Z 外籍人員。');
  if(tempStatus&&tempStart&&expectedReturn&&expectedReturn<=tempStart)return alert('預計返廠上班日必須晚於開始日。');
@@ -7309,6 +7359,8 @@ $('personSave').onclick=async()=>{
    employee_no:no,
    name,
    shift:draft.shift,
+   pending_shift:draft.pending_shift,
+   shift_effective_date:draft.shift_effective_date,
    job_title:draft.job_title,
    group_name:draft.group_name,
    level:draft.level,
@@ -7357,6 +7409,8 @@ $('personSave').onclick=async()=>{
      else if(!newTemp&&oldTemp==='支援')type='支援結束';
    }else if(old && old.group_name!==payload.group_name){
      type='調組';
+   }else if(old && (String(old?.pending_shift||'')!==String(payload.pending_shift||'') || String(old?.shift_effective_date||'')!==String(payload.shift_effective_date||''))){
+     type='預排班別';
    }else if(oldNo && oldNo!==no){
      type='工號更正';
    }
@@ -7493,7 +7547,7 @@ function snapshotPayload(month,p){
    snapshot_month:monthDate(month),
    employee_no:p.employee_no,
    name:p.name,
-   shift:p.shift||null,
+   shift:effectiveShift(p,reportAsOfDate(month))||null,
    job_title:p.job_title||null,
    group_name:personGroup(p),
    level:p.level||null,
@@ -7628,7 +7682,7 @@ function createForeignSheet(rows,month){
      supervisorGroupsOf(p).includes(g)
    ).map(p=>p.name);
    let supervisorText=[...new Set(supervisors)].join('、');
-   people.forEach((p,i)=>aoa.push([i+1,p.shift||'',p.job_title||'',p.name,p.employee_no,i===0?supervisorText:'']));
+   people.forEach((p,i)=>aoa.push([i+1,effectiveShift(p,reportAsOfDate(month))||'',p.job_title||'',p.name,p.employee_no,i===0?supervisorText:'']));
    let end=aoa.length-1;
    if(end>start)merges.push({s:{r:start,c:5},e:{r:end,c:5}});
    aoa.push([]);
@@ -7657,7 +7711,7 @@ function createTaiwaneseSheet(rows,month){
      String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||
      a.employee_no.localeCompare(b.employee_no);
  });
- wind.forEach((p,i)=>aoa.push([i+1,exportWindDept(p),p.name,p.shift||'']));
+ wind.forEach((p,i)=>aoa.push([i+1,exportWindDept(p),p.name,effectiveShift(p,reportAsOfDate(month))||'']));
  if(!wind.length)aoa.push(['','','目前沒有資料','']);
  aoa.push([]);
 
@@ -7670,7 +7724,7 @@ function createTaiwaneseSheet(rows,month){
      String(a.job_title||'').localeCompare(String(b.job_title||''),'zh-Hant')||
      a.employee_no.localeCompare(b.employee_no);
  });
- overseas.forEach((p,i)=>aoa.push([i+1,exportOverseasDept(p),p.name,p.shift||'']));
+ overseas.forEach((p,i)=>aoa.push([i+1,exportOverseasDept(p),p.name,effectiveShift(p,reportAsOfDate(month))||'']));
  if(!overseas.length)aoa.push(['','','目前沒有資料','']);
 
  return sheetFromAOA(aoa,[6,18,18,10],merges);
@@ -7708,7 +7762,7 @@ function createMonthCountSheet(rows,month){
  Object.entries(counts).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]).forEach(x=>aoa.push(x));
  aoa.push([]);
  aoa.push(['目前在廠班別','人數']);
- ['日','中','夜'].forEach(sh=>aoa.push([sh,onsite.filter(p=>p.shift===sh).length]));
+ ['日','中','夜'].forEach(sh=>aoa.push([sh,onsite.filter(p=>effectiveShift(p,asOf)===sh).length]));
  return sheetFromAOA(aoa,[28,14],merges);
 }
 function exportDiffRow(label,fromRows,toRows){
@@ -7827,7 +7881,7 @@ function collectMonthExportData(tm,fm){
  let groupOrder=new Map(GROUPS.map((g,i)=>[g,i]));
  let groupCounts=Object.entries(groups).sort((a,b)=>(groupOrder.get(a[0])??999)-(groupOrder.get(b[0])??999)||b[1]-a[1]);
 
- let shiftCounts=['日','中','夜'].map(sh=>[sh,onsiteTo.filter(p=>p.shift===sh).length]);
+ let shiftCounts=['日','中','夜'].map(sh=>[sh,onsiteTo.filter(p=>effectiveShift(p,asOf)===sh).length]);
 
  let typeRows=['台籍','Z','W','建教生'].map(t=>({
    type:t,
@@ -7887,7 +7941,7 @@ function buildExcelForeignSheet(workbook,data){
    let supervisorText=[...new Set(supervisors)].join('、');
    let startNo=ws.lastRow.number+1;
    people.forEach((p,i)=>{
-     let row=ws.addRow([i+1,p.shift||'',p.job_title||'',p.name,p.employee_no,i===0?supervisorText:'']);
+     let row=ws.addRow([i+1,effectiveShift(p,data.asOf)||'',p.job_title||'',p.name,p.employee_no,i===0?supervisorText:'']);
      styleRow(row,{});
    });
    let endNo=ws.lastRow.number;
@@ -7934,7 +7988,7 @@ function buildExcelTaiwanSheet(workbook,data){
     a.employee_no.localeCompare(b.employee_no);
  });
  if(wind.length){
-   wind.forEach((p,i)=>{let row=ws.addRow([i+1,exportWindDept(p),p.name,p.shift||'']);styleRow(row,{})})
+   wind.forEach((p,i)=>{let row=ws.addRow([i+1,exportWindDept(p),p.name,effectiveShift(p,data.asOf)||'']);styleRow(row,{})})
  }else{
    let row=ws.addRow(['','','目前沒有資料','']);styleRow(row,{})
  }
@@ -7949,7 +8003,7 @@ function buildExcelTaiwanSheet(workbook,data){
     a.employee_no.localeCompare(b.employee_no);
  });
  if(overseas.length){
-   overseas.forEach((p,i)=>{let row=ws.addRow([i+1,exportOverseasDept(p),p.name,p.shift||'']);styleRow(row,{})})
+   overseas.forEach((p,i)=>{let row=ws.addRow([i+1,exportOverseasDept(p),p.name,effectiveShift(p,data.asOf)||'']);styleRow(row,{})})
  }else{
    let row=ws.addRow(['','','目前沒有資料','']);styleRow(row,{})
  }
@@ -8007,7 +8061,7 @@ function buildExcelStudentSheet(workbook,data){
 
    list.forEach((p,i)=>{
      let row=ws.addRow([
-       i+1,p.shift||'',p.name||'',p.employee_no||'',p.job_title||'建教生',
+       i+1,effectiveShift(p,data.asOf)||'',p.name||'',p.employee_no||'',p.job_title||'建教生',
        away?(p.temporary_start_date||''):'',
        away?(p.expected_return_date||''):''
      ]);
@@ -8207,7 +8261,7 @@ function buildForeignPdfPages(data){
      let sup=seg.supervisor||'';
      let rows=seg.people.map((p,i)=>`<tr>
        <td class="center">${seg.offset+i+1}</td>
-       <td class="center">${esc(p.shift||'')}</td>
+       <td class="center">${esc(effectiveShift(p,data?.asOf||todayISO())||'')}</td>
        <td>${esc(p.job_title||'')}</td>
        <td class="center">${esc(p.name)}</td>
        <td class="center">${esc(p.employee_no)}</td>
@@ -8249,7 +8303,7 @@ function buildTaiwanPdfPages(data){
        <td class="center">${offset+i+1}</td>
        <td class="dept-cell">${esc(deptFn(p))}</td>
        <td>${esc(p.name)}</td>
-       <td class="center">${esc(p.shift||'')}</td>
+       <td class="center">${esc(effectiveShift(p,data?.asOf||todayISO())||'')}</td>
      </tr>`).join(''):`<tr><td colspan="4" class="center">目前沒有資料</td></tr>`;
      pages.push(`<div class="pdf-page pdf-roster-page">
        ${pdfReportHeader(`${monthLabel(data.tm)} 台籍員工`)}
@@ -8405,11 +8459,11 @@ function splitForeignBlocksForTwoPages(blocks){
  });
  return[first,second];
 }
-function foreignTableRows(block){
+function foreignTableRows(block,asOf=todayISO()){
  let rowspan=block.people.length;
  return `<tr class="foreign-group-row"><td colspan="6">${esc(block.title)}　${block.people.length} 人</td></tr>`+
  block.people.map((p,i)=>`<tr>
-  <td class="center">${i+1}</td><td class="center">${esc(p.shift||'-')}</td><td>${esc(p.job_title||'-')}</td>
+  <td class="center">${i+1}</td><td class="center">${esc(effectiveShift(p,asOf)||'-')}</td><td>${esc(p.job_title||'-')}</td>
   <td class="person-name">${esc(p.name)}</td><td class="employee-no">${esc(p.employee_no)}</td>
   ${i===0?`<td class="supervisor-cell" rowspan="${rowspan}">${esc(block.supervisor||'—')}</td>`:''}
  </tr>`).join('');
@@ -8418,7 +8472,7 @@ function buildForeignRosterPage(data,blocks){
  return `<div class="pdf-page pdf-roster-4"><div class="pdf-safe">
   ${pdfReportHeader(`${monthLabel(data.tm)} 外籍員工`)}
   <table class="pdf-foreign-table-v24"><thead><tr><th>NO.</th><th>班別</th><th>職別</th><th>姓名</th><th>工號</th><th>台籍主管</th></tr></thead>
-  <tbody>${blocks.map(foreignTableRows).join('')}</tbody></table>
+  <tbody>${blocks.map(block=>foreignTableRows(block,data.asOf)).join('')}</tbody></table>
  </div>${pdfFooter()}</div>`;
 }
 function buildForeignRosterPages(data){
@@ -8438,7 +8492,7 @@ function buildStudentRosterPage(data){
      let schoolDate=shortChangeDate(p.temporary_start_date||'');
      return `<tr>
       <td class="center">${i+1}</td>
-      <td class="center">${esc(p.shift||'-')}</td>
+      <td class="center">${esc(effectiveShift(p,data.asOf)||'-')}</td>
       <td class="person-name">${esc(p.name||'')}</td>
       <td class="employee-no">${esc(p.employee_no||'')}</td>
       <td>${esc(p.job_title||'建教生')}</td>
@@ -8499,7 +8553,7 @@ function buildTaiwanRosterOnePage(data){
    <td>${esc(reportWindDept(p))}</td>
    <td class="person-name">${esc(p.name)}</td>
    <td class="employee-no">${esc(p.employee_no)}</td>
-   <td class="center">${esc(p.shift||'-')}</td>
+   <td class="center">${esc(effectiveShift(p,data.asOf)||'-')}</td>
  </tr>`).join('');
 
  no=0;
@@ -8508,7 +8562,7 @@ function buildTaiwanRosterOnePage(data){
    <td>${esc(reportOverseasDept(p))}</td>
    <td class="person-name">${esc(p.name)}</td>
    <td class="employee-no">${esc(p.employee_no)}</td>
-   <td class="center">${esc(p.shift||'-')}</td>
+   <td class="center">${esc(effectiveShift(p,data.asOf)||'-')}</td>
  </tr>`).join('');
 
  return `<div class="pdf-page pdf-roster-4">

@@ -5308,6 +5308,8 @@ body.change-manage-mode .change-manage-inline{
   font-size:11px;
   font-weight:800;
 }
+#returnConfirmModal .modalfoot{flex-wrap:wrap}
+#returnResignBtn{white-space:nowrap}
 @media(max-width:620px){
   .return-confirm-banner{align-items:flex-start;flex-direction:column}
   .return-confirm-banner .btn{width:100%}
@@ -5901,7 +5903,7 @@ body.change-manage-mode .change-manage-inline{
   <h2>返廠確認</h2>
   <div id="returnConfirmPerson" class="return-confirm-person"></div>
   <p id="returnConfirmQuestion" class="return-confirm-question"></p>
-  <p id="returnConfirmHint">確認後才會把人員改回在廠；若尚未返廠，請更新下一次預計返廠日。</p>
+  <p id="returnConfirmHint">確認後才會把人員改回在廠；若尚未返廠，可更新下一次預計返廠日；若確定不再返廠，可直接辦理離職。</p>
 
   <div id="returnDelayBlock" class="return-delay-block hidden">
    <div class="field">
@@ -5917,6 +5919,7 @@ body.change-manage-mode .change-manage-inline{
 
   <div class="modalfoot">
    <button id="returnSnoozeBtn" class="btn" type="button">稍後確認</button>
+   <button id="returnResignBtn" class="btn danger" type="button">不返廠・辦理離職</button>
    <span style="flex:1"></span>
    <button id="returnNotBackBtn" class="btn" type="button">尚未返廠</button>
    <button id="returnConfirmedBtn" class="btn success" type="button">確認已返廠</button>
@@ -6501,6 +6504,8 @@ function dueReturnCandidates(){
  return employees.filter(p=>{
    let due=String(p?.expected_return_date||'').slice(0,10);
    if(!due||due>today)return false;
+   // V107：只要已登記離職（即使離職日排在未來），就不再要求返廠確認。
+   if(String(p?.resigned_at||'').slice(0,10))return false;
    if(!isActiveAsOf(p,today))return false;
    let temp=String(p?.temporary_status||'').trim();
    return !!temp||p?.status==='留停';
@@ -6570,6 +6575,21 @@ function maybeAutoPromptReturnConfirm(){
 }
 $('returnConfirmClose').onclick=()=>closeReturnConfirm({snooze:true});
 $('returnSnoozeBtn').onclick=()=>closeReturnConfirm({snooze:true});
+$('returnResignBtn').onclick=()=>{
+ if(!isAdmin()||!returnConfirmNo)return;
+ let p=employees.find(x=>x.employee_no===returnConfirmNo);
+ if(!p)return alert('找不到這筆人員資料，請重新整理後再試。');
+ let no=p.employee_no;
+ let due=String(p.expected_return_date||'').slice(0,10);
+ // 關閉返廠確認後，直接進入既有離職確認流程；不在此處直接寫入離職，避免誤觸。
+ $('returnConfirmModal').classList.remove('show');
+ $('returnDelayBlock').classList.add('hidden');
+ $('returnNextDate').value='';
+ returnConfirmNo=null;
+ openResign(no);
+ $('rDate').value=todayISO();
+ $('rNote').value=`未返廠，改辦離職${due?`｜原預計返廠 ${due}`:''}`;
+};
 $('returnNotBackBtn').onclick=()=>{
  let p=employees.find(x=>x.employee_no===returnConfirmNo);
  if(!p)return;

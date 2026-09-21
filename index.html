@@ -1496,6 +1496,80 @@ body.change-manage-mode .change-manage-inline{
 }
 
 
+/* V109 - 人員變動關鍵字搜尋 */
+.change-search-bar{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  margin:12px 0;
+  padding:12px;
+  border:1px solid #e4e9f1;
+  border-radius:14px;
+  background:#f8fafc;
+}
+.change-search-field{
+  flex:1 1 420px;
+  min-width:0;
+}
+.change-search-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#64748b;
+  font-size:11px;
+  font-weight:800;
+}
+.change-search-input-wrap{
+  position:relative;
+}
+.change-search-input-wrap input{
+  width:100%;
+  min-height:44px;
+  padding:0 42px 0 13px;
+  box-sizing:border-box;
+  border:1px solid #dbe3ec;
+  border-radius:11px;
+  background:#fff;
+  color:#1f2937;
+  font-size:14px;
+  outline:none;
+}
+.change-search-input-wrap input:focus{
+  border-color:#94b1ef;
+  box-shadow:0 0 0 3px rgba(49,94,251,.07);
+}
+.change-search-clear{
+  position:absolute;
+  right:7px;
+  top:50%;
+  transform:translateY(-50%);
+  width:30px;
+  height:30px;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:#94a3b8;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+}
+.change-search-clear:hover{background:#eef2f7;color:#475569}
+.change-search-meta{
+  flex:0 0 auto;
+  min-width:92px;
+  padding-bottom:12px;
+  color:#64748b;
+  font-size:12px;
+  font-weight:700;
+  text-align:right;
+}
+.change-search-meta b{color:#17365d;font-size:14px}
+@media(max-width:680px){
+  .change-search-bar{align-items:stretch;flex-direction:column}
+  .change-search-meta{padding:0;text-align:left}
+}
+
+
 #changeEditModal .modal{
   width:min(700px,100%);
 }
@@ -5790,6 +5864,17 @@ body.change-manage-mode .change-manage-inline{
    </button>
   </div>
 
+  <div class="change-search-bar">
+   <div class="change-search-field">
+    <label for="changeSearch">搜尋人員變動</label>
+    <div class="change-search-input-wrap">
+     <input id="changeSearch" type="search" autocomplete="off" placeholder="輸入工號、姓名、類型、地點、內容或備註，例如 W225 返廠">
+     <button id="clearChangeSearch" class="change-search-clear hidden" type="button" aria-label="清除搜尋">×</button>
+    </div>
+   </div>
+   <div id="changeSearchMeta" class="change-search-meta">共 <b>0</b> 筆</div>
+  </div>
+
   <div id="changeManageBar" class="change-manage-bar admin-only">
    <div class="manage-info">
     <span>勾選要刪除的紀錄</span>
@@ -6481,8 +6566,9 @@ $('changeDeleteOne').onclick=async()=>{
 
 $('selectAllChanges').onchange=()=>{
  if(!isAdmin())return;
- if($('selectAllChanges').checked)changes.forEach(c=>selectedChangeIds.add(String(c.id)));
- else changes.forEach(c=>selectedChangeIds.delete(String(c.id)));
+ let visible=changeSearchRows();
+ if($('selectAllChanges').checked)visible.forEach(c=>selectedChangeIds.add(String(c.id)));
+ else visible.forEach(c=>selectedChangeIds.delete(String(c.id)));
  renderChanges();
 };
 
@@ -7300,12 +7386,30 @@ function changeNoteText(c){
  }
  return '-';
 }
+function changeSearchRows(){
+ let raw=($('changeSearch')?.value||'').trim().toLowerCase();
+ if(!raw)return changes;
+ let terms=raw.split(/\s+/).filter(Boolean);
+ return changes.filter(c=>{
+   let hay=[
+     c.change_date,
+     c.change_type,
+     c.employee_no,
+     c.employee_name,
+     c.old_group,
+     c.new_group,
+     changeDetailText(c),
+     changeNoteText(c)
+   ].map(v=>String(v||'')).join(' ').toLowerCase();
+   return terms.every(term=>hay.includes(term));
+ });
+}
 function syncChangeSelectionUI(){
  if(!$('changeSelectedCount'))return;
  $('changeSelectedCount').textContent=`已選 ${selectedChangeIds.size} 筆`;
  if($('deleteSelectedChanges'))$('deleteSelectedChanges').disabled=selectedChangeIds.size===0;
 
- let allIds=changes.map(c=>String(c.id));
+ let allIds=changeSearchRows().map(c=>String(c.id));
  let selectedVisible=allIds.filter(id=>selectedChangeIds.has(id)).length;
  if($('selectAllChanges')){
    $('selectAllChanges').checked=allIds.length>0&&selectedVisible===allIds.length;
@@ -7315,7 +7419,16 @@ function syncChangeSelectionUI(){
 function renderChanges(){
  if($('changesTable'))$('changesTable').classList.toggle('change-table-manage',changeManageMode);
 
- $('changesBody').innerHTML=changes.map(c=>`<tr>
+ let rows=changeSearchRows();
+ let q=($('changeSearch')?.value||'').trim();
+ if($('changeSearchMeta')){
+   $('changeSearchMeta').innerHTML=q
+     ? `找到 <b>${rows.length}</b> 筆／共 ${changes.length} 筆`
+     : `共 <b>${changes.length}</b> 筆`;
+ }
+ if($('clearChangeSearch'))$('clearChangeSearch').classList.toggle('hidden',!q);
+
+ $('changesBody').innerHTML=rows.map(c=>`<tr>
   ${isAdmin()&&changeManageMode?`<td><input class="change-select change-row-select" type="checkbox" data-change-id="${c.id}" ${selectedChangeIds.has(String(c.id))?'checked':''}></td>`:''}
   <td>${esc(c.change_date)}</td>
   <td>${changeBadge(c.change_type)}</td>
@@ -7326,7 +7439,7 @@ function renderChanges(){
   <td>${esc(changeDetailText(c))}</td>
   <td>${esc(changeNoteText(c))}</td>
   ${isAdmin()&&changeManageMode?`<td><button class="btn change-row-edit" onclick="openChangeEditor(${c.id})">編輯</button></td>`:''}
- </tr>`).join('')||`<tr><td colspan="${isAdmin()&&changeManageMode?10:8}" class="empty">目前沒有變動紀錄</td></tr>`;
+ </tr>`).join('')||`<tr><td colspan="${isAdmin()&&changeManageMode?10:8}" class="empty">${q?'找不到符合關鍵字的變動紀錄':'目前沒有變動紀錄'}</td></tr>`;
 
  document.querySelectorAll('.change-row-select').forEach(cb=>{
    cb.onchange=()=>{
@@ -7338,6 +7451,13 @@ function renderChanges(){
  syncChangeSelectionUI();
  renderMonthComparison();
 }
+
+if($('changeSearch'))$('changeSearch').addEventListener('input',renderChanges);
+if($('clearChangeSearch'))$('clearChangeSearch').onclick=()=>{
+ $('changeSearch').value='';
+ $('changeSearch').focus();
+ renderChanges();
+};
 
 function contractDays(dateStr){if(!dateStr)return null;let today=new Date();today.setHours(0,0,0,0);let d=new Date(dateStr+'T00:00:00');return Math.ceil((d-today)/86400000)}
 function contractRowsFiltered(){

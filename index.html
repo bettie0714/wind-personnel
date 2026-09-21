@@ -905,6 +905,8 @@ tr.homeleave-row td{background:#f4ecff !important}
 tr.homeleave-row td:first-child{box-shadow:inset 4px 0 0 #7c3aed}
 tr.school-row td{background:#eaf7ff !important}
 tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
+tr.leave-row td{background:#fff1f4 !important}
+tr.leave-row td:first-child{box-shadow:inset 4px 0 0 #c0566f}
 .temp-badge{
  display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:3px 8px;
  border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap
@@ -912,6 +914,7 @@ tr.school-row td:first-child{box-shadow:inset 4px 0 0 #0284c7}
 .temp-badge.support{background:#f59e0b;color:white}
 .temp-badge.homeleave{background:#7c3aed;color:white}
 .temp-badge.school{background:#0284c7;color:white}
+.temp-badge.leave{background:#c0566f;color:white}
 .temp-detail{font-size:11px;color:#64748b;margin-top:4px;white-space:nowrap}
 .presence-filter.active{background:#17365d;color:#fff;border-color:#17365d}
 .temp-fields-note{grid-column:1/-1;padding:9px 11px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:12px}
@@ -6118,14 +6121,25 @@ function currentTempStatus(p,asOf=todayISO()){
 }
 function tempStatusHtml(p){
  let st=currentTempStatus(p);
- if(!st)return '<span class="mini">—</span>';
+ let isLeave=p?.status==='留停';
+ if(!st&&!isLeave)return '<span class="mini">—</span>';
  let back=String(p.expected_return_date||'').slice(0,10);
  let start=String(p.temporary_start_date||'').slice(0,10);
- let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
- let location=String(p.support_location||'').trim();
- let label=st==='返鄉'?'返鄉中':st==='返校'?'返校中':location?`支援 ${location}`:'支援中';
- let detail=back?(back<=todayISO()?`原預計 ${back} 返廠・待確認`:`預計 ${back} 返廠`):start?`自 ${start}`:'';
- return `<span class="temp-badge ${cls}">${esc(label)}</span>${detail?`<div class="temp-detail">${esc(detail)}</div>`:''}`;
+ let badges=[];
+ if(isLeave)badges.push('<span class="temp-badge leave">留停中</span>');
+ if(st){
+   let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
+   let location=String(p.support_location||'').trim();
+   let label=st==='返鄉'?'返鄉中':st==='返校'?'返校中':location?`支援 ${location}`:'支援中';
+   badges.push(`<span class="temp-badge ${cls}">${esc(label)}</span>`);
+ }
+ let detail='';
+ if(isLeave&&!st){
+   detail=back?(back<=todayISO()?`原預計 ${back} 復職・待確認`:`預計 ${back} 復職`):start?`留停自 ${start}`:'';
+ }else{
+   detail=back?(back<=todayISO()?`原預計 ${back} 返廠・待確認`:`預計 ${back} 返廠`):start?`自 ${start}`:'';
+ }
+ return `${badges.join('')}${detail?`<div class="temp-detail">${esc(detail)}</div>`:''}`;
 }
 function isAdmin(){return role==='admin'}
 function normalizeNo(v){return String(v||'').trim().toUpperCase()}
@@ -6889,28 +6903,38 @@ function filtered(){
 
 function personInlineStatusHtml(p){
  let st=currentTempStatus(p);
- if(!st)return '';
+ let isLeave=p?.status==='留停';
+ if(!st&&!isLeave)return '';
 
  let start=String(p.temporary_start_date||'').slice(0,10);
  let back=String(p.expected_return_date||'').slice(0,10);
  let location=String(p.support_location||'').trim();
+ let badges=[];
 
- let label='';
- if(st==='支援')label=location?`支援 ${location}`:'支援中';
- else if(st==='返鄉')label='返鄉中';
- else if(st==='返校')label='返校中';
+ if(isLeave)badges.push('<span class="temp-badge leave">留停中</span>');
+ if(st){
+   let label='';
+   if(st==='支援')label=location?`支援 ${location}`:'支援中';
+   else if(st==='返鄉')label='返鄉中';
+   else if(st==='返校')label='返校中';
+   let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
+   badges.push(`<span class="temp-badge ${cls}">${esc(label)}</span>`);
+ }
 
- let cls=st==='支援'?'support':st==='返鄉'?'homeleave':'school';
  let detail='';
- if(back)detail=back<=todayISO()?`原預計 ${back} 返廠・待確認`:`預計 ${back} 返廠`;
- else if(start)detail=`自 ${start}`;
+ if(isLeave&&!st){
+   if(back)detail=back<=todayISO()?`原預計 ${back} 復職・待確認`:`預計 ${back} 復職`;
+   else if(start)detail=`留停自 ${start}`;
+ }else{
+   if(back)detail=back<=todayISO()?`原預計 ${back} 返廠・待確認`:`預計 ${back} 返廠`;
+   else if(start)detail=`自 ${start}`;
+ }
 
  return `<div class="person-inline-status">
-   <span class="temp-badge ${cls}">${esc(label)}</span>
+   ${badges.join('')}
    ${detail?`<span class="person-inline-detail">${esc(detail)}</span>`:''}
  </div>`;
 }
-
 function renderPeople(){
  let a=filtered();
  renderPresenceCounts();
@@ -6930,7 +6954,7 @@ function renderPeople(){
 
  $('peopleBody').innerHTML=a.map(x=>{
    let st=currentTempStatus(x);
-   let rowClass=st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
+   let rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
    return `<tr class="${rowClass}">
     <td><b>${esc(x.employee_no)}</b></td>
     <td>
@@ -7410,9 +7434,9 @@ function renderOverseas(){
  ];
  $('overseasKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
  $('overseasCount').textContent=`共 ${a.length} 人`;
- $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}">
+ $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}">
   <td><b>${esc(x.employee_no)}</b></td>
-  <td>${esc(x.name)}${currentTempStatus(x)?tempStatusHtml(x):''}</td>
+  <td>${esc(x.name)}${(currentTempStatus(x)||x.status==='留停')?tempStatusHtml(x):''}</td>
   <td>${esc(effectiveShift(x)||'-')}${shiftPlanHintHtml(x)}</td>
   <td>${badge(personGroup(x)||'-')}</td>
   <td>${esc(x.job_title||'-')}</td>
@@ -7782,7 +7806,7 @@ function populateEmployeeDataManage(){
  }).sort((a,b)=>a.employee_no.localeCompare(b.employee_no));
 
  $('employeeDataManageSelect').innerHTML=list.map(p=>{
-   let status=isActiveAsOf(p)?'在職':(p.status||'離職');
+   let status=p.status==='留停'?'留停':isActiveAsOf(p)?'在職':(p.status||'離職');
    return `<option value="${esc(p.employee_no)}">${esc(p.employee_no)}｜${esc(p.name)}｜${esc(personGroup(p)||'未設定')}｜${esc(status)}</option>`;
  }).join('');
 }

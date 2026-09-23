@@ -9109,13 +9109,16 @@ function foreignRosterBlocks(data){
 function splitForeignBlocksForTwoPages(blocks){
  let first=[],second=[],target=45,count=0;
  blocks.forEach(block=>{
-   if(count>=target){second.push(block);return}
+   // V111：跨頁前先記住整個組別總人數；分頁只切名單，不切統計人數。
+   let totalCount=Number(block.totalCount||block.people.length||0);
+   let base={...block,totalCount};
+   if(count>=target){second.push(base);return}
    let room=target-count;
-   if(block.people.length<=room){first.push(block);count+=block.people.length}
+   if(block.people.length<=room){first.push(base);count+=block.people.length}
    else{
      let a=block.people.slice(0,room),b=block.people.slice(room);
-     if(a.length)first.push({...block,people:a});
-     if(b.length)second.push({...block,title:block.title+'（續）',people:b});
+     if(a.length)first.push({...base,people:a});
+     if(b.length)second.push({...base,title:block.title+'（續）',people:b});
      count=target;
    }
  });
@@ -9123,7 +9126,8 @@ function splitForeignBlocksForTwoPages(blocks){
 }
 function foreignTableRows(block,asOf=todayISO()){
  let rowspan=block.people.length;
- return `<tr class="foreign-group-row"><td colspan="6">${esc(block.title)}　${block.people.length} 人</td></tr>`+
+ let totalCount=Number(block.totalCount||block.people.length||0);
+ return `<tr class="foreign-group-row"><td colspan="6">${esc(block.title)}　共 ${totalCount} 人</td></tr>`+
  block.people.map((p,i)=>`<tr>
   <td class="center">${i+1}</td><td class="center">${esc(effectiveShift(p,asOf)||'-')}</td><td>${esc(p.job_title||'-')}</td>
   <td class="person-name">${esc(p.name)}</td><td class="employee-no">${esc(p.employee_no)}</td>

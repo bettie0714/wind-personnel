@@ -898,6 +898,21 @@ tr.supporting-row td:first-child{
 }
 
 
+
+/* V112 - 管理員整列點擊編輯 */
+tr.editable-person-row{
+  cursor:pointer;
+}
+tr.editable-person-row td{
+  transition:background-color .15s ease,background-image .15s ease;
+}
+tr.editable-person-row:hover td{
+  background-image:linear-gradient(rgba(23,54,93,.055),rgba(23,54,93,.055));
+}
+tr.editable-person-row:focus-within td{
+  background-image:linear-gradient(rgba(23,54,93,.07),rgba(23,54,93,.07));
+}
+
 /* V39 temporary status */
 tr.supporting-row td{background:#fff7d6 !important}
 tr.supporting-row td:first-child{box-shadow:inset 4px 0 0 #d97706}
@@ -5808,7 +5823,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="section people-list-section">
   <div class="tablewrap">
    <table>
-    <thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th class="admin-only">操作</th></tr></thead>
+    <thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th></tr></thead>
     <tbody id="peopleBody"></tbody>
    </table>
   </div>
@@ -5928,7 +5943,7 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="overseas" class="page">
  <div class="section"><div class="sectionhead"><div><h2>海外事業部</h2></div><button id="overseasAddBtn" class="btn primary admin-only">＋ 新增海外人員</button></div><div id="overseasKpis" class="overseas-kpis"></div></div>
- <div class="section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th class="admin-only">操作</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
+ <div class="section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
 </section>
 <section id="contracts" class="page">
  <div class="section">
@@ -5947,7 +5962,7 @@ body.change-manage-mode .change-manage-inline{
  </div>
  <div class="section">
   <div id="contractCount" class="mini" style="margin-bottom:12px"></div>
-  <div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>類型</th><th>組別</th><th>班別</th><th>到職日</th><th>合約到期日</th><th>剩餘天數</th><th class="admin-only">操作</th></tr></thead><tbody id="contractBody"></tbody></table></div>
+  <div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>類型</th><th>組別</th><th>班別</th><th>到職日</th><th>合約到期日</th><th>剩餘天數</th></tr></thead><tbody id="contractBody"></tbody></table></div>
  </div>
 </section>
 </main>
@@ -7081,7 +7096,7 @@ function renderPeople(){
  $('peopleBody').innerHTML=a.map(x=>{
    let st=currentTempStatus(x);
    let rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
-   return `<tr class="${rowClass}">
+   return `<tr class="${rowClass}${isAdmin()?' editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(x.employee_no)}')" title="點一下編輯這位人員"`:''}>
     <td><b>${esc(x.employee_no)}</b></td>
     <td>
      <div class="person-name-cell">${esc(x.name)}</div>
@@ -7094,9 +7109,8 @@ function renderPeople(){
     <td>${esc(x.nationality||'-')}</td>
     <td>${esc(x.hire_date||'-')}</td>
     <td>${tenure(x.hire_date)}</td>
-    ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="${isAdmin()?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
+ }).join('')||`<tr><td colspan="9" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -7530,7 +7544,7 @@ function renderContracts(){
    let d=contractDays(e.contract_end_date);
    let txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
    let cls=d<0?'red':d<=30?'orange':'green';
-   return `<tr>
+   return `<tr class="${isAdmin()?'editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(e.employee_no)}')" title="點一下編輯這位人員"`:''}>
     <td><b>${esc(e.employee_no)}</b></td>
     <td>${esc(e.name)}</td>
     <td>${e.employee_no[0]}</td>
@@ -7539,9 +7553,8 @@ function renderContracts(){
     <td>${esc(e.hire_date||'-')}</td>
     <td><b>${esc(e.contract_end_date)}</b></td>
     <td><span class="badge ${cls}">${txt}</span></td>
-    ${isAdmin()?`<td><button class="btn" onclick="editPerson('${esc(e.employee_no)}')">操作</button></td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有符合條件的合約資料</td></tr>`;
+ }).join('')||`<tr><td colspan="8" class="empty">目前沒有符合條件的合約資料</td></tr>`;
 }
 
 async function exportContractExcel(){
@@ -7594,7 +7607,7 @@ function renderOverseas(){
  ];
  $('overseasKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
  $('overseasCount').textContent=`共 ${a.length} 人`;
- $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}">
+ $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}${isAdmin()?' editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(x.employee_no)}')" title="點一下編輯這位人員"`:''}>
   <td><b>${esc(x.employee_no)}</b></td>
   <td>${esc(x.name)}${(currentTempStatus(x)||x.status==='留停')?tempStatusHtml(x):''}</td>
   <td>${esc(effectiveShift(x)||'-')}${shiftPlanHintHtml(x)}</td>
@@ -7603,8 +7616,7 @@ function renderOverseas(){
   <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
   <td>${esc(x.nationality||'-')}</td>
   <td>${esc(x.hire_date||'-')}</td>
-  ${isAdmin()?`<td><button class="btn compact" onclick="editPerson('${esc(x.employee_no)}')">操作</button></td>`:''}
- </tr>`}).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有海外事業部人員</td></tr>`;
+ </tr>`}).join('')||`<tr><td colspan="8" class="empty">目前沒有海外事業部人員</td></tr>`;
 }
 
 ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{

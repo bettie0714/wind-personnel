@@ -5788,7 +5788,7 @@ body.change-manage-mode .change-manage-inline{
     <div class="field"><label>班別</label><select id="fShift"><option value="">全部班別</option></select></div>
     <div class="field"><label>職級</label><select id="fLevel"><option value="">全部職級</option><option>主管</option><option>員工</option><option>學生</option></select></div>
     <div class="field hidden"><label>職別</label><select id="fJob"><option value="">全部</option></select></div>
-    <div class="field hidden"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>外籍</option><option>—</option></select></div>
+    <div class="field hidden"><label>籍別</label><select id="fNat"><option value="">全部</option><option>台籍</option><option>泰國</option><option>印尼</option><option>越南</option><option>其他外籍</option><option value="外籍">外籍（未分類）</option><option>—</option></select></div>
    </div>
 
    <div class="people-quickbar">
@@ -5968,14 +5968,14 @@ body.change-manage-mode .change-manage-inline{
 </main>
 </div>
 
-<div id="personModal" class="modalback"><div class="modal"><button id="personClose" class="close">×</button><h2 id="personModalTitle">新增人員</h2><p>「建教生」是人員身分，不是國籍。X 工號仍代表建教生；國籍請另外選擇台籍或外籍。</p><div class="formgrid">
+<div id="personModal" class="modalback"><div class="modal"><button id="personClose" class="close">×</button><h2 id="personModalTitle">新增人員</h2><p>「建教生」是人員身分，不是國籍。X 工號仍代表建教生；國籍可另外選擇台籍、泰國、印尼、越南或其他外籍。</p><div class="formgrid">
  <div class="field"><label>工號 *</label><input id="mNo"></div><div class="field"><label>姓名 *</label><input id="mName"></div>
  <div class="field"><label>目前班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
  <div class="field"><label>預排班別</label><select id="mPendingShift"><option value="">無</option><option>日</option><option>中</option><option>夜</option></select><div class="mini">可先排未來換班；生效日前仍顯示目前班別。</div></div>
  <div class="field"><label>班別生效日</label><input id="mShiftEffectiveDate" type="date"><div class="mini">到生效日後，統計、篩選與名單會自動使用新班別。</div></div>
  <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
  <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
- <div class="field"><label>國籍</label><select id="mNat"><option value="—">未設定</option><option value="台籍">台籍</option><option value="外籍">外籍</option></select><div class="field-hint">國籍與建教生身分分開，可獨立修改</div></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
+ <div class="field"><label>國籍</label><select id="mNat"><option value="—">未設定</option><option value="台籍">台籍</option><option value="泰國">泰國</option><option value="印尼">印尼</option><option value="越南">越南</option><option value="其他外籍">其他外籍</option><option value="外籍">外籍（未分類）</option></select><div class="field-hint">國籍與 W／Z 類型、建教生身分分開，可獨立修改</div></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
  <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
  <div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div>
  <div class="field" id="mSupportLocationField"><label>支援地點</label><select id="mSupportLocation"><option value="">請選擇</option><option>台北港</option><option>東17</option><option>製造部</option></select></div>
@@ -6205,6 +6205,11 @@ function shiftPlanHintHtml(p){
  return `<div class="mini" style="margin-top:3px;color:#6b7f9a">${Number(m)}/${Number(d)} → ${esc(pending)}</div>`;
 }
 function isActiveAsOf(p,asOf=todayISO()){
+ let hire=String(p?.hire_date||'').slice(0,10);
+ // V114：到職日視為正式生效日。未到到職日只先保存人員資料，
+ // 不計入在職、在廠、組別、籍別與月報人數；到職日當天才開始計入。
+ if(hire&&hire>asOf)return false;
+
  let resign=String(p?.resigned_at||'').slice(0,10);
  if(resign){
    // 離職日當天起不再計入；離職日前仍是目前在職人力。
@@ -6285,6 +6290,18 @@ function identityLabelFromNo(no){
  return '台籍';
 }
 function deriveNationality(no){no=normalizeNo(no);if(no.startsWith('W')||no.startsWith('Z'))return'外籍';if(no.startsWith('X'))return'—';return'台籍'}
+function normalizeNationality(v,no=''){
+ let raw=String(v||'').trim();
+ if(!raw)return deriveNationality(no);
+ let compact=raw.replace(/\s+/g,'');
+ if(['台籍','臺籍','台灣','臺灣','Taiwan','TAIWAN'].includes(raw)||['台籍','臺籍','台灣','臺灣'].includes(compact))return'台籍';
+ if(['泰國','泰国','泰籍','Thailand','THAILAND','Thai','THAI'].includes(raw)||['泰國','泰国','泰籍'].includes(compact))return'泰國';
+ if(['印尼','印度尼西亞','印度尼西亚','印尼籍','Indonesia','INDONESIA'].includes(raw)||['印尼','印度尼西亞','印度尼西亚','印尼籍'].includes(compact))return'印尼';
+ if(['越南','越南籍','Vietnam','VIETNAM'].includes(raw)||['越南','越南籍'].includes(compact))return'越南';
+ if(['外籍','外國籍','外国籍'].includes(compact))return'外籍';
+ if(['其他外籍','其他國籍','其他国籍'].includes(compact))return'其他外籍';
+ return raw;
+}
 function deriveLevel(no,job){no=normalizeNo(no);job=String(job||'');if(no.startsWith('X')||job.includes('建教生'))return'學生';return /(組長|課長|廠長|副廠長|工程師)/.test(job)?'主管':'員工'}
 function deriveGroup(no,job,existing){
  no=normalizeNo(no);
@@ -7670,7 +7687,11 @@ function openPerson(p=null,area=null){
  $('mJob').value=p?.job_title||'';
  $('mLevel').value=p?.level||deriveLevel(p?.employee_no,p?.job_title);
  renderSupervisorGroupChecks(p?.supervisor_groups||'');
- $('mNat').value=p?.nationality||deriveNationality(p?.employee_no||'')||'—';
+ let nationalityValue=normalizeNationality(p?.nationality||'',p?.employee_no||'')||'—';
+ if(!$('mNat').querySelector(`option[value="${CSS.escape(nationalityValue)}"]`)){
+   let opt=document.createElement('option');opt.value=nationalityValue;opt.textContent=nationalityValue;$('mNat').appendChild(opt);
+ }
+ $('mNat').value=nationalityValue;
  $('mArea').value=p?(isOverseas(p)?'海外事業部':'本部'):(area||'本部');
  let fc=contracts.find(c=>c.employee_no===p?.employee_no);
  $('mHire').value=p?.hire_date||'';
@@ -7949,6 +7970,9 @@ $('personSave').onclick=async()=>{
      old_group:old?.group_name||null,
      new_group:payload.group_name,
      detail:diffs.join('｜'),
+     // V114：新進人員若已填到職日，異動紀錄以真正到職日為準。
+     // 先建檔不代表已經到職，避免月報提前出現新增人力。
+     change_date:!old?(payload.hire_date||todayISO()):todayISO(),
      created_by:user.id
    });
    if(changeError)alert('人員資料已儲存，但異動紀錄寫入失敗：'+changeError.message);
@@ -9659,7 +9683,7 @@ const HEADER_MAP={employee_no:['工號','員工編號','employee_no','工号'],n
 function pick(row,keys){for(let k of keys)if(Object.prototype.hasOwnProperty.call(row,k)&&row[k]!==''&&row[k]!=null)return row[k];return''}
 function excelDate(v){if(!v)return null;if(typeof v==='number'){let d=XLSX.SSF.parse_date_code(v);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`}let d=new Date(v);if(!isNaN(d))return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;return null}
 function normalizeShift(v){v=String(v||'').trim();if(v==='中'||v.includes('中'))return'中';if(v==='夜'||v==='晚'||v.includes('夜')||v.includes('晚'))return'夜';return'日'}
-function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(no,job),supervisor_groups:parseSupervisorGroups(pick(row,HEADER_MAP.supervisor_groups)).join(',')||null,nationality:deriveNationality(no),area:inferArea(no,name,pick(row,HEADER_MAP.area)),hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
+function mapExcelRow(row){let no=normalizeNo(pick(row,HEADER_MAP.employee_no)),name=String(pick(row,HEADER_MAP.name)||'').trim(),job=String(pick(row,HEADER_MAP.job_title)||'').trim(),g=String(pick(row,HEADER_MAP.group_name)||'').trim();return{employee_no:no,name,shift:normalizeShift(pick(row,HEADER_MAP.shift)),job_title:job||null,group_name:deriveGroup(no,job,g),level:String(pick(row,HEADER_MAP.level)||'').trim()||deriveLevel(no,job),supervisor_groups:parseSupervisorGroups(pick(row,HEADER_MAP.supervisor_groups)).join(',')||null,nationality:normalizeNationality(pick(row,HEADER_MAP.nationality),no),area:inferArea(no,name,pick(row,HEADER_MAP.area)),hire_date:excelDate(pick(row,HEADER_MAP.hire_date)),status:String(pick(row,HEADER_MAP.status)||'').trim()||'在職',note:String(pick(row,HEADER_MAP.note)||'').trim()||null,updated_by:user.id,created_by:user.id,updated_at:new Date().toISOString(),_contract_end_date:excelDate(pick(row,HEADER_MAP.contract_end_date))}}
 async function parseFile(file){try{
  let buf=await file.arrayBuffer(),
      wb=XLSX.read(buf,{type:'array',cellDates:true}),

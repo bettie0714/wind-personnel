@@ -1504,6 +1504,21 @@ body.change-manage-mode .change-manage-inline{
   font-size:11px;
   border-radius:8px;
 }
+/* V115 - 人員變動整列點擊編輯 */
+#changesBody tr.change-row-clickable{
+  cursor:pointer;
+  transition:background .14s ease, box-shadow .14s ease;
+}
+#changesBody tr.change-row-clickable:hover td{
+  background:#f4f8ff !important;
+}
+#changesBody tr.change-row-clickable:hover td:first-child{
+  box-shadow:inset 3px 0 0 #315efb;
+}
+#changesBody tr.change-row-clickable:focus-visible{
+  outline:2px solid #8fb0ff;
+  outline-offset:-2px;
+}
 @media(max-width:760px){
   .change-manage-bar.show{
     align-items:flex-start;
@@ -6163,6 +6178,7 @@ body.change-manage-mode .change-manage-inline{
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
+// V115：管理員在人員變動編輯模式可直接點整列開啟編輯，不必滑到最右側操作欄。
 const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
 const cfg=window.APP_CONFIG||{};
@@ -7499,7 +7515,7 @@ function renderChanges(){
  }
  if($('clearChangeSearch'))$('clearChangeSearch').classList.toggle('hidden',!q);
 
- $('changesBody').innerHTML=rows.map(c=>`<tr>
+ $('changesBody').innerHTML=rows.map(c=>`<tr${isAdmin()&&changeManageMode?` class="change-row-clickable" data-change-id="${c.id}" tabindex="0" title="點一下編輯這筆人員變動紀錄"`:''}>
   ${isAdmin()&&changeManageMode?`<td><input class="change-select change-row-select" type="checkbox" data-change-id="${c.id}" ${selectedChangeIds.has(String(c.id))?'checked':''}></td>`:''}
   <td>${esc(c.change_date)}</td>
   <td>${changeBadge(c.change_type)}</td>
@@ -7517,6 +7533,27 @@ function renderChanges(){
      let id=String(cb.dataset.changeId);
      if(cb.checked)selectedChangeIds.add(id);else selectedChangeIds.delete(id);
      syncChangeSelectionUI();
+   };
+   // 勾選只處理選取，不觸發整列編輯。
+   cb.onclick=e=>e.stopPropagation();
+ });
+
+ // V115：管理員在編輯模式直接點整列即可開啟該筆紀錄。
+ document.querySelectorAll('#changesBody tr.change-row-clickable').forEach(tr=>{
+   const openRowEditor=()=>{
+     let id=Number(tr.dataset.changeId);
+     if(Number.isFinite(id))openChangeEditor(id);
+   };
+   tr.onclick=e=>{
+     if(e.target.closest('input,button,a,select,textarea,label'))return;
+     openRowEditor();
+   };
+   tr.onkeydown=e=>{
+     if(e.key==='Enter' || e.key===' '){
+       if(e.target.closest('input,button,a,select,textarea,label'))return;
+       e.preventDefault();
+       openRowEditor();
+     }
    };
  });
  syncChangeSelectionUI();

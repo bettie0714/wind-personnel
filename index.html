@@ -1,3 +1,4 @@
+<!-- V118：人員操作介面分區；少用欄位漸進展開；轉調主要入口移至人員操作。 -->
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -1571,6 +1572,30 @@ body.change-manage-mode .change-manage-inline{
     width:100%;
   }
 }
+
+/* V118 - 人員操作介面分區與漸進顯示 */
+#personModal .person-modal-v118{width:min(860px,calc(100vw - 32px));max-height:min(92vh,900px);padding:0;overflow:hidden}
+.person-editor-head{padding:24px 26px 18px;border-bottom:1px solid #e8edf3;background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%)}
+.person-editor-kicker{margin-bottom:4px;color:#7a8798;font-size:10px;font-weight:900;letter-spacing:.12em}
+.person-editor-head h2{margin:0;color:#0f2949;font-size:23px}
+.person-editor-sub{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px;color:#6b7b8f;font-size:12px}
+.person-editor-status{display:inline-flex;align-items:center;min-height:24px;padding:3px 9px;border:1px solid #dce5ef;border-radius:999px;background:#fff;color:#486178;font-weight:800}
+.person-editor-body{max-height:calc(92vh - 154px);overflow:auto;padding:18px 22px 20px;background:#f7f9fc}
+.person-editor-section,.person-editor-details{margin:0 0 12px;padding:16px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.025)}
+.person-editor-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+.person-editor-section-head h3{margin:0;color:#223b5a;font-size:14px;font-weight:900}
+.person-editor-section-head p{margin:3px 0 0;color:#8390a0;font-size:11px}
+.person-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}
+.person-editor-grid .field{min-width:0}.person-editor-grid .field.full{grid-column:1/-1}
+.person-editor-details{padding:0;overflow:hidden}
+.person-editor-details summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;cursor:pointer;list-style:none;user-select:none;color:#334b68;font-size:13px;font-weight:900}
+.person-editor-details summary::-webkit-details-marker{display:none}.person-editor-details summary::after{content:'＋';color:#8190a4;font-size:17px;font-weight:500}.person-editor-details[open] summary::after{content:'−'}.person-editor-details[open] summary{border-bottom:1px solid #edf1f5}
+.person-editor-details-body{padding:14px 16px 16px}.person-editor-summary-note{margin-left:auto;color:#7c8b9d;font-size:11px;font-weight:700}
+#personModal .temp-fields-note{margin-top:10px}.person-dynamic-empty{margin-top:10px;padding:9px 11px;border-radius:10px;background:#f8fafc;color:#7c8998;font-size:11px}
+.person-special-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-right:auto}.person-special-actions-label{margin-right:2px;color:#7a8798;font-size:11px;font-weight:800}
+#personModal .modalfoot{position:sticky;bottom:0;z-index:4;margin:0;padding:13px 22px;border-top:1px solid #e3e9f0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px)}
+.person-editor-section .change-log-card{margin-top:12px}
+@media(max-width:700px){#personModal .person-modal-v118{width:calc(100vw - 16px);max-height:96vh}.person-editor-head{padding:19px 18px 14px}.person-editor-body{padding:12px;max-height:calc(96vh - 145px)}.person-editor-grid{grid-template-columns:1fr}.person-editor-grid .field.full{grid-column:auto}#personModal .modalfoot{padding:11px 13px;flex-wrap:wrap}.person-special-actions{width:100%}}
 
 /* V117 - 人員轉調其他部門 */
 .temp-badge.transfer{
@@ -6001,7 +6026,6 @@ body.change-manage-mode .change-manage-inline{
       <select id="changeQuickAction">
        <option value="">請選擇要進行的操作</option>
        <option value="resign">辦理離職</option>
-       <option value="transfer">轉調其他部門</option>
        <option value="restore">取消離職／恢復在職</option>
        <option value="employee">人員資料管理</option>
        <option value="delete">刪除選取</option>
@@ -6083,38 +6107,61 @@ body.change-manage-mode .change-manage-inline{
 </main>
 </div>
 
-<div id="personModal" class="modalback"><div class="modal"><button id="personClose" class="close">×</button><h2 id="personModalTitle">新增人員</h2><p>「建教生」是人員身分，不是國籍。X 工號仍代表建教生；國籍可另外選擇台籍、泰國、印尼、越南或其他外籍。</p><div class="formgrid">
- <div class="field"><label>工號 *</label><input id="mNo"></div><div class="field"><label>姓名 *</label><input id="mName"></div>
- <div class="field"><label>目前班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
- <div class="field"><label>預排班別</label><select id="mPendingShift"><option value="">無</option><option>日</option><option>中</option><option>夜</option></select><div class="mini">可先排未來換班；生效日前仍顯示目前班別。</div></div>
- <div class="field"><label>班別生效日</label><input id="mShiftEffectiveDate" type="date"><div class="mini">到生效日後，統計、篩選與名單會自動使用新班別。</div></div>
- <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
- <div class="field full"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">只有主管需要設定，可複選。例如副廠長同時負責「捲板＋研磨」。</div></div>
- <div class="field"><label>國籍</label><select id="mNat"><option value="—">未設定</option><option value="台籍">台籍</option><option value="泰國">泰國</option><option value="印尼">印尼</option><option value="越南">越南</option><option value="其他外籍">其他外籍</option><option value="外籍">外籍（未分類）</option></select><div class="field-hint">國籍與 W／Z 類型、建教生身分分開，可獨立修改</div></div><select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
- <div class="field"><label>到職日</label><input id="mHire" type="date"></div><div class="field"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">W／Z 使用。</div></div><div class="field"><label>狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
- <div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div>
- <div class="field" id="mSupportLocationField"><label>支援地點</label><select id="mSupportLocation"><option value="">請選擇</option><option>台北港</option><option>東17</option><option>製造部</option></select></div>
- <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div>
- <div class="field"><label>預計返廠／復職日</label><input id="mExpectedReturn" type="date"></div>
- <div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職，但不列入目前在廠；支援到台北港或東17時，也不列入目前在廠。</div>
- <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
- <div class="change-log-card" id="changeLogOption">
-  <div class="change-log-copy">
-   <div class="change-log-title">人員變動紀錄</div>
-   <div id="mChangePreview" class="change-log-preview">尚未偵測到變更。</div>
+<div id="personModal" class="modalback">
+ <div class="modal person-modal-v118">
+  <button id="personClose" class="close">×</button>
+  <div class="person-editor-head">
+   <div class="person-editor-kicker">PERSONNEL</div>
+   <h2 id="personModalTitle">新增人員</h2>
+   <div class="person-editor-sub"><span>常用資料直接顯示；少用設定只有需要時再展開。</span><span id="personEditorStatus" class="person-editor-status hidden"></span></div>
   </div>
-  <label class="log-switch" for="mLogChange">
-   <input id="mLogChange" type="checkbox">
-   <span class="switch-ui" aria-hidden="true"></span>
-   <span class="log-switch-text">記錄</span>
-  </label>
+  <div class="person-editor-body">
+   <section class="person-editor-section">
+    <div class="person-editor-section-head"><div><h3>基本資料</h3><p>日常最常修改的資料集中在這裡。</p></div></div>
+    <div class="person-editor-grid">
+     <div class="field"><label>工號 *</label><input id="mNo"></div><div class="field"><label>姓名 *</label><input id="mName"></div>
+     <div class="field"><label>目前班別</label><select id="mShift"><option>日</option><option>中</option><option>夜</option></select></div><div class="field"><label>組別</label><select id="mGroup"></select></div>
+     <div class="field"><label>職別</label><input id="mJob"></div><div class="field"><label>職級</label><select id="mLevel"><option>員工</option><option>主管</option><option>學生</option></select></div>
+     <div class="field full hidden" id="mSupervisorGroupField"><label>主管負責組別</label><div id="mSupervisorGroups" class="group-checks"></div><div class="mini">主管才需要設定，可複選。</div></div>
+    </div>
+   </section>
+   <section class="person-editor-section">
+    <div class="person-editor-section-head"><div><h3>任用資料</h3><p>國籍、到職日期與任用狀態。</p></div></div>
+    <div class="person-editor-grid">
+     <div class="field"><label>國籍</label><select id="mNat"><option value="—">未設定</option><option value="台籍">台籍</option><option value="泰國">泰國</option><option value="印尼">印尼</option><option value="越南">越南</option><option value="其他外籍">其他外籍</option><option value="外籍">外籍（未分類）</option></select></div>
+     <select id="mArea" class="hidden" aria-hidden="true"><option>本部</option><option>海外事業部</option></select>
+     <div class="field"><label>到職日</label><input id="mHire" type="date"></div>
+     <div class="field hidden" id="mContractEndField"><label>合約到期日</label><input id="mContractEnd" type="date"><div class="mini">W／Z 使用。</div></div>
+     <div class="field"><label>任用狀態</label><select id="mStatus"><option>在職</option><option>留停</option></select></div>
+    </div>
+   </section>
+   <details id="mShiftPlanDetails" class="person-editor-details">
+    <summary><span>班別排程</span><span id="mShiftPlanSummary" class="person-editor-summary-note">未設定</span></summary>
+    <div class="person-editor-details-body"><div class="person-editor-grid">
+     <div class="field"><label>預排班別</label><select id="mPendingShift"><option value="">無</option><option>日</option><option>中</option><option>夜</option></select></div>
+     <div class="field"><label>班別生效日</label><input id="mShiftEffectiveDate" type="date"><div class="mini">生效日前仍使用目前班別。</div></div>
+    </div></div>
+   </details>
+   <section class="person-editor-section">
+    <div class="person-editor-section-head"><div><h3>人員動態</h3><p>返鄉、支援、返校或留停時才顯示相關日期。</p></div></div>
+    <div class="person-editor-grid"><div class="field"><label>目前動態</label><select id="mTempStatus"><option value="">無</option><option>支援</option><option>返校</option><option>返鄉</option></select></div><div id="mDynamicEmpty" class="person-dynamic-empty">目前沒有暫時性人員動態。</div></div>
+    <div id="mDynamicFields" class="hidden"><div class="person-editor-grid" style="margin-top:12px">
+     <div class="field" id="mSupportLocationField"><label>支援地點</label><select id="mSupportLocation"><option value="">請選擇</option><option>台北港</option><option>東17</option><option>製造部</option></select></div>
+     <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div><div class="field"><label>預計返廠／復職日</label><input id="mExpectedReturn" type="date"></div>
+    </div><div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職但不列入目前在廠；支援台北港或東17也不列入目前在廠。</div></div>
+   </section>
+   <section class="person-editor-section">
+    <div class="person-editor-section-head"><div><h3>備註與紀錄</h3><p>需要留下的說明與異動紀錄放在最後。</p></div></div>
+    <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
+    <div class="change-log-card" id="changeLogOption"><div class="change-log-copy"><div class="change-log-title">人員變動紀錄</div><div id="mChangePreview" class="change-log-preview">尚未偵測到變更。</div></div><label class="log-switch" for="mLogChange"><input id="mLogChange" type="checkbox"><span class="switch-ui" aria-hidden="true"></span><span class="log-switch-text">記錄</span></label></div>
+   </section>
+  </div>
+  <div class="modalfoot">
+   <div id="personSpecialActions" class="person-special-actions hidden"><span class="person-special-actions-label">人事處理</span><button id="personTransferBtn" class="btn" type="button">轉調其他部門</button><button id="personResignBtn" class="btn soft-danger" type="button">辦理離職</button></div>
+   <span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button>
+  </div>
  </div>
- </div><div class="modalfoot">
-   
-   <span style="flex:1"></span>
-   <button id="personCancel" class="btn">取消</button>
-   <button id="personSave" class="btn primary">儲存</button>
- </div></div></div>
+</div>
 
 <div id="returnConfirmModal" class="modalback">
  <div class="modal">
@@ -6505,6 +6552,7 @@ function syncSupervisorGroupState(){
  let enabled=$('mLevel').value==='主管';
  $('mSupervisorGroups').querySelectorAll('.group-check').forEach(l=>l.classList.toggle('disabled',!enabled));
  $('mSupervisorGroups').querySelectorAll('input').forEach(i=>i.disabled=!enabled);
+ if($('mSupervisorGroupField'))$('mSupervisorGroupField').classList.toggle('hidden',!enabled);
 }
 const LEGACY_OVERSEAS_NAMES=['楊天豪','黃銘彥','溫雁淑','蔡英金','莊翊'];
 function isOverseas(p){
@@ -7647,7 +7695,6 @@ function syncChangeQuickActionUI(){
  const action=$('changeQuickAction').value;
  const labelMap={
    resign:'前往辦理離職',
-   transfer:'前往辦理轉調',
    restore:'前往恢復在職',
    employee:'前往人員資料管理',
    delete:'刪除選取'
@@ -7739,7 +7786,6 @@ if($('runChangeQuickAction'))$('runChangeQuickAction').onclick=()=>{
  if(!isAdmin())return;
  let action=$('changeQuickAction')?.value||'';
  if(action==='resign')return $('openResignPickerBtn')?.click();
- if(action==='transfer')return $('openTransferPickerBtn')?.click();
  if(action==='restore')return $('openRestorePickerBtn')?.click();
  if(action==='employee')return $('openEmployeeDataManageBtn')?.click();
  if(action==='delete')return $('deleteSelectedChanges')?.click();
@@ -7889,6 +7935,40 @@ $('clearFilters').onclick=()=>{
  renderPeople();
 };
 
+function syncShiftPlanEditor(){
+ let pending=$('mPendingShift')?.value||'';
+ let date=$('mShiftEffectiveDate')?.value||'';
+ if($('mShiftEffectiveDate')){
+   $('mShiftEffectiveDate').disabled=!pending;
+   if(!pending)$('mShiftEffectiveDate').value='';
+ }
+ if($('mShiftPlanSummary'))$('mShiftPlanSummary').textContent=pending?`${pending}${date?'・'+date+' 生效':''}`:'未設定';
+ refreshChangePreview();
+}
+function syncPersonEditorStatus(p=null){
+ if(!$('personEditorStatus'))return;
+ let bits=[];
+ if(p){
+   let st=currentTempStatus(p);
+   if(p.status==='留停')bits.push('留停中');
+   else if(st==='返鄉')bits.push('返鄉中');
+   else if(st==='支援')bits.push(p.support_location?`支援 ${p.support_location}`:'支援中');
+   else if(st==='返校')bits.push('返校中');
+   else bits.push('在職');
+   let td=String(p.transferred_at||'').slice(0,10),to=String(p.transferred_to||'').trim();
+   if(td)bits.push(`${td<=todayISO()?'已':'預計'} ${td} 轉調${to?' '+to:''}`);
+ }
+ $('personEditorStatus').textContent=bits.join('・');
+ $('personEditorStatus').classList.toggle('hidden',!bits.length);
+}
+function syncPersonSpecialActions(p=null){
+ if(!$('personSpecialActions'))return;
+ $('personSpecialActions').classList.toggle('hidden',!p);
+ if(!p)return;
+ let transferred=!!String(p.transferred_at||'').slice(0,10);
+ if($('personTransferBtn'))$('personTransferBtn').textContent=transferred?'查看／取消轉調':'轉調其他部門';
+}
+
 function openPerson(p=null,area=null){
  if(!isAdmin())return;
  editNo=p?.employee_no||null;
@@ -7921,8 +8001,12 @@ function openPerson(p=null,area=null){
  $('mNote').value=p?.note||'';
  logChoiceTouched=false;
  $('mLogChange').checked=!p;
+ if($('mShiftPlanDetails'))$('mShiftPlanDetails').open=!!$('mPendingShift').value;
  syncTempFields();
  syncIdentityFromEmployeeNo({fromUser:false});
+ syncShiftPlanEditor();
+ syncPersonEditorStatus(p);
+ syncPersonSpecialActions(p);
  refreshChangePreview();
  $('personModal').classList.add('show');
 }
@@ -7952,6 +8036,7 @@ function syncIdentityFromEmployeeNo({fromUser=false}={}){
 
  // 外籍合約到期欄仍依 W/Z 工號使用，和國籍欄位分開。
  $('mContractEnd').disabled=!isForeignWorkNo;
+ if($('mContractEndField'))$('mContractEndField').classList.toggle('hidden',!isForeignWorkNo);
  if(!isForeignWorkNo && fromUser)$('mContractEnd').value='';
 
  refreshChangePreview();
@@ -7964,17 +8049,21 @@ function syncTempFields(){
  let enabled=!!st||isLeave;
  $('mTempStart').disabled=!enabled;
  $('mExpectedReturn').disabled=!enabled;
+ if($('mDynamicFields'))$('mDynamicFields').classList.toggle('hidden',!enabled);
+ if($('mDynamicEmpty'))$('mDynamicEmpty').classList.toggle('hidden',enabled);
  $('mSupportLocationField').classList.toggle('hidden',st!=='支援');
  $('mSupportLocation').disabled=st!=='支援';
  if(st!=='支援')$('mSupportLocation').value='';
- if(!enabled){
-   $('mTempStart').value='';
-   $('mExpectedReturn').value='';
- }
+ if(!enabled){$('mTempStart').value='';$('mExpectedReturn').value='';}
+ refreshChangePreview();
 }
 $('mTempStatus').addEventListener('change',syncTempFields);
 $('mStatus').addEventListener('change',syncTempFields);
-$('mLevel').addEventListener('change',syncSupervisorGroupState);
+$('mLevel').addEventListener('change',()=>{syncSupervisorGroupState();refreshChangePreview();});
+$('mPendingShift').addEventListener('change',syncShiftPlanEditor);
+$('mShiftEffectiveDate').addEventListener('change',syncShiftPlanEditor);
+if($('personTransferBtn'))$('personTransferBtn').onclick=()=>{if(!isAdmin()||!editNo)return;let no=editNo;$('personModal').classList.remove('show');openTransferForPerson(no);};
+if($('personResignBtn'))$('personResignBtn').onclick=()=>{if(!isAdmin()||!editNo)return;let no=editNo;$('personModal').classList.remove('show');openResign(no);};
 window.editPerson=no=>{
  let p=employees.find(x=>x.employee_no===no);
  if(!p){alert('找不到這筆人員資料，請重新整理頁面後再試。');return}
@@ -8302,6 +8391,18 @@ function syncTransferPickerState(){
    $('transferHint').textContent=`${p.employee_no}｜${p.name}｜目前仍屬風力事業部`;
    $('transferCancelExisting').classList.add('hidden');
  }
+}
+
+function openTransferForPerson(no){
+ if(!isAdmin())return;
+ let normalized=normalizeNo(no);
+ let p=employees.find(x=>x.employee_no===normalized);
+ if(!p)return alert('找不到這筆人員資料。');
+ $('transferPickerSearch').value=normalized;
+ populateTransferPicker();
+ let opt=[...$('transferPickerSelect').options].find(o=>o.value===normalized);
+ if(opt){$('transferPickerSelect').value=normalized;syncTransferPickerState();}
+ $('transferPickerModal').classList.add('show');
 }
 
 $('openTransferPickerBtn').onclick=()=>{

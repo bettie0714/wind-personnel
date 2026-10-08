@@ -1504,6 +1504,74 @@ body.change-manage-mode .change-manage-inline{
   font-size:11px;
   border-radius:8px;
 }
+/* V116 - 人員變動管理列按鈕整併優化 */
+.change-manage-bar{
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.change-manage-bar .manage-info{
+  flex:1 1 220px;
+  min-width:0;
+}
+.change-manage-bar .manage-actions{
+  margin-left:auto;
+}
+.change-manage-quick{
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.change-manage-quick-field{
+  min-width:220px;
+}
+.change-manage-quick-field label{
+  display:block;
+  margin-bottom:6px;
+  color:#64748b;
+  font-size:11px;
+  font-weight:800;
+}
+.change-manage-quick-field select{
+  min-width:240px;
+  min-height:40px;
+  padding:0 12px;
+  border:1px solid #dbe3ec;
+  border-radius:10px;
+  background:#fff;
+  color:#1f2937;
+  font-size:13px;
+  outline:none;
+}
+.change-manage-quick-field select:focus{
+  border-color:#94b1ef;
+  box-shadow:0 0 0 3px rgba(49,94,251,.07);
+}
+.change-manage-quick .btn{
+  min-height:40px;
+  padding:0 15px;
+}
+.manage-actions-hidden{
+  display:none !important;
+}
+@media(max-width:760px){
+  .change-manage-bar .manage-actions{
+    width:100%;
+    margin-left:0;
+  }
+  .change-manage-quick{
+    width:100%;
+    align-items:stretch;
+  }
+  .change-manage-quick-field{
+    width:100%;
+  }
+  .change-manage-quick-field select,
+  .change-manage-quick .btn{
+    width:100%;
+  }
+}
+
 /* V115 - 人員變動整列點擊編輯 */
 #changesBody tr.change-row-clickable{
   cursor:pointer;
@@ -5912,10 +5980,25 @@ body.change-manage-mode .change-manage-inline{
     <b id="changeSelectedCount">已選 0 筆</b>
    </div>
    <div class="manage-actions">
-    <button id="openResignPickerBtn" class="btn danger">辦理離職</button>
-    <button id="openRestorePickerBtn" class="btn success">取消離職／恢復在職</button>
-    <button id="openEmployeeDataManageBtn" class="btn">人員資料管理</button>
-    <button id="deleteSelectedChanges" class="btn soft-danger" disabled>刪除選取</button>
+    <div class="change-manage-quick">
+     <div class="change-manage-quick-field">
+      <label for="changeQuickAction">快速操作</label>
+      <select id="changeQuickAction">
+       <option value="">請選擇要進行的操作</option>
+       <option value="resign">辦理離職</option>
+       <option value="restore">取消離職／恢復在職</option>
+       <option value="employee">人員資料管理</option>
+       <option value="delete">刪除選取</option>
+      </select>
+     </div>
+     <button id="runChangeQuickAction" class="btn primary" type="button" disabled>執行</button>
+    </div>
+    <div class="manage-actions-hidden" aria-hidden="true">
+     <button id="openResignPickerBtn" class="btn danger">辦理離職</button>
+     <button id="openRestorePickerBtn" class="btn success">取消離職／恢復在職</button>
+     <button id="openEmployeeDataManageBtn" class="btn">人員資料管理</button>
+     <button id="deleteSelectedChanges" class="btn soft-danger" disabled>刪除選取</button>
+    </div>
    </div>
   </div>
 
@@ -7491,6 +7574,20 @@ function changeSearchRows(){
    return terms.every(term=>hay.includes(term));
  });
 }
+function syncChangeQuickActionUI(){
+ if(!$('changeQuickAction') || !$('runChangeQuickAction'))return;
+ const action=$('changeQuickAction').value;
+ const labelMap={
+   resign:'前往辦理離職',
+   restore:'前往恢復在職',
+   employee:'前往人員資料管理',
+   delete:'刪除選取'
+ };
+ const needsSelection=action==='delete';
+ const disabled=!action || (needsSelection && selectedChangeIds.size===0);
+ $('runChangeQuickAction').disabled=disabled;
+ $('runChangeQuickAction').textContent=labelMap[action] || '執行';
+}
 function syncChangeSelectionUI(){
  if(!$('changeSelectedCount'))return;
  $('changeSelectedCount').textContent=`已選 ${selectedChangeIds.size} 筆`;
@@ -7502,6 +7599,7 @@ function syncChangeSelectionUI(){
    $('selectAllChanges').checked=allIds.length>0&&selectedVisible===allIds.length;
    $('selectAllChanges').indeterminate=selectedVisible>0&&selectedVisible<allIds.length;
  }
+ syncChangeQuickActionUI();
 }
 function renderChanges(){
  if($('changesTable'))$('changesTable').classList.toggle('change-table-manage',changeManageMode);
@@ -7566,6 +7664,18 @@ if($('clearChangeSearch'))$('clearChangeSearch').onclick=()=>{
  $('changeSearch').focus();
  renderChanges();
 };
+
+if($('changeQuickAction'))$('changeQuickAction').onchange=syncChangeQuickActionUI;
+if($('runChangeQuickAction'))$('runChangeQuickAction').onclick=()=>{
+ if(!isAdmin())return;
+ let action=$('changeQuickAction')?.value||'';
+ if(action==='resign')return $('openResignPickerBtn')?.click();
+ if(action==='restore')return $('openRestorePickerBtn')?.click();
+ if(action==='employee')return $('openEmployeeDataManageBtn')?.click();
+ if(action==='delete')return $('deleteSelectedChanges')?.click();
+ alert('請先選擇要進行的操作。');
+};
+syncChangeQuickActionUI();
 
 function contractDays(dateStr){if(!dateStr)return null;let today=new Date();today.setHours(0,0,0,0);let d=new Date(dateStr+'T00:00:00');return Math.ceil((d-today)/86400000)}
 function contractRowsFiltered(){

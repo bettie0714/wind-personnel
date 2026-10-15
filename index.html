@@ -932,6 +932,7 @@ tr.leave-row td:first-child{box-shadow:inset 4px 0 0 #c0566f}
 .temp-badge.homeleave{background:#7c3aed;color:white}
 .temp-badge.school{background:#0284c7;color:white}
 .temp-badge.leave{background:#c0566f;color:white}
+.temp-badge.resign-plan{background:#fff1f2;color:#b42318;border:1px solid #fecdd3}
 .temp-badge.planned{background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe}
 .temp-detail{font-size:11px;color:#64748b;margin-top:4px;white-space:nowrap}
 .presence-filter.active{background:#17365d;color:#fff;border-color:#17365d}
@@ -6158,7 +6159,7 @@ body.change-manage-mode .change-manage-inline{
    </section>
   </div>
   <div class="modalfoot">
-   <div id="personSpecialActions" class="person-special-actions hidden"><span class="person-special-actions-label">人事處理</span><button id="personTransferBtn" class="btn" type="button">轉調其他部門</button><button id="personResignBtn" class="btn soft-danger" type="button">辦理離職</button></div>
+   <div id="personSpecialActions" class="person-special-actions hidden"><span class="person-special-actions-label">人事處理</span><button id="personTransferBtn" class="btn" type="button">轉調其他部門</button><button id="personCancelResignBtn" class="btn hidden" type="button">取消預定離職</button><button id="personResignBtn" class="btn soft-danger" type="button">辦理離職</button></div>
    <span style="flex:1"></span><button id="personCancel" class="btn">取消</button><button id="personSave" class="btn primary">儲存</button>
   </div>
  </div>
@@ -6351,6 +6352,8 @@ body.change-manage-mode .change-manage-inline{
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script>
+// V120 — 預定離職在生效日前保持在職，新增取消預定離職入口與預計離職提示；2026-10-15
+
 // V115：管理員在人員變動編輯模式可直接點整列開啟編輯，不必滑到最右側操作欄。
 const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
@@ -6720,7 +6723,13 @@ async function loadAll(){
    client.from('personnel_changes').select('*').order('id',{ascending:false}),
    client.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true})
  ]);
- if(e.error)alert('讀取人員資料失敗：'+e.error.message);else employees=e.data||[];
+ if(e.error)alert('讀取人員資料失敗：'+e.error.message);else employees=(e.data||[]).map(p=>{
+   // V120：預定離職日尚未到，仍屬在職。舊資料即使 status 已被寫成「離職」，
+   // 介面與所有統計都先依 resigned_at 生效日判定，避免提前從名單移除。
+   let resign=String(p?.resigned_at||'').slice(0,10);
+   if(resign&&resign>todayISO()&&p?.status==='離職')return {...p,status:'在職'};
+   return p;
+ });
  if(c.error)console.error(c.error);else changes=c.data||[];
  if(sm.error){
    snapshotReady=false;snapshots=[];snapshotError=sm.error.message||'月份紀錄資料表尚未建立';
@@ -6824,6 +6833,7 @@ $('changeEditSave').onclick=async()=>{
  );
  const targetNo=normalizeNo(original?.employee_no||payload.employee_no||'');
  let oldResignDate='';
+ let oldMasterStatus='在職';
  let masterUpdated=false;
 
  if(syncResignDate){
@@ -6833,8 +6843,10 @@ $('changeEditSave').onclick=async()=>{
      return;
    }
    oldResignDate=String(person.resigned_at||'').slice(0,10);
+   oldMasterStatus=String(person.status||'在職');
    let {error:masterError}=await db.from('employees').update({
-     status:'離職',
+     // V120：未到離職日只是「預定離職」，主檔仍保持在職。
+     status:payload.change_date>todayISO()?'在職':'離職',
      resigned_at:payload.change_date,
      updated_by:user.id,
      updated_at:new Date().toISOString()
@@ -6853,7 +6865,7 @@ $('changeEditSave').onclick=async()=>{
      try{
        await db.from('employees').update({
          resigned_at:oldResignDate||null,
-         status:'離職',
+         status:oldMasterStatus,
          updated_by:user.id,
          updated_at:new Date().toISOString()
        }).eq('employee_no',targetNo);
@@ -7322,12 +7334,18 @@ function personInlineStatusHtml(p){
  let transferDate=String(p?.transferred_at||'').slice(0,10);
  let transferTo=String(p?.transferred_to||'').trim();
  let plannedTransfer=!!transferDate&&transferDate>todayISO();
- if(!st&&!isLeave&&!planned&&!plannedTransfer)return '';
+ let resignDate=String(p?.resigned_at||'').slice(0,10);
+ let plannedResign=!!resignDate&&resignDate>todayISO();
+ if(!st&&!isLeave&&!planned&&!plannedTransfer&&!plannedResign)return '';
 
  let back=String(p.expected_return_date||'').slice(0,10);
  let location=String(p.support_location||'').trim();
  let badges=[];
 
+ if(plannedResign){
+   let [ry,rm,rd]=resignDate.split('-').map(Number);
+   badges.push(`<span class="temp-badge resign-plan">${rm}/${rd} 預計離職</span>`);
+ }
  if(plannedTransfer){
    let [ty,tm,td]=transferDate.split('-').map(Number);
    let when=`${tm}/${td}`;
@@ -8018,6 +8036,8 @@ function syncPersonEditorStatus(p=null){
    else if(st==='支援')bits.push(p.support_location?`支援 ${p.support_location}`:'支援中');
    else if(st==='返校')bits.push('返校中');
    else bits.push('在職');
+   let rd=String(p.resigned_at||'').slice(0,10);
+   if(rd)bits.push(`${rd<=todayISO()?'已':'預計'} ${rd} 離職`);
    let td=String(p.transferred_at||'').slice(0,10),to=String(p.transferred_to||'').trim();
    if(td)bits.push(`${td<=todayISO()?'已':'預計'} ${td} 轉調${to?' '+to:''}`);
  }
@@ -8029,7 +8049,14 @@ function syncPersonSpecialActions(p=null){
  $('personSpecialActions').classList.toggle('hidden',!p);
  if(!p)return;
  let transferred=!!String(p.transferred_at||'').slice(0,10);
+ let resignDate=String(p.resigned_at||'').slice(0,10);
+ let plannedResign=!!resignDate&&resignDate>todayISO();
  if($('personTransferBtn'))$('personTransferBtn').textContent=transferred?'查看／取消轉調':'轉調其他部門';
+ if($('personCancelResignBtn')){
+   $('personCancelResignBtn').classList.toggle('hidden',!plannedResign);
+   $('personCancelResignBtn').textContent=plannedResign?`取消 ${returnDateLabel(resignDate)} 預定離職`:'取消預定離職';
+ }
+ if($('personResignBtn'))$('personResignBtn').textContent=plannedResign?'修改離職日期':'辦理離職';
 }
 
 function openPerson(p=null,area=null){
@@ -8126,6 +8153,37 @@ $('mLevel').addEventListener('change',()=>{syncSupervisorGroupState();refreshCha
 $('mPendingShift').addEventListener('change',syncShiftPlanEditor);
 $('mShiftEffectiveDate').addEventListener('change',syncShiftPlanEditor);
 if($('personTransferBtn'))$('personTransferBtn').onclick=()=>{if(!isAdmin()||!editNo)return;let no=editNo;$('personModal').classList.remove('show');openTransferForPerson(no);};
+if($('personCancelResignBtn'))$('personCancelResignBtn').onclick=async()=>{
+ if(!isAdmin()||!editNo)return;
+ let p=employees.find(x=>x.employee_no===editNo);
+ if(!p)return alert('找不到這筆人員資料。');
+ let oldDate=String(p.resigned_at||'').slice(0,10);
+ if(!oldDate||oldDate<=todayISO())return alert('這不是尚未生效的預定離職，請使用「取消離職／恢復在職」。');
+ if(!confirm(`${p.employee_no}｜${p.name}\n\n確定取消原訂 ${oldDate} 的離職排程嗎？`))return;
+ let {error}=await db.from('employees').update({
+   status:'在職',
+   resigned_at:null,
+   updated_by:user.id,
+   updated_at:new Date().toISOString()
+ }).eq('employee_no',p.employee_no);
+ if(error){alert('取消預定離職失敗：'+error.message);return}
+ let {error:changeError}=await db.from('personnel_changes').insert({
+   employee_no:p.employee_no,
+   employee_name:p.name,
+   change_type:'取消離職',
+   old_group:p.group_name||null,
+   new_group:p.group_name||null,
+   detail:`取消原訂 ${oldDate} 離職`,
+   change_date:todayISO(),
+   created_by:user.id
+ });
+ if(changeError)alert('已取消預定離職，但人員變動紀錄寫入失敗：'+changeError.message);
+ $('personModal').classList.remove('show');
+ await loadAll();
+ await syncCurrentMonthSnapshot();
+ renderAll();
+ alert(`已取消 ${p.employee_no}｜${p.name} 原訂 ${oldDate} 的離職排程。`);
+};
 if($('personResignBtn'))$('personResignBtn').onclick=()=>{if(!isAdmin()||!editNo)return;let no=editNo;$('personModal').classList.remove('show');openResign(no);};
 window.editPerson=no=>{
  let p=employees.find(x=>x.employee_no===no);
@@ -8733,38 +8791,61 @@ $('resignPickerNext').onclick=()=>{
  $('resignPickerModal').classList.remove('show');
  openResign(no);
 };
-window.openResign=no=>{if(!isAdmin())return;resignNo=no;let p=employees.find(x=>x.employee_no===no);$('resignWho').textContent=`${p.employee_no}｜${p.name}｜${personGroup(p)||'-'}`;$('rDate').value=new Date().toISOString().slice(0,10);$('rNote').value='';$('resignModal').classList.add('show')};
+window.openResign=no=>{
+ if(!isAdmin())return;
+ resignNo=no;
+ let p=employees.find(x=>x.employee_no===no);
+ if(!p)return alert('找不到這筆人員資料。');
+ let existing=String(p.resigned_at||'').slice(0,10);
+ $('resignWho').textContent=`${p.employee_no}｜${p.name}｜${personGroup(p)||'-'}${existing?`｜目前預定 ${existing} 離職`:''}`;
+ $('rDate').value=existing||todayISO();
+ $('rNote').value='';
+ $('resignModal').querySelector('h2').textContent=existing&&existing>todayISO()?'修改預定離職':'登記離職';
+ $('resignSave').textContent=existing&&existing>todayISO()?'儲存離職日期':'確認離職';
+ $('resignModal').classList.add('show');
+};
 $('resignClose').onclick=$('resignCancel').onclick=()=>$('resignModal').classList.remove('show');
 $('resignSave').onclick=async()=>{
  let p=employees.find(x=>x.employee_no===resignNo),date=$('rDate').value;
  if(!p||!date)return;
  let future=date>todayISO();
+ let previousDate=String(p.resigned_at||'').slice(0,10);
  let {error}=await db.from('employees').update({
-   status:'離職',
+   // V120：預定離職日尚未到，仍保留在職；到離職日當天才正式離職。
+   status:future?'在職':'離職',
    resigned_at:date,
    updated_by:user.id,
    updated_at:new Date().toISOString()
  }).eq('employee_no',p.employee_no);
  if(error){alert(error.message);return}
 
- let {error:changeError}=await db.from('personnel_changes').insert({
-   employee_no:p.employee_no,
-   employee_name:p.name,
-   change_type:'離職',
-   old_group:p.group_name,
-   new_group:null,
-   detail:`${$('rReason').value}${$('rNote').value?'｜'+$('rNote').value:''}`,
-   change_date:date,
-   created_by:user.id
- });
- if(changeError)alert('離職已生效，但人員異動紀錄寫入失敗：'+changeError.message);
+ let detail=`${$('rReason').value}${$('rNote').value?'｜'+$('rNote').value:''}`;
+ let existingChange=previousDate?changes.find(c=>
+   c.employee_no===p.employee_no &&
+   c.change_type==='離職' &&
+   String(c.change_date||'').slice(0,10)===previousDate
+ ):null;
+ let changeResult=existingChange
+   ? await db.from('personnel_changes').update({change_date:date,detail}).eq('id',existingChange.id)
+   : await db.from('personnel_changes').insert({
+       employee_no:p.employee_no,
+       employee_name:p.name,
+       change_type:'離職',
+       old_group:p.group_name,
+       new_group:null,
+       detail,
+       change_date:date,
+       created_by:user.id
+     });
+ let changeError=changeResult.error;
+ if(changeError)alert('離職日期已儲存，但人員異動紀錄寫入失敗：'+changeError.message);
 
  $('resignModal').classList.remove('show');
  await loadAll();
  await syncCurrentMonthSnapshot();
  renderAll();
  if(future){
-   alert(`已登記 ${date} 離職。此人員在 ${date} 前仍會計入目前人數，到了離職日才會自動扣除。`);
+   alert(`已登記 ${date} 預定離職。此人員在 ${date} 前會繼續留在人員名單與所有在職統計；到了離職日當天才會自動扣除。需要取消時，可從「人員操作 → 取消預定離職」復原。`);
  }
 };
 

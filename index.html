@@ -1,3 +1,4 @@
+<!-- V119：修正離職紀錄日期時同步 employees.resigned_at，避免主檔與歷史紀錄不同步 -->
 <!-- V118：人員操作介面分區；少用欄位漸進展開；轉調主要入口移至人員操作。 -->
 <!doctype html>
 <html lang="zh-Hant">
@@ -6256,7 +6257,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="modal">
   <button id="changeEditClose" class="close">×</button>
   <h2>編輯人員變動紀錄</h2>
-  <p>只修改這筆紀錄，不會更動目前的人員主檔。</p>
+  <p id="changeEditHint">一般紀錄只修改歷史內容；若這筆是「離職」，修改離職日期時會同步修正人員主檔的離職日。</p>
 
   <div class="formgrid">
    <div class="field">
@@ -6358,7 +6359,7 @@ let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapsho
 let returnConfirmNo=null,returnPromptSnoozedUntilReload=false;
 let pendingSession=null;
 let logChoiceTouched=false;
-let editingChangeId=null;
+let editingChangeId=null,editingChangeOriginal=null;
 let selectedChangeIds=new Set();
 let changeManageMode=false;
 
@@ -6777,6 +6778,7 @@ window.openChangeEditor=id=>{
  let c=changes.find(x=>Number(x.id)===Number(id));
  if(!c)return alert('找不到這筆人員變動紀錄。');
  editingChangeId=c.id;
+ editingChangeOriginal={...c};
  $('ceDate').value=c.change_date||todayISO();
  $('ceType').value=[...$('ceType').options].some(o=>o.value===c.change_type)?c.change_type:'其他';
  $('ceNo').value=c.employee_no||'';
@@ -6784,16 +6786,23 @@ window.openChangeEditor=id=>{
  $('ceOldGroup').value=c.old_group||'';
  $('ceNewGroup').value=c.new_group||'';
  $('ceDetail').value=c.detail||'';
+ if($('changeEditHint')){
+   $('changeEditHint').textContent=c.change_type==='離職'
+     ? '這筆是離職紀錄。修改日期後儲存，會同步修正人員主檔真正的離職日，不需要再另外恢復或重辦離職。'
+     : '這裡用來修正人員變動紀錄；一般紀錄不會直接改動人員主檔。';
+ }
  $('changeEditModal').classList.add('show');
 };
 function closeChangeEditor(){
  editingChangeId=null;
+ editingChangeOriginal=null;
  $('changeEditModal').classList.remove('show');
 }
 $('changeEditClose').onclick=$('changeEditCancel').onclick=closeChangeEditor;
 
 $('changeEditSave').onclick=async()=>{
  if(!isAdmin()||!editingChangeId)return;
+ const original=editingChangeOriginal?{...editingChangeOriginal}:changes.find(x=>Number(x.id)===Number(editingChangeId));
  let payload={
    change_date:$('ceDate').value||todayISO(),
    change_type:$('ceType').value||'其他',
@@ -6803,10 +6812,64 @@ $('changeEditSave').onclick=async()=>{
    new_group:$('ceNewGroup').value.trim()||null,
    detail:$('ceDetail').value.trim()||null
  };
+
+ // V119：若是在修正既有「離職」紀錄的日期，必須同步修改 employees.resigned_at。
+ // 否則只改歷史紀錄，實際人力仍會照舊日期被扣除。
+ const syncResignDate=!!(
+   original &&
+   String(original.change_type||'')==='離職' &&
+   payload.change_type==='離職' &&
+   payload.change_date &&
+   (original.employee_no||payload.employee_no)
+ );
+ const targetNo=normalizeNo(original?.employee_no||payload.employee_no||'');
+ let oldResignDate='';
+ let masterUpdated=false;
+
+ if(syncResignDate){
+   let person=employees.find(x=>normalizeNo(x.employee_no)===targetNo);
+   if(!person){
+     alert('找不到這位人員的主檔，暫時無法同步修改離職日期。');
+     return;
+   }
+   oldResignDate=String(person.resigned_at||'').slice(0,10);
+   let {error:masterError}=await db.from('employees').update({
+     status:'離職',
+     resigned_at:payload.change_date,
+     updated_by:user.id,
+     updated_at:new Date().toISOString()
+   }).eq('employee_no',person.employee_no);
+   if(masterError){
+     alert('離職日期修改失敗：'+masterError.message);
+     return;
+   }
+   masterUpdated=true;
+ }
+
  let {error}=await db.from('personnel_changes').update(payload).eq('id',editingChangeId);
- if(error){alert('紀錄儲存失敗：'+error.message);return}
+ if(error){
+   // 歷史紀錄更新失敗時，盡量把主檔退回原本日期，避免兩邊不一致。
+   if(masterUpdated){
+     try{
+       await db.from('employees').update({
+         resigned_at:oldResignDate||null,
+         status:'離職',
+         updated_by:user.id,
+         updated_at:new Date().toISOString()
+       }).eq('employee_no',targetNo);
+     }catch(_rollbackError){}
+   }
+   alert('紀錄儲存失敗：'+error.message);
+   return;
+ }
+
  closeChangeEditor();
  await loadAll();
+ await syncCurrentMonthSnapshot();
+ renderAll();
+ if(syncResignDate){
+   alert(`離職日期已同步修正為 ${payload.change_date}。`);
+ }
 };
 
 window.deleteChangeRecord=async id=>{

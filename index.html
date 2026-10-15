@@ -1,6 +1,7 @@
 <!-- V119：修正離職紀錄日期時同步 employees.resigned_at，避免主檔與歷史紀錄不同步 -->
 <!-- V118：人員操作介面分區；少用欄位漸進展開；轉調主要入口移至人員操作。 -->
 <!doctype html>
+<!-- V123：外籍合約續約管理｜100天確認、續約+3年、不續約30天提醒 -->
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
@@ -1637,6 +1638,86 @@ body.change-manage-mode .change-manage-inline{
 }
 
 
+/* V122 - 人員變動依月份分組 */
+#changesBody .change-month-row td{
+  padding:0 !important;
+  background:#f7f9fc !important;
+  border-top:1px solid #dfe6ef;
+  border-bottom:1px solid #dfe6ef;
+}
+.change-month-toggle{
+  width:100%;
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border:0;
+  background:transparent;
+  color:#17365d;
+  text-align:left;
+  cursor:pointer;
+}
+.change-month-toggle:hover{
+  background:#f1f5fb;
+}
+.change-month-arrow{
+  width:18px;
+  color:#64748b;
+  font-size:12px;
+  transition:transform .15s ease;
+}
+.change-month-row.is-open .change-month-arrow{
+  transform:rotate(90deg);
+}
+.change-month-title{
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:.01em;
+}
+.change-month-count{
+  margin-left:auto;
+  padding:3px 9px;
+  border:1px solid #dde5ef;
+  border-radius:999px;
+  background:#fff;
+  color:#64748b;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.change-month-current{
+  margin-left:2px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#e8f0ff;
+  color:#315efb;
+  font-size:10px;
+  font-weight:850;
+}
+#changesBody tr.change-month-hidden{
+  display:none;
+}
+
+/* V121 - 人員變動內容分行顯示 */
+#changes .change-content-cell{
+  min-width:240px;
+  white-space:normal;
+  line-height:1.55;
+}
+#changes .change-content-lines{
+  display:grid;
+  gap:3px;
+}
+#changes .change-content-line{
+  display:block;
+  color:#334155;
+}
+#changes .change-content-line + .change-content-line{
+  padding-top:3px;
+  border-top:1px dashed #e8edf3;
+}
+
 /* V109 - 人員變動關鍵字搜尋 */
 .change-search-bar{
   display:flex;
@@ -2184,6 +2265,90 @@ body.change-manage-mode .change-manage-inline{
 }
 .dashboard-distribution #typeChart{
   padding-bottom:2px;
+}
+.z-nationality-chart{
+  display:grid;
+  gap:10px;
+}
+.z-nat-empty{
+  padding:12px 0 4px;
+  color:#94a3b8;
+  font-size:12px;
+}
+.z-nat-bar{
+  display:flex;
+  width:100%;
+  height:10px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#edf2f7;
+}
+.z-nat-segment{
+  height:100%;
+  border:0;
+  padding:0;
+  min-width:10px;
+  cursor:pointer;
+}
+.z-nat-list{
+  display:grid;
+  gap:2px;
+}
+.z-nat-row{
+  width:100%;
+  border:0;
+  background:transparent;
+  padding:8px 0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid #edf1f5;
+  text-align:left;
+}
+.z-nat-row:last-child{
+  border-bottom:0;
+}
+.z-nat-row:hover{
+  background:#f8faff;
+}
+.z-nat-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.z-nat-label i{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  flex:0 0 auto;
+}
+.z-nat-label span{
+  color:#334155;
+  font-size:13px;
+  font-weight:700;
+}
+.z-nat-value{
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  color:#1e40af;
+}
+.z-nat-value b{
+  font-size:19px;
+  line-height:1;
+}
+.z-nat-value small{
+  font-size:11px;
+  color:#94a3b8;
+  font-weight:700;
+}
+.z-nat-value em{
+  font-style:normal;
+  font-size:11px;
+  color:#94a3b8;
+  margin-left:4px;
 }
 
 /* 組別清單高度由內容決定，不再被右側兩張卡片合計高度硬撐開 */
@@ -5535,6 +5700,48 @@ body.change-manage-mode .change-manage-inline{
   #returnConfirmModal .modalfoot .btn{width:100%}
 }
 
+
+/* V123 - 外籍合約續約管理 */
+.contract-stat-card{
+  width:100%;
+  text-align:left;
+  border:1px solid #e4e9f1;
+  border-radius:14px;
+  background:#fff;
+  padding:18px 20px;
+  cursor:pointer;
+  font:inherit;
+  color:inherit;
+  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.contract-stat-card:hover{
+  border-color:#b8c9e8;
+  box-shadow:0 8px 22px rgba(23,54,93,.07);
+  transform:translateY(-1px);
+}
+.contract-stat-card.active{
+  border-color:#315efb;
+  box-shadow:0 0 0 3px rgba(49,94,251,.08);
+}
+.contract-stat-card .label{color:#64748b;font-size:12px;margin-bottom:10px}
+.contract-stat-card .num{font-size:32px;font-weight:760;color:#315efb;line-height:1}
+.contract-stat-card .num span{font-size:14px;color:#64748b;font-weight:500}
+.contract-state{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}
+.contract-state.pending{background:#fff3cd;color:#9a6700}
+.contract-state.nonrenew{background:#fff1f2;color:#b42318}
+.contract-state.leaving{background:#fee2e2;color:#991b1b}
+.contract-state.future{background:#eef4ff;color:#315efb}
+.contract-state.check{background:#f3f4f6;color:#4b5563}
+.contract-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.contract-actions .btn{padding:6px 9px;font-size:11px;border-radius:8px}
+.contract-note{font-size:11px;color:#7a8798;margin-top:4px}
+#contracts table{min-width:980px}
+@media(max-width:760px){
+  #contractKpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .contract-stat-card{padding:14px 15px}
+  .contract-stat-card .num{font-size:27px}
+}
+
 </style>
 </head>
 <body>
@@ -5834,7 +6041,7 @@ body.change-manage-mode .change-manage-inline{
   <button data-page="changes">↗　人員變動</button>
   <button class="admin-only" data-page="admin">⚙　管理後台</button>
   <button data-page="overseas">🌏　海外事業部</button>
-  <button data-page="contracts">📅　外籍合約到期</button>
+  <button data-page="contracts">📅　外籍合約續約</button>
  </nav>
 </aside>
 <main class="content">
@@ -5876,7 +6083,15 @@ body.change-manage-mode .change-manage-inline{
 
   <div class="section dashboard-distribution dashboard-shift-only">
    <div class="sectionhead"><div><h2>班別分布</h2></div></div>
-   <div id="shiftChart" class="donutwrap"></div>
+   <div class="distribution-block">
+    <div class="distribution-title">班別</div>
+    <div id="shiftChart" class="donutwrap"></div>
+   </div>
+   <div class="distribution-divider"></div>
+   <div class="distribution-block">
+    <div class="distribution-title">Z員工國籍分布</div>
+    <div id="zNationalityChart" class="z-nationality-chart"></div>
+   </div>
   </div>
  </div>
  <div class="section recent-changes-section">
@@ -6089,21 +6304,21 @@ body.change-manage-mode .change-manage-inline{
 <section id="contracts" class="page">
  <div class="section">
   <div class="sectionhead">
- <div><h2>外籍合約到期</h2><div class="mini">檢視者可查看與匯出；只有管理員可以修改合約日期。</div></div>
- <button id="exportContractExcelBtn" class="btn success">匯出 Excel</button>
-</div>
+   <div><h2>外籍合約續約管理</h2><div class="mini">合約剩餘 100 天時確認一次；續約直接延長 3 年，不續約者於剩餘 30 天再次提醒離廠安排。</div></div>
+   <button id="exportContractExcelBtn" class="btn success">匯出 Excel</button>
+  </div>
   <div class="grid4" id="contractKpis"></div>
  </div>
  <div class="section">
-  <div class="filters" style="grid-template-columns:repeat(4,1fr)">
-   <div class="field"><label>到期範圍</label><select id="cRange"><option value="">全部</option><option value="30">30 天內</option><option value="60">60 天內</option><option value="90">90 天內</option><option value="expired">已到期</option></select></div>
+  <div class="filters" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+   <div class="field"><label>處理狀態</label><select id="cRange"><option value="">全部</option><option value="pending100">100 天內待確認</option><option value="nonrenewal">不續約待離開</option><option value="leaving30">30 天內即將離開</option></select></div>
    <div class="field"><label>外籍類型</label><select id="cType"><option value="">全部</option><option>W</option><option>Z</option></select></div>
-   <div class="field search"><label>搜尋</label><input id="cSearch" placeholder="工號／姓名"></div>
+   <div class="field search"><label>搜尋</label><input id="cSearch" placeholder="工號／姓名／國籍／組別"></div>
   </div>
  </div>
  <div class="section">
   <div id="contractCount" class="mini" style="margin-bottom:12px"></div>
-  <div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>類型</th><th>組別</th><th>班別</th><th>到職日</th><th>合約到期日</th><th>剩餘天數</th></tr></thead><tbody id="contractBody"></tbody></table></div>
+  <div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>國籍</th><th>組別</th><th>班別</th><th>合約到期日</th><th>剩餘天數</th><th>續約狀態</th><th class="admin-only">操作</th></tr></thead><tbody id="contractBody"></tbody></table></div>
  </div>
 </section>
 </main>
@@ -6270,6 +6485,7 @@ body.change-manage-mode .change-manage-inline{
     <select id="ceType">
      <option>新增</option>
      <option>修改</option>
+     <option>預排班別</option>
      <option>調組</option>
      <option>工號更正</option>
      <option>支援</option>
@@ -6281,6 +6497,9 @@ body.change-manage-mode .change-manage-inline{
      <option>復職</option>
      <option>轉調</option>
      <option>取消轉調</option>
+     <option>續約</option>
+     <option>不續約</option>
+     <option>取消不續約</option>
      <option>離職</option>
      <option>取消離職</option>
      <option>其他</option>
@@ -6364,6 +6583,8 @@ let pendingSession=null;
 let logChoiceTouched=false;
 let editingChangeId=null,editingChangeOriginal=null;
 let selectedChangeIds=new Set();
+// V122：月份分組展開狀態；當月預設展開，其他月份可點標題切換。
+let expandedChangeMonths=new Set();
 let changeManageMode=false;
 
 function configured(){return cfg.SUPABASE_URL&&cfg.SUPABASE_ANON_KEY&&cfg.VIEWER_EMAIL&&!cfg.SUPABASE_URL.includes('YOUR_PROJECT')&&!cfg.SUPABASE_ANON_KEY.includes('YOUR_')}
@@ -6749,7 +6970,7 @@ async function loadAll(){
  renderAll();
  setTimeout(maybeAutoPromptReturnConfirm,180);
 }
-function showPage(id){if(id!=='changes'&&changeManageMode){changeManageMode=false;selectedChangeIds.clear();document.body.classList.remove('change-manage-mode');}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約到期','查看 W／Z 合約到期日與剩餘天數']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
+function showPage(id){if(id!=='changes'&&changeManageMode){changeManageMode=false;selectedChangeIds.clear();document.body.classList.remove('change-manage-mode');}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約續約管理','100 天確認續約；不續約者 30 天前再次提醒']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(b.dataset.page==='admin'&&!isAdmin())return;showPage(b.dataset.page)});
 function populateFilters(){
  let gs=[...new Set([...GROUPS,...employees.map(personGroup).filter(Boolean)])]
@@ -7231,7 +7452,37 @@ function renderDash(){
    </div>
   </div>`;
 
-
+ let zNationalityColorMap={'泰國':'#2f80ed','印尼':'#8b5cf6','越南':'#f2992e','其他外籍':'#43b05c','外籍（未分類）':'#94a3b8','未設定':'#cbd5e1'};
+ let zNatSource=employed.filter(x=>personType(x)==='Z');
+ let zNatCounts={};
+ zNatSource.forEach(x=>{
+   let nat=normalizeNationality(x.nationality||'',x.employee_no||'');
+   if(nat==='外籍')nat='外籍（未分類）';
+   if(!nat||nat==='—')nat='未設定';
+   zNatCounts[nat]=(zNatCounts[nat]||0)+1;
+ });
+ let zNatOrder=['泰國','印尼','越南','其他外籍','外籍（未分類）','未設定'];
+ let zNatEntries=zNatOrder.filter(n=>(zNatCounts[n]||0)>0).map(n=>[n,zNatCounts[n]]);
+ let zNatTotal=zNatEntries.reduce((sum,[,count])=>sum+count,0);
+ if(!zNatEntries.length){
+   $('zNationalityChart').innerHTML='<div class="z-nat-empty">目前沒有 Z 員工國籍資料</div>';
+ }else{
+   $('zNationalityChart').innerHTML=`
+    <div class="shift-total-line shift-clickable" onclick="openTypeList('Z')">
+      <span>Z 員工總數</span>
+      <b>${zNatTotal}<small>人</small><i class="shift-arrow">›</i></b>
+    </div>
+    <div class="z-nat-bar" aria-label="Z員工國籍分布">
+      ${zNatEntries.map(([nat,count])=>`<button type="button" class="z-nat-segment" style="width:${count/zNatTotal*100}%;background:${zNationalityColorMap[nat]||'#94a3b8'}" title="${esc(nat)} ${count} 人" onclick="openZNationalityFromDashboard('${esc(nat)}')"></button>`).join('')}
+    </div>
+    <div class="z-nat-list">
+      ${zNatEntries.map(([nat,count])=>`
+        <button type="button" class="z-nat-row" onclick="openZNationalityFromDashboard('${esc(nat)}')">
+          <div class="z-nat-label"><i style="background:${zNationalityColorMap[nat]||'#94a3b8'}"></i><span>${esc(nat)}</span></div>
+          <div class="z-nat-value"><b>${count}</b><small>人</small><em>${Math.round(count/zNatTotal*100)}%</em></div>
+        </button>`).join('')}
+    </div>`;
+ }
 
  $('recentBody').innerHTML=changes.slice(0,7).map(c=>{
    let detail=changeDetailText(c);
@@ -7273,6 +7524,17 @@ window.openShiftFromDashboard=shift=>{
  activePresenceFilter='';
  activeOnsiteOnly=true;
  if($('fShift') && ['日','中','夜'].includes(shift))$('fShift').value=shift;
+ syncTypeButtons();
+ renderPeople();
+};
+
+window.openZNationalityFromDashboard=nat=>{
+ showPage('people');
+ resetPeopleAdvancedFilters();
+ activeTypeFilter='Z';
+ activePresenceFilter='';
+ activeOnsiteOnly=false;
+ if($('fNat'))$('fNat').value=nat==='外籍（未分類）'?'外籍':nat;
  syncTypeButtons();
  renderPeople();
 };
@@ -7733,6 +7995,17 @@ function changeDetailText(c){
  // 舊版或手動編輯過、無法解析的內容仍保留原文。
  return sentences.length?sentences.join('，'):detail.replaceAll('｜','，').replaceAll(' → ','改為');
 }
+function changeDetailDisplayHtml(c){
+ let text=String(changeDetailText(c)||'').trim();
+ if(!text||text==='-')return '<span class="mini">-</span>';
+ let lines=text
+   .split(/[，｜\n]+/)
+   .map(x=>String(x||'').trim())
+   .filter(Boolean);
+ if(lines.length<=1)return `<div class="change-content-lines"><span class="change-content-line">${esc(text)}</span></div>`;
+ return `<div class="change-content-lines">${lines.map(line=>`<span class="change-content-line">${esc(line)}</span>`).join('')}</div>`;
+}
+
 function changeNoteText(c){
  let detail=String(c.detail||'').trim();
  let parts=parseChangeParts(detail);
@@ -7798,6 +8071,15 @@ function syncChangeSelectionUI(){
  }
  syncChangeQuickActionUI();
 }
+function changeMonthKey(c){
+ let d=String(c?.change_date||'').slice(0,7);
+ return /^\d{4}-\d{2}$/.test(d)?d:'未設定日期';
+}
+function changeMonthLabel(key){
+ if(key==='未設定日期')return key;
+ let [y,m]=key.split('-');
+ return `${y}年${Number(m)}月`;
+}
 function renderChanges(){
  if($('changesTable'))$('changesTable').classList.toggle('change-table-manage',changeManageMode);
 
@@ -7810,7 +8092,28 @@ function renderChanges(){
  }
  if($('clearChangeSearch'))$('clearChangeSearch').classList.toggle('hidden',!q);
 
- $('changesBody').innerHTML=rows.map(c=>`<tr${isAdmin()&&changeManageMode?` class="change-row-clickable" data-change-id="${c.id}" tabindex="0" title="點一下編輯這筆人員變動紀錄"`:''}>
+ const colspan=isAdmin()&&changeManageMode?10:8;
+ const currentMonth=todayISO().slice(0,7);
+ if(!expandedChangeMonths.size)expandedChangeMonths.add(currentMonth);
+
+ const monthMap=new Map();
+ rows.forEach(c=>{
+   const key=changeMonthKey(c);
+   if(!monthMap.has(key))monthMap.set(key,[]);
+   monthMap.get(key).push(c);
+ });
+ const monthKeys=[...monthMap.keys()].sort((a,b)=>{
+   if(a==='未設定日期')return 1;
+   if(b==='未設定日期')return -1;
+   return b.localeCompare(a);
+ });
+
+ const rowHtml=(c,open)=>{
+   const classes=[
+     !open?'change-month-hidden':'',
+     isAdmin()&&changeManageMode?'change-row-clickable':''
+   ].filter(Boolean).join(' ');
+   return `<tr${classes?` class="${classes}"`:''}${isAdmin()&&changeManageMode?` data-change-id="${c.id}" tabindex="0" title="點一下編輯這筆人員變動紀錄"`:''} data-change-month="${esc(changeMonthKey(c))}">
   ${isAdmin()&&changeManageMode?`<td><input class="change-select change-row-select" type="checkbox" data-change-id="${c.id}" ${selectedChangeIds.has(String(c.id))?'checked':''}></td>`:''}
   <td>${esc(c.change_date)}</td>
   <td>${changeBadge(c.change_type)}</td>
@@ -7818,10 +8121,44 @@ function renderChanges(){
   <td>${esc(c.employee_name||'-')}</td>
   <td>${esc(c.old_group||'-')}</td>
   <td>${esc(c.new_group||'-')}</td>
-  <td>${esc(changeDetailText(c))}</td>
+  <td class="change-content-cell">${changeDetailDisplayHtml(c)}</td>
   <td>${esc(changeNoteText(c))}</td>
   ${isAdmin()&&changeManageMode?`<td><button class="btn change-row-edit" onclick="openChangeEditor(${c.id})">編輯</button></td>`:''}
- </tr>`).join('')||`<tr><td colspan="${isAdmin()&&changeManageMode?10:8}" class="empty">${q?'找不到符合關鍵字的變動紀錄':'目前沒有變動紀錄'}</td></tr>`;
+ </tr>`;
+ };
+
+ if(!rows.length){
+   $('changesBody').innerHTML=`<tr><td colspan="${colspan}" class="empty">${q?'找不到符合關鍵字的變動紀錄':'目前沒有變動紀錄'}</td></tr>`;
+ }else{
+   $('changesBody').innerHTML=monthKeys.map(key=>{
+     const monthRows=monthMap.get(key)||[];
+     // 搜尋時自動展開所有命中的月份；平常只有使用者手動展開的月份顯示。
+     const open=q?true:expandedChangeMonths.has(key);
+     const current=key===currentMonth;
+     const items=monthRows.map(c=>rowHtml(c,open)).join('');
+     return `<tr class="change-month-row ${open?'is-open':''}" data-month="${esc(key)}">
+       <td colspan="${colspan}">
+        <button type="button" class="change-month-toggle" data-month="${esc(key)}" aria-expanded="${open?'true':'false'}">
+         <span class="change-month-arrow">▶</span>
+         <span class="change-month-title">${esc(changeMonthLabel(key))}</span>
+         ${current?'<span class="change-month-current">本月</span>':''}
+         <span class="change-month-count">共 ${monthRows.length} 筆</span>
+        </button>
+       </td>
+      </tr>${items}`;
+   }).join('');
+ }
+
+ document.querySelectorAll('.change-month-toggle').forEach(btn=>{
+   btn.onclick=()=>{
+     if(q)return;
+     const key=btn.dataset.month||'';
+     if(!key)return;
+     if(expandedChangeMonths.has(key))expandedChangeMonths.delete(key);
+     else expandedChangeMonths.add(key);
+     renderChanges();
+   };
+ });
 
  document.querySelectorAll('.change-row-select').forEach(cb=>{
    cb.onchange=()=>{
@@ -7874,49 +8211,178 @@ if($('runChangeQuickAction'))$('runChangeQuickAction').onclick=()=>{
 };
 syncChangeQuickActionUI();
 
-function contractDays(dateStr){if(!dateStr)return null;let today=new Date();today.setHours(0,0,0,0);let d=new Date(dateStr+'T00:00:00');return Math.ceil((d-today)/86400000)}
+function contractDays(dateStr){
+ if(!dateStr)return null;
+ let today=new Date(todayISO()+'T00:00:00');
+ let d=new Date(String(dateStr).slice(0,10)+'T00:00:00');
+ return Math.ceil((d-today)/86400000);
+}
+function contractAddYearsClamped(dateStr,years=3){
+ let s=String(dateStr||'').slice(0,10),m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(!m)return '';
+ let y=Number(m[1])+Number(years||0),mo=Number(m[2]),day=Number(m[3]);
+ let last=new Date(Date.UTC(y,mo,0)).getUTCDate();
+ return `${y}-${String(mo).padStart(2,'0')}-${String(Math.min(day,last)).padStart(2,'0')}`;
+}
+function contractDecisionState(contract){
+ let end=String(contract?.contract_end_date||'').slice(0,10);
+ let d=contractDays(end);
+ let nonrenew=!!contract?.nonrenewal_confirmed_at && String(contract?.nonrenewal_for_end_date||'').slice(0,10)===end;
+ return{
+   end,
+   days:d,
+   nonrenew,
+   pending100:Number.isFinite(d)&&d>=0&&d<=100&&!nonrenew,
+   leaving30:nonrenew&&Number.isFinite(d)&&d>=0&&d<=30,
+   expired:Number.isFinite(d)&&d<0
+ };
+}
 function contractRowsFiltered(){
- let cmap=new Map(contracts.map(c=>[c.employee_no,c]));
+ let cmap=new Map(contracts.map(c=>[normalizeNo(c.employee_no),c]));
  let q=($('cSearch')?.value||'').trim().toLowerCase();
  let range=$('cRange')?.value||'';
  let typ=$('cType')?.value||'';
  let all=employees
-   .filter(e=>isActiveAsOf(e)&&/^[WZ]/.test(e.employee_no)&&cmap.has(e.employee_no))
-   .map(e=>({...e,contract_end_date:cmap.get(e.employee_no).contract_end_date}));
+   .filter(e=>isActiveAsOf(e)&&/^[WZ]/.test(normalizeNo(e.employee_no))&&cmap.has(normalizeNo(e.employee_no)))
+   .map(e=>({...e,...cmap.get(normalizeNo(e.employee_no)),employee_no:normalizeNo(e.employee_no)}));
 
  let rows=all.filter(e=>{
-   let d=contractDays(e.contract_end_date);
+   let state=contractDecisionState(e);
    if(typ&&!e.employee_no.startsWith(typ))return false;
-   if(q&&!(e.employee_no+' '+e.name+' '+(e.job_title||'')+' '+personGroup(e)).toLowerCase().includes(q))return false;
-   if(range==='expired'&&!(d<0))return false;
-   if(range&&range!=='expired'&&!(d>=0&&d<=Number(range)))return false;
+   if(q&&!`${e.employee_no} ${e.name} ${e.nationality||''} ${e.job_title||''} ${personGroup(e)}`.toLowerCase().includes(q))return false;
+   if(range==='pending100'&&!state.pending100)return false;
+   if(range==='nonrenewal'&&!state.nonrenew)return false;
+   if(range==='leaving30'&&!state.leaving30)return false;
    return true;
- }).sort((a,b)=>a.contract_end_date.localeCompare(b.contract_end_date)||a.employee_no.localeCompare(b.employee_no));
+ }).sort((a,b)=>String(a.contract_end_date||'').localeCompare(String(b.contract_end_date||''))||a.employee_no.localeCompare(b.employee_no));
  return{all,rows};
+}
+function contractStateHtml(e){
+ let s=contractDecisionState(e);
+ if(s.leaving30)return `<span class="contract-state leaving">30 天內即將離開</span>${e.nonrenewal_note?`<div class="contract-note">${esc(e.nonrenewal_note)}</div>`:''}`;
+ if(s.nonrenew)return `<span class="contract-state nonrenew">不續約・待離開</span>${e.nonrenewal_note?`<div class="contract-note">${esc(e.nonrenewal_note)}</div>`:''}`;
+ if(s.pending100)return `<span class="contract-state pending">100 天內待確認</span>`;
+ if(s.expired)return `<span class="contract-state check">日期已過・請檢查</span>`;
+ return `<span class="contract-state future">尚未進入確認期</span>`;
 }
 function renderContracts(){
  if(!$('contractBody'))return;
  let {all,rows:a}=contractRowsFiltered();
- let ds=all.map(e=>contractDays(e.contract_end_date));
- let k=[['外籍合約',all.length],['30天內',ds.filter(d=>d>=0&&d<=30).length],['90天內',ds.filter(d=>d>=0&&d<=90).length],['已到期',ds.filter(d=>d<0).length]];
- $('contractKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
+ let states=all.map(contractDecisionState);
+ let filter=$('cRange')?.value||'';
+ let k=[
+   ['外籍合約',all.length,''],
+   ['100天內待確認',states.filter(s=>s.pending100).length,'pending100'],
+   ['不續約待離開',states.filter(s=>s.nonrenew).length,'nonrenewal'],
+   ['30天內即將離開',states.filter(s=>s.leaving30).length,'leaving30']
+ ];
+ $('contractKpis').innerHTML=k.map(x=>`<button type="button" class="contract-stat-card ${filter===x[2]?'active':''}" data-contract-filter="${x[2]}"><div class="label">${x[0]}</div><div class="num">${x[1]} <span>人</span></div></button>`).join('');
+ $('contractKpis').querySelectorAll('[data-contract-filter]').forEach(card=>card.onclick=()=>{
+   let v=card.dataset.contractFilter||'';
+   $('cRange').value=$('cRange').value===v?'':v;
+   renderContracts();
+ });
  $('contractCount').textContent=`共 ${a.length} 人`;
  $('contractBody').innerHTML=a.map(e=>{
-   let d=contractDays(e.contract_end_date);
-   let txt=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
-   let cls=d<0?'red':d<=30?'orange':'green';
+   let s=contractDecisionState(e);
+   let txt=s.expired?`已過 ${Math.abs(s.days)} 天`:s.days===0?'今天到期':`${s.days} 天`;
+   let cls=s.expired?'red':s.days<=30?'orange':'green';
+   let actions='';
+   if(isAdmin()){
+     if(s.nonrenew){
+       actions=`<div class="contract-actions"><button type="button" class="btn success" onclick="event.stopPropagation();renewContractThreeYears('${esc(e.employee_no)}')">改為續約 3 年</button><button type="button" class="btn" onclick="event.stopPropagation();clearContractNonrenewal('${esc(e.employee_no)}')">取消不續約</button></div>`;
+     }else if(s.pending100){
+       actions=`<div class="contract-actions"><button type="button" class="btn success" onclick="event.stopPropagation();renewContractThreeYears('${esc(e.employee_no)}')">續約 3 年</button><button type="button" class="btn soft-danger" onclick="event.stopPropagation();markContractNonrenewal('${esc(e.employee_no)}')">不續約</button></div>`;
+     }else{
+       actions='<span class="mini">—</span>';
+     }
+   }
    return `<tr class="${isAdmin()?'editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(e.employee_no)}')" title="點一下編輯這位人員"`:''}>
     <td><b>${esc(e.employee_no)}</b></td>
     <td>${esc(e.name)}</td>
-    <td>${e.employee_no[0]}</td>
+    <td>${esc(e.nationality||'-')}</td>
     <td>${badge(personGroup(e)||'-')}</td>
     <td>${esc(effectiveShift(e)||'-')}${shiftPlanHintHtml(e)}</td>
-    <td>${esc(e.hire_date||'-')}</td>
-    <td><b>${esc(e.contract_end_date)}</b></td>
+    <td><b>${esc(e.contract_end_date||'-')}</b></td>
     <td><span class="badge ${cls}">${txt}</span></td>
+    <td>${contractStateHtml(e)}</td>
+    ${isAdmin()?`<td>${actions}</td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="8" class="empty">目前沒有符合條件的合約資料</td></tr>`;
+ }).join('')||`<tr><td colspan="${isAdmin()?9:8}" class="empty">目前沒有符合條件的合約資料</td></tr>`;
 }
+window.renewContractThreeYears=async no=>{
+ if(!isAdmin())return;
+ no=normalizeNo(no);
+ let c=contracts.find(x=>normalizeNo(x.employee_no)===no),p=employees.find(x=>normalizeNo(x.employee_no)===no);
+ if(!c||!p)return alert('找不到這筆外籍合約資料。');
+ let oldEnd=String(c.contract_end_date||'').slice(0,10),newEnd=contractAddYearsClamped(oldEnd,3);
+ if(!oldEnd||!newEnd)return alert('合約到期日格式不正確。');
+ if(!confirm(`${no}｜${p.name}\n\n確認續約 3 年嗎？\n${oldEnd} → ${newEnd}`))return;
+ let {error}=await db.from('foreign_contracts').update({
+   contract_end_date:newEnd,
+   nonrenewal_confirmed_at:null,
+   nonrenewal_for_end_date:null,
+   nonrenewal_note:null,
+   last_renewed_at:new Date().toISOString(),
+   last_previous_end_date:oldEnd,
+   updated_by:user.id,
+   updated_at:new Date().toISOString()
+ }).eq('employee_no',no);
+ if(error){alert('續約失敗：'+error.message);return}
+ let {error:logError}=await db.from('personnel_changes').insert({
+   employee_no:no,employee_name:p.name,change_type:'續約',old_group:p.group_name||null,new_group:p.group_name||null,
+   detail:`外籍合約：${oldEnd} → ${newEnd}｜續約三年`,change_date:todayISO(),created_by:user.id
+ });
+ if(logError)console.error('續約紀錄寫入失敗',logError);
+ await loadAll();
+ showPage('contracts');
+ alert(`${no} 已確認續約，合約到期日更新為 ${newEnd}。`);
+};
+window.markContractNonrenewal=async no=>{
+ if(!isAdmin())return;
+ no=normalizeNo(no);
+ let c=contracts.find(x=>normalizeNo(x.employee_no)===no),p=employees.find(x=>normalizeNo(x.employee_no)===no);
+ if(!c||!p)return alert('找不到這筆外籍合約資料。');
+ let end=String(c.contract_end_date||'').slice(0,10);
+ let note=prompt(`${no}｜${p.name}\n確認「不續約」？\n\n可輸入備註（可留空）：`,'') ;
+ if(note===null)return;
+ if(!confirm(`確定將 ${no} 標記為不續約？\n合約到期：${end}\n\n之後進入 30 天內時，閃電會提醒主管安排離廠。`))return;
+ let {error}=await db.from('foreign_contracts').update({
+   nonrenewal_confirmed_at:new Date().toISOString(),
+   nonrenewal_for_end_date:end,
+   nonrenewal_note:String(note||'').trim()||null,
+   updated_by:user.id,
+   updated_at:new Date().toISOString()
+ }).eq('employee_no',no);
+ if(error){alert('更新失敗：'+error.message);return}
+ let {error:logError}=await db.from('personnel_changes').insert({
+   employee_no:no,employee_name:p.name,change_type:'不續約',old_group:p.group_name||null,new_group:p.group_name||null,
+   detail:`合約到期：${end}｜確認不續約${String(note||'').trim()?`｜備註：${String(note).trim()}`:''}`,change_date:todayISO(),created_by:user.id
+ });
+ if(logError)console.error('不續約紀錄寫入失敗',logError);
+ await loadAll();
+ showPage('contracts');
+};
+window.clearContractNonrenewal=async no=>{
+ if(!isAdmin())return;
+ no=normalizeNo(no);
+ let c=contracts.find(x=>normalizeNo(x.employee_no)===no),p=employees.find(x=>normalizeNo(x.employee_no)===no);
+ if(!c||!p)return alert('找不到這筆外籍合約資料。');
+ if(!confirm(`確定取消 ${no}｜${p.name} 的「不續約」標記？\n取消後會重新回到 100 天內待確認。`))return;
+ let end=String(c.contract_end_date||'').slice(0,10);
+ let {error}=await db.from('foreign_contracts').update({
+   nonrenewal_confirmed_at:null,nonrenewal_for_end_date:null,nonrenewal_note:null,
+   updated_by:user.id,updated_at:new Date().toISOString()
+ }).eq('employee_no',no);
+ if(error){alert('更新失敗：'+error.message);return}
+ let {error:logError}=await db.from('personnel_changes').insert({
+   employee_no:no,employee_name:p.name,change_type:'取消不續約',old_group:p.group_name||null,new_group:p.group_name||null,
+   detail:`取消不續約｜合約到期：${end}`,change_date:todayISO(),created_by:user.id
+ });
+ if(logError)console.error('取消不續約紀錄寫入失敗',logError);
+ await loadAll();
+ showPage('contracts');
+};
 
 async function exportContractExcel(){
  if(!window.ExcelJS||!window.saveAs)return alert('Excel 匯出元件尚未載入完成，請稍後再試。');
@@ -7926,23 +8392,24 @@ async function exportContractExcel(){
  let workbook=new ExcelJS.Workbook();
  workbook.creator='風力人員統計系統';
  workbook.created=new Date();
- let ws=workbook.addWorksheet('外籍合約到期',{views:[{state:'frozen',ySplit:3}]});
+ let ws=workbook.addWorksheet('外籍合約續約管理',{views:[{state:'frozen',ySplit:3}]});
 
- ws.mergeCells('A1:I1');
- ws.getCell('A1').value='外籍合約到期名單';
+ ws.mergeCells('A1:J1');
+ ws.getCell('A1').value='外籍合約續約管理';
  ws.getCell('A1').font={name:'Microsoft JhengHei',size:16,bold:true,color:{argb:'FF17365D'}};
  ws.getCell('A1').alignment={vertical:'middle',horizontal:'center'};
  ws.getRow(1).height=28;
 
- ws.mergeCells('A2:I2');
+ ws.mergeCells('A2:J2');
  ws.getCell('A2').value=`匯出時間：${new Date().toLocaleString('zh-TW')}`;
  ws.getCell('A2').font={name:'Microsoft JhengHei',size:9,color:{argb:'FF64748B'}};
 
- ws.addRow(['NO.','工號','姓名','類型','組別','班別','到職日','合約到期日','剩餘天數']);
+ ws.addRow(['NO.','工號','姓名','國籍','類型','組別','班別','合約到期日','剩餘天數','續約狀態']);
  rows.forEach((e,i)=>{
-   let d=contractDays(e.contract_end_date);
-   let remain=d<0?`已逾期 ${Math.abs(d)} 天`:d===0?'今天到期':`${d} 天`;
-   ws.addRow([i+1,e.employee_no,e.name,e.employee_no[0],personGroup(e)||'-',effectiveShift(e)||'-',e.hire_date||'-',e.contract_end_date||'-',remain]);
+   let s=contractDecisionState(e);
+   let remain=s.expired?`已過 ${Math.abs(s.days)} 天`:s.days===0?'今天到期':`${s.days} 天`;
+   let status=s.leaving30?'30 天內即將離開':s.nonrenew?'不續約待離開':s.pending100?'100 天內待確認':s.expired?'日期已過・請檢查':'尚未進入確認期';
+   ws.addRow([i+1,e.employee_no,e.name,e.nationality||'',e.employee_no[0],personGroup(e)||'-',effectiveShift(e)||'-',e.contract_end_date||'-',remain,status]);
  });
 
  ws.getRow(3).eachCell(cell=>{
@@ -7951,13 +8418,13 @@ async function exportContractExcel(){
    cell.alignment={vertical:'middle',horizontal:'center'};
  });
 
- ws.columns=[{width:7},{width:13},{width:28},{width:8},{width:14},{width:9},{width:14},{width:16},{width:17}];
- ws.autoFilter={from:'A3',to:`I${ws.rowCount}`};
+ ws.columns=[{width:7},{width:13},{width:18},{width:12},{width:8},{width:14},{width:9},{width:16},{width:16},{width:22}];
+ ws.autoFilter={from:'A3',to:`J${ws.rowCount}`};
  ws.pageSetup={paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0};
 
  let buffer=await workbook.xlsx.writeBuffer();
  saveAs(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
-   `${monthKey()}_外籍合約到期.xlsx`);
+   `${monthKey()}_外籍合約續約管理.xlsx`);
 }
 
 function renderOverseas(){
@@ -8360,12 +8827,19 @@ $('personSave').onclick=async()=>{
 
  let contractEnd=draft.contract_end_date,isForeign=/^[WZ]/.test(no);
  if(isForeign&&contractEnd){
-   let {error:ce}=await db.from('foreign_contracts').upsert({
+   let oldContractRow=contracts.find(c=>normalizeNo(c.employee_no)===no);
+   let contractPayload={
      employee_no:no,
      contract_end_date:contractEnd,
      updated_by:user.id,
      updated_at:new Date().toISOString()
-   },{onConflict:'employee_no'});
+   };
+   if(oldContractRow&&String(oldContractRow.contract_end_date||'').slice(0,10)!==String(contractEnd).slice(0,10)){
+     contractPayload.nonrenewal_confirmed_at=null;
+     contractPayload.nonrenewal_for_end_date=null;
+     contractPayload.nonrenewal_note=null;
+   }
+   let {error:ce}=await db.from('foreign_contracts').upsert(contractPayload,{onConflict:'employee_no'});
    if(ce){alert('人員已儲存，但合約日期儲存失敗：'+ce.message);return}
  }else{
    await db.from('foreign_contracts').delete().eq('employee_no',no)

@@ -6376,7 +6376,7 @@ body.change-manage-mode .change-manage-inline{
      <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div><div class="field"><label>預計返廠／復職日</label><input id="mExpectedReturn" type="date"></div>
     </div><div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職但不列入目前在廠；支援台北港或東17也不列入目前在廠。</div></div>
    </section>
-   <section class="person-editor-section">
+   <section id="mLeaveSection" class="person-editor-section">
     <div class="person-editor-section-head"><div><h3>特休與使用紀錄</h3><p>依到職日採週年制自動計算，以「天」登記；本區獨立儲存；1 天以 8 小時換算。</p></div></div>
     <p id="mLeaveSummary" style="font-weight:600" role="status"></p>
     <div class="person-editor-grid">
@@ -6968,7 +6968,7 @@ async function loadAll(){
    client.from('employees').select('*').order('employee_no'),
    client.from('personnel_changes').select('*').order('id',{ascending:false}),
    client.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true}),
-   isAdmin()?client.rpc('annual_leave_list_summary'):Promise.resolve({data:[]})
+   client.rpc('annual_leave_list_summary')
  ]);
  peopleLeaveBalances=new Map((leaveSummary.data||[]).map(r=>[r.employee_no,r]));
  if(leaveSummary.error)console.error('讀取特休摘要失敗：',leaveSummary.error);
@@ -7669,6 +7669,7 @@ function personInlineStatusHtml(p){
  </div>`;
 }
 function peopleLeaveCell(person){
+ if(!/^Z/i.test(person.employee_no||''))return '—';
  const data=peopleLeaveBalances.get(person.employee_no);
  if(!data)return '<span class="muted">讀取未完成</span>';
  if(!data.hire_date)return '<span class="muted">待填到職日</span>';
@@ -7676,7 +7677,8 @@ function peopleLeaveCell(person){
  return `<span class="leave-balance" title="本期特休，依已登記使用紀錄計算">${days} 天<span class="leave-hours">（${hours} 小時）</span></span>`;
 }
 function renderPeople(){
- $('peopleLeaveHead').classList.toggle('hidden',!isAdmin());
+ const showLeave=activeTypeFilter==='Z'&&!activePresenceFilter;
+ $('peopleLeaveHead').classList.toggle('hidden',!showLeave);
  let a=filtered();
  renderPresenceCounts();
  $('peopleCount').textContent=`${a.length} 人`;
@@ -7709,9 +7711,9 @@ function renderPeople(){
     <td>${esc(x.nationality||'-')}</td>
     <td>${esc(x.hire_date||'-')}</td>
     <td>${tenure(x.hire_date)}</td>
-    ${isAdmin()?`<td>${peopleLeaveCell(x)}</td>`:''}
+    ${showLeave?`<td>${peopleLeaveCell(x)}</td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="${isAdmin()?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
+ }).join('')||`<tr><td colspan="${showLeave?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -8671,7 +8673,9 @@ function openPerson(p=null,area=null){
  syncPersonSpecialActions(p);
  refreshChangePreview();
  $('personModal').classList.add('show');
- void loadAnnualLeaveEditor(editNo);
+ $('mLeaveSection').classList.toggle('hidden',!/^Z/i.test(editNo||''));
+ if(/^Z/i.test(editNo||''))void loadAnnualLeaveEditor(editNo);
+ else{annualLeaveEditorToken++;annualLeaveData=null;}
 }
 
 function syncIdentityFromEmployeeNo({fromUser=false}={}){

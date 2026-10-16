@@ -6368,6 +6368,21 @@ body.change-manage-mode .change-manage-inline{
     </div><div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職但不列入目前在廠；支援台北港或東17也不列入目前在廠。</div></div>
    </section>
    <section class="person-editor-section">
+    <div class="person-editor-section-head"><div><h3>特休與使用紀錄</h3><p>依到職日採週年制自動計算，以「天」登記；本區獨立儲存。</p></div></div>
+    <p id="mLeaveSummary" style="font-weight:600" role="status"></p>
+    <div class="person-editor-grid">
+     <div class="field"><label>使用開始日</label><input id="mLeaveDate" type="date"></div>
+     <div class="field"><label>使用結束日</label><input id="mLeaveEndDate" type="date"></div>
+     <div class="field"><label>實際使用天數（可填 0.5）</label><input id="mLeaveDays" type="number" min="0.01" max="30" step="0.01"></div>
+     <div class="field"><label>備註</label><input id="mLeaveNote" maxlength="500"></div>
+    </div>
+    <p class="mini">日期區間內只填實際請特休的天數，不把休息日算進去。跨週年期間請分筆登記；相同日期請編輯原紀錄。</p>
+    <button id="mLeaveSave" class="btn" type="button">登記使用特休</button> <button id="mLeaveReset" class="btn" type="button">清空／新增一筆</button>
+    <p id="mLeaveStatus" role="status" aria-live="polite"></p>
+    <details><summary>本期使用紀錄／編輯</summary><div id="mLeaveHistory"></div></details>
+    <details><summary>計算規則與注意事項</summary><p class="mini">滿半年 3 天；滿 1 年 7 天；滿 2 年 10 天；滿 3～4 年 14 天；滿 5～9 年 15 天；滿 10 年 16 天，之後每年加 1 天，上限 30 天。滿週年自動換期，半年 3 天與滿一年 7 天分開計算。以同一雇主連續年資為前提；留停、年資承認或公司採曆年制時需另外核對。到新一期自動重新計算法定特休，不遞延。畫面僅顯示本期；過期資料不顯示、不提醒、不做折薪管理。</p><a href="https://calcr2.mol.gov.tw/RestDays" target="_blank" rel="noopener">勞動部特休試算與規則</a></details>
+   </section>
+   <section class="person-editor-section">
     <div class="person-editor-section-head"><div><h3>備註與紀錄</h3><p>需要留下的說明與異動紀錄放在最後。</p></div></div>
     <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
     <div class="change-log-card" id="changeLogOption"><div class="change-log-copy"><div class="change-log-title">人員變動紀錄</div><div id="mChangePreview" class="change-log-preview">尚未偵測到變更。</div></div><label class="log-switch" for="mLogChange"><input id="mLogChange" type="checkbox"><span class="switch-ui" aria-hidden="true"></span><span class="log-switch-text">記錄</span></label></div>
@@ -8531,6 +8546,69 @@ function syncPersonSpecialActions(p=null){
  if($('personResignBtn'))$('personResignBtn').textContent=plannedResign?'修改離職日期':'辦理離職';
 }
 
+let annualLeaveEditorToken=0,annualLeaveData=null,annualLeaveEditId=null,annualLeaveBusy=false;
+function resetLeaveUsageForm(){
+ annualLeaveEditId=null;$('mLeaveDate').value=todayISO();$('mLeaveEndDate').value=todayISO();$('mLeaveDays').value='1';$('mLeaveNote').value='';$('mLeaveSave').textContent='登記使用特休';
+}
+function renderAnnualLeave(data){
+ const p=data.period;
+ let summary=!data.hire_date?'請先設定到職日':!p?.start?`尚未滿半年，預計 ${p?.next_date||'—'} 取得 3 天`:`本期 ${p.start} ～ ${p.end}｜法定 ${p.days} 天｜已登記使用 ${data.used_days} 天｜剩餘 ${data.remaining_days} 天`;
+ if(data.inactive)summary='已離職，以下供結算核對。'+summary;
+ if(data.review_seniority)summary='留停年資需人工核對，本頁依到職日連續年資試算。'+summary;
+ $('mLeaveSummary').textContent=summary;
+ $('mLeaveStatus').textContent='依週年制與已登記紀錄計算；導入前已休假也請補登，否則餘額會偏高。';
+ const rows=(data.history||[]).filter(row=>row.period_start===p?.start);
+ $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天${row.voided?'（已作廢）':''}</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(row.note):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">作廢</button>`:''}</div>`).join(''):'尚無使用紀錄。';
+ $('mLeaveSave').disabled=!data.hire_date||!!data.inactive;
+}
+async function loadAnnualLeaveEditor(no,keepForm=false){
+ const ticket=++annualLeaveEditorToken;annualLeaveData=null;
+ if(!keepForm)resetLeaveUsageForm();
+ $('mLeaveSave').disabled=true;$('mLeaveHistory').innerHTML='';
+ $('mLeaveSummary').textContent=no?'讀取並計算特休中…':'請先儲存新人資料，再登記特休。';
+ if(!no)return;
+ try{
+   const {data,error}=await db.rpc('annual_leave_snapshot',{p_employee_no:no});
+   if(ticket!==annualLeaveEditorToken||editNo!==no)return;
+   if(error)throw error;if(!data?.found)throw new Error('找不到員工資料');
+   annualLeaveData=data;renderAnnualLeave(data);
+ }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='特休讀取失敗：'+error.message;}
+}
+$('mLeaveReset').onclick=()=>{if(!annualLeaveBusy)resetLeaveUsageForm();};
+$('mLeaveDate').onchange=()=>{if($('mLeaveEndDate').value<$('mLeaveDate').value)$('mLeaveEndDate').value=$('mLeaveDate').value;};
+$('mLeaveHistory').onclick=async event=>{
+ if(annualLeaveBusy)return;
+ const edit=event.target.closest('[data-leave-edit]'),cancel=event.target.closest('[data-leave-void]');
+ if(edit){
+   const row=annualLeaveData?.history.find(x=>x.id===edit.dataset.leaveEdit);if(!row)return;
+   annualLeaveEditId=row.id;$('mLeaveDate').value=row.start_date;$('mLeaveEndDate').value=row.end_date;$('mLeaveDays').value=row.days;$('mLeaveNote').value=row.note;$('mLeaveSave').textContent='儲存更正';return;
+ }
+ if(cancel&&confirm('確定作廢這筆使用紀錄？餘額會重新計算，紀錄仍保留。')){
+   annualLeaveBusy=true;const no=editNo,ticket=annualLeaveEditorToken;
+   try{
+     const {data,error}=await db.from('employee_annual_leave_usage').update({voided:true}).eq('id',cancel.dataset.leaveVoid).eq('employee_no',no).select('id').single();
+     if(error)throw error;
+     if(ticket===annualLeaveEditorToken)await loadAnnualLeaveEditor(no);
+   }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='作廢失敗：'+error.message;}
+   finally{annualLeaveBusy=false;}
+ }
+};
+$('mLeaveSave').onclick=async()=>{
+ if(annualLeaveBusy||!isAdmin()||!editNo||!annualLeaveData)return;
+ const no=editNo,ticket=annualLeaveEditorToken;
+ if(normalizeNo($('mNo').value)!==no||$('mHire').value!==(annualLeaveData.hire_date||''))return alert('請先儲存工號或到職日修改，再登記特休。');
+ const start=$('mLeaveDate').value,end=$('mLeaveEndDate').value,days=Number($('mLeaveDays').value),note=$('mLeaveNote').value.trim();
+ if(!start||!end||end<start||end>todayISO()||!Number.isFinite(days)||days<=0||Math.abs(days*100-Math.round(days*100))>0.000001)return alert('請填正確的已休日期與天數（可填 0.5，最多兩位小數）；不可登記未來日期。');
+ annualLeaveBusy=true;$('mLeaveSave').disabled=true;$('mLeaveStatus').textContent='儲存並重新計算中…';
+ annualLeaveEditId=annualLeaveEditId||crypto.randomUUID();
+ try{
+   const {error}=await db.from('employee_annual_leave_usage').upsert({id:annualLeaveEditId,employee_no:no,start_date:start,end_date:end,days,note},{onConflict:'id'});
+   if(error)throw error;
+   if(ticket===annualLeaveEditorToken)await loadAnnualLeaveEditor(no);
+ }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='儲存未完成：'+error.message+'。請核對紀錄後再重試。';}
+ finally{annualLeaveBusy=false;if(ticket===annualLeaveEditorToken)$('mLeaveSave').disabled=false;}
+};
+
 function openPerson(p=null,area=null){
  if(!isAdmin())return;
  editNo=p?.employee_no||null;
@@ -8571,6 +8649,7 @@ function openPerson(p=null,area=null){
  syncPersonSpecialActions(p);
  refreshChangePreview();
  $('personModal').classList.add('show');
+ void loadAnnualLeaveEditor(editNo);
 }
 
 function syncIdentityFromEmployeeNo({fromUser=false}={}){

@@ -5742,6 +5742,13 @@ body.change-manage-mode .change-manage-inline{
   .contract-stat-card .num{font-size:27px}
 }
 
+/* V129: content-sized personnel columns */
+#people .people-list-section table{width:max-content;min-width:0;max-width:none;table-layout:auto}
+#people .people-list-section th,#people .people-list-section td{width:auto;min-width:0;padding:9px 10px;white-space:nowrap}
+#people .people-list-section td:nth-child(2){max-width:210px;white-space:normal;overflow-wrap:anywhere}
+#people .people-list-section td:nth-child(5){max-width:140px;white-space:normal;overflow-wrap:anywhere}
+#people .people-list-section .leave-hours{font-size:12px;color:#64748b;font-weight:400}
+#people .people-list-section .leave-balance{font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -6163,7 +6170,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="section people-list-section">
   <div class="tablewrap">
    <table>
-    <thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th></tr></thead>
+    <thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th id="peopleLeaveHead" class="hidden">剩餘特休</th></tr></thead>
     <tbody id="peopleBody"></tbody>
    </table>
   </div>
@@ -6368,7 +6375,7 @@ body.change-manage-mode .change-manage-inline{
     </div><div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職但不列入目前在廠；支援台北港或東17也不列入目前在廠。</div></div>
    </section>
    <section class="person-editor-section">
-    <div class="person-editor-section-head"><div><h3>特休與使用紀錄</h3><p>依到職日採週年制自動計算，以「天」登記；本區獨立儲存。</p></div></div>
+    <div class="person-editor-section-head"><div><h3>特休與使用紀錄</h3><p>依到職日採週年制自動計算，以「天」登記；本區獨立儲存；1 天以 8 小時換算。</p></div></div>
     <p id="mLeaveSummary" style="font-weight:600" role="status"></p>
     <div class="person-editor-grid">
      <div class="field"><label>使用開始日</label><input id="mLeaveDate" type="date"></div>
@@ -6592,6 +6599,7 @@ body.change-manage-mode .change-manage-inline{
 const $=id=>document.getElementById(id);
 const GROUPS=["捲板","手焊","電焊","焊接協調","清根","研磨","主管","文管","廠務","未分類"];
 const cfg=window.APP_CONFIG||{};
+let peopleLeaveBalances=new Map();
 let db=null,user=null,role='viewer',employees=[],changes=[],contracts=[],snapshots=[],snapshotReady=false,snapshotError='',editNo=null,resignNo=null,importRows=[],activeTypeFilter='',activePresenceFilter='',activeOnsiteOnly=false;
 let returnConfirmNo=null,returnPromptSnoozedUntilReload=false;
 let pendingSession=null;
@@ -6942,7 +6950,7 @@ $('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn
 $('logoutBtn').onclick=()=>db.auth.signOut();
 async function enter(u){user=u;await ensureDbClient();let {data:p,error}=await db.from('profiles').select('role,display_name,email').eq('id',u.id).single();if(error){console.error(error);role='viewer'}else role=p?.role||'viewer';$('openingView').classList.add('hidden');$('appView').classList.remove('hidden');$('roleBadge').textContent=isAdmin()?'管理員':'僅檢視';$('userEmail').textContent=isAdmin()?(u.email||''):'公司檢視者';document.querySelectorAll('.admin-only').forEach(x=>x.classList.toggle('hidden',!isAdmin()));await loadAll();showPage('dashboard')}
 function leave(){
- user=null;role='viewer';pendingSession=null;
+ user=null;role='viewer';pendingSession=null;peopleLeaveBalances.clear();
  employees=[];changes=[];contracts=[];snapshots=[];snapshotReady=false;snapshotError='';
  $('appView').classList.add('hidden');
  $('viewerPassword').value='';
@@ -6954,11 +6962,14 @@ function leave(){
 }
 async function loadAll(){
  let client=await ensureDbClient();
- let [e,c,sm]=await Promise.all([
+ let [e,c,sm,leaveSummary]=await Promise.all([
    client.from('employees').select('*').order('employee_no'),
    client.from('personnel_changes').select('*').order('id',{ascending:false}),
-   client.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true})
+   client.from('monthly_personnel_snapshots').select('*').order('snapshot_month',{ascending:true}).order('employee_no',{ascending:true}),
+   isAdmin()?client.rpc('annual_leave_list_summary'):Promise.resolve({data:[]})
  ]);
+ peopleLeaveBalances=new Map((leaveSummary.data||[]).map(r=>[r.employee_no,r]));
+ if(leaveSummary.error)console.error('讀取特休摘要失敗：',leaveSummary.error);
  if(e.error)alert('讀取人員資料失敗：'+e.error.message);else employees=(e.data||[]).map(p=>{
    // V120：預定離職日尚未到，仍屬在職。舊資料即使 status 已被寫成「離職」，
    // 介面與所有統計都先依 resigned_at 生效日判定，避免提前從名單移除。
@@ -7655,7 +7666,15 @@ function personInlineStatusHtml(p){
    ${detail?`<span class="person-inline-detail">${esc(detail)}</span>`:''}
  </div>`;
 }
+function peopleLeaveCell(person){
+ const data=peopleLeaveBalances.get(person.employee_no);
+ if(!data)return '<span class="muted">讀取未完成</span>';
+ if(!data.hire_date)return '<span class="muted">待填到職日</span>';
+ const days=Number(data.remaining_days),hours=Math.round(days*800)/100;
+ return `<span class="leave-balance" title="本期特休，依已登記使用紀錄計算">${days} 天<span class="leave-hours">（${hours} 小時）</span></span>`;
+}
 function renderPeople(){
+ $('peopleLeaveHead').classList.toggle('hidden',!isAdmin());
  let a=filtered();
  renderPresenceCounts();
  $('peopleCount').textContent=`${a.length} 人`;
@@ -7688,8 +7707,9 @@ function renderPeople(){
     <td>${esc(x.nationality||'-')}</td>
     <td>${esc(x.hire_date||'-')}</td>
     <td>${tenure(x.hire_date)}</td>
+    ${isAdmin()?`<td>${peopleLeaveCell(x)}</td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="9" class="empty">沒有符合條件的人員</td></tr>`;
+ }).join('')||`<tr><td colspan="${isAdmin()?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -8552,13 +8572,13 @@ function resetLeaveUsageForm(){
 }
 function renderAnnualLeave(data){
  const p=data.period;
- let summary=!data.hire_date?'請先設定到職日':!p?.start?`尚未滿半年，預計 ${p?.next_date||'—'} 取得 3 天`:`本期 ${p.start} ～ ${p.end}｜法定 ${p.days} 天｜已登記使用 ${data.used_days} 天｜剩餘 ${data.remaining_days} 天`;
+ let summary=!data.hire_date?'請先設定到職日':!p?.start?`尚未滿半年，預計 ${p?.next_date||'—'} 取得 3 天`:`本期 ${p.start} ～ ${p.end}｜法定 ${p.days} 天｜已登記使用 ${data.used_days} 天｜剩餘 ${data.remaining_days} 天（${Math.round(Number(data.remaining_days)*800)/100} 小時）`;
  if(data.inactive)summary='已離職，以下供結算核對。'+summary;
  if(data.review_seniority)summary='留停年資需人工核對，本頁依到職日連續年資試算。'+summary;
  $('mLeaveSummary').textContent=summary;
  $('mLeaveStatus').textContent='依週年制與已登記紀錄計算；導入前已休假也請補登，否則餘額會偏高。';
- const rows=(data.history||[]).filter(row=>row.period_start===p?.start);
- $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天${row.voided?'（已作廢）':''}</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(row.note):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">作廢</button>`:''}</div>`).join(''):'尚無使用紀錄。';
+ const rows=(data.history||[]).filter(row=>row.period_start===p?.start&&!row.voided);
+ $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(row.note):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">移除</button>`:''}</div>`).join(''):'尚無使用紀錄。';
  $('mLeaveSave').disabled=!data.hire_date||!!data.inactive;
 }
 async function loadAnnualLeaveEditor(no,keepForm=false){
@@ -8571,7 +8591,7 @@ async function loadAnnualLeaveEditor(no,keepForm=false){
    const {data,error}=await db.rpc('annual_leave_snapshot',{p_employee_no:no});
    if(ticket!==annualLeaveEditorToken||editNo!==no)return;
    if(error)throw error;if(!data?.found)throw new Error('找不到員工資料');
-   annualLeaveData=data;renderAnnualLeave(data);
+   annualLeaveData=data;peopleLeaveBalances.set(no,data);renderAnnualLeave(data);renderPeople();
  }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='特休讀取失敗：'+error.message;}
 }
 $('mLeaveReset').onclick=()=>{if(!annualLeaveBusy)resetLeaveUsageForm();};
@@ -8583,13 +8603,13 @@ $('mLeaveHistory').onclick=async event=>{
    const row=annualLeaveData?.history.find(x=>x.id===edit.dataset.leaveEdit);if(!row)return;
    annualLeaveEditId=row.id;$('mLeaveDate').value=row.start_date;$('mLeaveEndDate').value=row.end_date;$('mLeaveDays').value=row.days;$('mLeaveNote').value=row.note;$('mLeaveSave').textContent='儲存更正';return;
  }
- if(cancel&&confirm('確定作廢這筆使用紀錄？餘額會重新計算，紀錄仍保留。')){
+ if(cancel&&confirm('確定永久移除這筆使用紀錄？資料刪除後無法復原，剩餘特休會重新計算。')){
    annualLeaveBusy=true;const no=editNo,ticket=annualLeaveEditorToken;
    try{
-     const {data,error}=await db.from('employee_annual_leave_usage').update({voided:true}).eq('id',cancel.dataset.leaveVoid).eq('employee_no',no).select('id').single();
+     const {data,error}=await db.from('employee_annual_leave_usage').delete().eq('id',cancel.dataset.leaveVoid).eq('employee_no',no).select('id').single();
      if(error)throw error;
      if(ticket===annualLeaveEditorToken)await loadAnnualLeaveEditor(no);
-   }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='作廢失敗：'+error.message;}
+   }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='移除失敗：'+error.message;}
    finally{annualLeaveBusy=false;}
  }
 };

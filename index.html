@@ -8083,7 +8083,12 @@ function changeMonthLabel(key){
 function renderChanges(){
  if($('changesTable'))$('changesTable').classList.toggle('change-table-manage',changeManageMode);
 
- let rows=changeSearchRows();
+ // V125：依變動日期由新到舊排列，同日再依紀錄編號排序。
+ let rows=[...changeSearchRows()].sort((a,b)=>{
+   const dateA=String(a.change_date||'').slice(0,10);
+   const dateB=String(b.change_date||'').slice(0,10);
+   return dateB.localeCompare(dateA)||(Number(b.id)||0)-(Number(a.id)||0);
+ });
  let q=($('changeSearch')?.value||'').trim();
  if($('changeSearchMeta')){
    $('changeSearchMeta').innerHTML=q

@@ -5742,15 +5742,35 @@ body.change-manage-mode .change-manage-inline{
   .contract-stat-card .num{font-size:27px}
 }
 
-/* V133: fill the personnel card, distribute space by content */
-#people .people-list-section table{width:100%;min-width:0;max-width:none;table-layout:auto}
-#people .people-list-section th,#people .people-list-section td{width:auto;min-width:0;padding:12px 16px;white-space:nowrap}
-#people .people-list-section td:nth-child(2){min-width:100px;max-width:240px;white-space:normal;overflow-wrap:anywhere}
-#people .people-list-section td:nth-child(5){min-width:72px;max-width:160px;white-space:normal;overflow-wrap:anywhere}
-#people .people-list-section td:nth-child(8){min-width:100px}
-#people .people-list-section td:nth-child(10){min-width:145px}
-#people .people-list-section .leave-hours{font-size:12px;color:#64748b;font-weight:400}
-#people .people-list-section .leave-balance{font-variant-numeric:tabular-nums}
+/* V134: two-line personnel overview */
+#people .people-list-section table{width:100%;min-width:620px;table-layout:auto}
+#people .people-list-section th,#people .people-list-section td{padding:14px 20px;white-space:normal;vertical-align:middle}
+#people .people-list-section td:first-child{min-width:180px;max-width:300px;overflow-wrap:anywhere}
+#people .people-list-section th{white-space:nowrap}
+#people .people-primary{font-size:14px;font-weight:600;color:#243d36;line-height:1.5}
+#people .people-secondary{font-size:12px;color:#64748b;margin-top:4px;line-height:1.5}
+#people .people-no{font-variant-numeric:tabular-nums;margin-right:8px}
+#people .leave-balance{font-size:16px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+#people .leave-hours{display:block;font-size:12px;font-weight:400;color:#64748b;margin-top:4px}
+#people .editable-person-row{cursor:pointer}
+#people .editable-person-row:focus-visible{outline:2px solid #557b6b;outline-offset:-2px}
+.person-read-dialog{border:1px solid #dce5e1;border-radius:18px;padding:24px;width:min(560px,calc(100vw - 40px));max-height:85vh;overflow:auto;color:#243d36;box-sizing:border-box}
+.person-read-dialog::backdrop{background:rgba(15,30,25,.35)}
+.person-read-dialog h2{margin:0 0 20px;font-size:20px}
+.person-read-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px}
+.person-read-grid dt{font-size:12px;color:#64748b;margin-bottom:5px}
+.person-read-grid dd{margin:0;line-height:1.6;overflow-wrap:anywhere}
+.person-read-dialog form{text-align:right;margin-top:24px}
+@media(max-width:640px){#people .people-list-section th,#people .people-list-section td{padding:12px}.person-read-grid{gap:14px}}
+/* V135: synchronized horizontal scrollbar above each table */
+.table-top-scroll{display:block;width:100%;max-width:100%;height:18px;overflow-x:scroll;overflow-y:hidden;box-sizing:border-box;margin:4px 0 8px;border-radius:8px;background:#eef2f5;scrollbar-color:#94a3b8 #eef2f5;scrollbar-width:auto}
+.table-top-scroll[hidden]{display:none!important}
+.table-top-scroll>div{height:1px;pointer-events:none}
+.table-top-scroll::-webkit-scrollbar{height:14px}
+.table-top-scroll::-webkit-scrollbar-track{background:#eef2f5;border-radius:8px}
+.table-top-scroll::-webkit-scrollbar-thumb{background:#94a3b8;border:3px solid #eef2f5;border-radius:8px}
+.table-top-scroll:focus-visible{outline:2px solid #557b6b;outline-offset:2px}
+@media print{.table-top-scroll{display:none!important}}
 </style>
 </head>
 <body>
@@ -6172,7 +6192,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="section people-list-section">
   <div class="tablewrap">
    <table>
-    <thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th><th>年資</th><th id="peopleLeaveHead" class="hidden">剩餘特休</th></tr></thead>
+    <thead><tr><th>人員</th><th>班別／組別</th><th>職務</th><th>到職／年資</th><th id="peopleLeaveHead" class="hidden">剩餘特休</th></tr></thead>
     <tbody id="peopleBody"></tbody>
    </table>
   </div>
@@ -6333,6 +6353,7 @@ body.change-manage-mode .change-manage-inline{
 </main>
 </div>
 
+<dialog id="personReadDialog" class="person-read-dialog" aria-labelledby="personReadTitle"><h2 id="personReadTitle">人員資料</h2><dl id="personReadBody" class="person-read-grid"></dl><form method="dialog"><button class="btn" autofocus>關閉</button></form></dialog>
 <div id="personModal" class="modalback">
  <div class="modal person-modal-v118">
   <button id="personClose" class="close">×</button>
@@ -6380,12 +6401,13 @@ body.change-manage-mode .change-manage-inline{
     <div class="person-editor-section-head"><div><h3>特休與使用紀錄</h3><p>依到職日採週年制自動計算，以「天」登記；本區獨立儲存；1 天以 8 小時換算。</p></div></div>
     <p id="mLeaveSummary" style="font-weight:600" role="status"></p>
     <div class="person-editor-grid">
+     <div class="field"><label>請假當時班別</label><select id="mLeaveShift"><option value="">請確認當時班別</option><option value="日">日班</option><option value="中">中班</option><option value="夜">晚班（跨日）</option></select><div id="mLeaveShiftHint" class="mini"></div></div>
      <div class="field"><label>使用開始日</label><input id="mLeaveDate" type="date"></div>
      <div class="field"><label>使用結束日</label><input id="mLeaveEndDate" type="date"></div>
      <div class="field"><label>實際使用天數（可填 0.5）</label><input id="mLeaveDays" type="number" min="0.01" max="30" step="0.01"></div>
      <div class="field"><label>備註</label><input id="mLeaveNote" maxlength="500"></div>
     </div>
-    <p class="mini">日期區間內只填實際請特休的天數，不把休息日算進去。跨週年期間請分筆登記；相同日期請編輯原紀錄。</p>
+    <p class="mini">選開始日會自動帶入結束日與 1 天；日班同日、晚班至隔日為一班。修改結束日會重算天數；休息日與半天請手動調整。跨換班或特休週期請分筆登記。</p>
     <button id="mLeaveSave" class="btn" type="button">登記使用特休</button> <button id="mLeaveReset" class="btn" type="button">清空／新增一筆</button>
     <p id="mLeaveStatus" role="status" aria-live="polite"></p>
     <details><summary>本期使用紀錄／編輯</summary><div id="mLeaveHistory"></div></details>
@@ -7698,23 +7720,26 @@ function renderPeople(){
  $('peopleBody').innerHTML=a.map(x=>{
    let st=currentTempStatus(x);
    let rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
-   return `<tr class="${rowClass}${isAdmin()?' editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(x.employee_no)}')" title="點一下編輯這位人員"`:''}>
-    <td><b>${esc(x.employee_no)}</b></td>
-    <td>
-     <div class="person-name-cell">${esc(x.name)}</div>
-     ${personInlineStatusHtml(x)}
-    </td>
-    <td>${esc(effectiveShift(x)||'-')}${shiftPlanHintHtml(x)}</td>
-    <td>${badge(personGroup(x)||'-')}</td>
-    <td>${esc(x.job_title||'-')}</td>
-    <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
-    <td>${esc(x.nationality||'-')}</td>
-    <td>${esc(x.hire_date||'-')}</td>
-    <td>${tenure(x.hire_date)}</td>
+   return `<tr class="${rowClass} editable-person-row" data-person-no="${esc(x.employee_no)}" tabindex="0" role="button" aria-label="${isAdmin()?'編輯':'查看'} ${esc(x.employee_no)} ${esc(x.name)}" title="${isAdmin()?'點一下編輯人員':'點一下查看詳細資料'}">
+    <td><div class="people-primary"><span class="people-no">${esc(x.employee_no)}</span>${esc(x.name)}</div><div class="people-secondary">${esc(x.nationality||personType(x)||'—')}</div>${personInlineStatusHtml(x)}</td>
+    <td><div class="people-primary">${esc(effectiveShift(x)||'—')}${effectiveShift(x)?'班':''}</div><div class="people-secondary">${esc(personGroup(x)||'—')}</div>${shiftPlanHintHtml(x)}</td>
+    <td><div class="people-primary">${esc(x.job_title||'—')}</div><div class="people-secondary">${esc(x.level||'—')}</div></td>
+    <td><div class="people-primary" style="white-space:nowrap">${esc(x.hire_date||'—')}</div><div class="people-secondary">${tenure(x.hire_date)}</div></td>
     ${showLeave?`<td>${peopleLeaveCell(x)}</td>`:''}
    </tr>`;
- }).join('')||`<tr><td colspan="${showLeave?10:9}" class="empty">沒有符合條件的人員</td></tr>`;
+ }).join('')||`<tr><td colspan="${showLeave?5:4}" class="empty">沒有符合條件的人員</td></tr>`;
 }
+function openPeopleRow(no){
+ if(isAdmin()){editPerson(no);return;}
+ const p=employees.find(x=>x.employee_no===no);if(!p)return;
+ const fields=[['工號',p.employee_no],['姓名',p.name],['國籍',p.nationality||personType(p)],['班別',effectiveShift(p)],['組別',personGroup(p)],['職別',p.job_title],['職級',p.level],['到職日',p.hire_date],['年資',tenure(p.hire_date)],['人員狀態',currentTempStatus(p)||p.status||'在職'],['預計返廠日',p.expected_return_date],['備註',p.note]];
+ $('personReadTitle').textContent=p.employee_no+' '+p.name;
+ $('personReadBody').innerHTML=fields.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value||'—')}</dd></div>`).join('')+(activeTypeFilter==='Z'&&!activePresenceFilter?`<div><dt>剩餘特休</dt><dd>${peopleLeaveCell(p)}</dd></div>`:'');
+ $('personReadDialog').showModal();
+}
+$('peopleBody').addEventListener('click',event=>{const row=event.target.closest('[data-person-no]');if(row)openPeopleRow(row.dataset.personNo);});
+$('peopleBody').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){const row=event.target.closest('[data-person-no]');if(row){event.preventDefault();openPeopleRow(row.dataset.personNo);}}});
+
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
  return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;
@@ -8571,8 +8596,32 @@ function syncPersonSpecialActions(p=null){
 }
 
 let annualLeaveEditorToken=0,annualLeaveData=null,annualLeaveEditId=null,annualLeaveBusy=false;
+let annualLeavePinnedShift='';
+function leaveAddDays(date,days){const d=new Date(date+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+days);return d.toISOString().slice(0,10);}
+function leaveShiftAt(date){
+ const records=(annualLeaveData?.shift_history||[]).filter(h=>h.effective_from<=date).sort((a,b)=>a.effective_from.localeCompare(b.effective_from)||Number(a.id)-Number(b.id));
+ const h=records[records.length-1];if(!h)return '';
+ return h.pending_shift&&h.shift_effective_date&&h.shift_effective_date<=date?h.pending_shift:h.shift||'';
+}
+function recalcLeaveDates(resetEnd=false,preserveDays=false){
+ const start=$('mLeaveDate').value;if(!start)return;
+ const known=leaveShiftAt(start),saved=annualLeavePinnedShift;
+ const select=$('mLeaveShift');
+ if(saved||known)select.value=saved||known;
+ select.disabled=!!(saved||known);
+ const shift=select.value;
+ $('mLeaveShiftHint').textContent=saved?'沿用此筆已儲存的班別':known?'依請假日期的班別歷程自動帶入':'此日期缺少完整班別歷程，請選擇當時班別。';
+ if(!shift){if(resetEnd){$('mLeaveEndDate').value=start;$('mLeaveDays').value='';}return;}
+ if(resetEnd)$('mLeaveEndDate').value=leaveAddDays(start,shift==='夜'?1:0);
+ const end=$('mLeaveEndDate').value;
+ if(!end)return;
+ const days=Math.round((Date.parse(end+'T00:00:00Z')-Date.parse(start+'T00:00:00Z'))/86400000)+(shift==='夜'?0:1);
+ if(!preserveDays)$('mLeaveDays').value=days>0?String(days):'';
+ if(days<=0)$('mLeaveShiftHint').textContent='晚班結束日須至少是開始日的隔天；請確認日期。';
+ else $('mLeaveShiftHint').textContent+=' '+(shift==='夜'?'晚班跨午夜算同一班。':'同一天算一班。')+'休息日請手動扣除。';
+}
 function resetLeaveUsageForm(){
- annualLeaveEditId=null;$('mLeaveDate').value=todayISO();$('mLeaveEndDate').value=todayISO();$('mLeaveDays').value='1';$('mLeaveNote').value='';$('mLeaveSave').textContent='登記使用特休';
+ annualLeavePinnedShift='';$('mLeaveShift').value='';annualLeaveEditId=null;$('mLeaveDate').value=todayISO();$('mLeaveEndDate').value=todayISO();$('mLeaveDays').value='1';$('mLeaveNote').value='';$('mLeaveSave').textContent='登記使用特休';recalcLeaveDates(true);
 }
 function renderAnnualLeave(data){
  const p=data.period;
@@ -8582,7 +8631,7 @@ function renderAnnualLeave(data){
  $('mLeaveSummary').textContent=summary;
  $('mLeaveStatus').textContent='依週年制與已登記紀錄計算；導入前已休假也請補登，否則餘額會偏高。';
  const rows=(data.history||[]).filter(row=>row.period_start===p?.start&&!row.voided);
- $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(row.note):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">移除</button>`:''}</div>`).join(''):'尚無使用紀錄。';
+ $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天${row.applied_shift?'（'+esc(row.applied_shift==='夜'?'晚班':row.applied_shift+'班')+'）':''}</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(row.note):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">移除</button>`:''}</div>`).join(''):'尚無使用紀錄。';
  $('mLeaveSave').disabled=!data.hire_date||!!data.inactive;
 }
 async function loadAnnualLeaveEditor(no,keepForm=false){
@@ -8595,17 +8644,19 @@ async function loadAnnualLeaveEditor(no,keepForm=false){
    const {data,error}=await db.rpc('annual_leave_snapshot',{p_employee_no:no});
    if(ticket!==annualLeaveEditorToken||editNo!==no)return;
    if(error)throw error;if(!data?.found)throw new Error('找不到員工資料');
-   annualLeaveData=data;peopleLeaveBalances.set(no,data);renderAnnualLeave(data);renderPeople();
+   annualLeaveData=data;peopleLeaveBalances.set(no,data);renderAnnualLeave(data);renderPeople();if(!keepForm)recalcLeaveDates(true);
  }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='特休讀取失敗：'+error.message;}
 }
 $('mLeaveReset').onclick=()=>{if(!annualLeaveBusy)resetLeaveUsageForm();};
-$('mLeaveDate').onchange=()=>{if($('mLeaveEndDate').value<$('mLeaveDate').value)$('mLeaveEndDate').value=$('mLeaveDate').value;};
+$('mLeaveDate').onchange=()=>{annualLeavePinnedShift='';$('mLeaveShift').value='';recalcLeaveDates(true);};
+$('mLeaveEndDate').onchange=()=>{annualLeavePinnedShift='';recalcLeaveDates();};
+$('mLeaveShift').onchange=()=>{annualLeavePinnedShift='';recalcLeaveDates(true);};
 $('mLeaveHistory').onclick=async event=>{
  if(annualLeaveBusy)return;
  const edit=event.target.closest('[data-leave-edit]'),cancel=event.target.closest('[data-leave-void]');
  if(edit){
    const row=annualLeaveData?.history.find(x=>x.id===edit.dataset.leaveEdit);if(!row)return;
-   annualLeaveEditId=row.id;$('mLeaveDate').value=row.start_date;$('mLeaveEndDate').value=row.end_date;$('mLeaveDays').value=row.days;$('mLeaveNote').value=row.note;$('mLeaveSave').textContent='儲存更正';return;
+   annualLeaveEditId=row.id;$('mLeaveDate').value=row.start_date;$('mLeaveEndDate').value=row.end_date;$('mLeaveDays').value=row.days;$('mLeaveNote').value=row.note;$('mLeaveSave').textContent='儲存更正';annualLeavePinnedShift=row.applied_shift||'';$('mLeaveShift').value=row.applied_shift||'';recalcLeaveDates(false,true);return;
  }
  if(cancel&&confirm('確定永久移除這筆使用紀錄？資料刪除後無法復原，剩餘特休會重新計算。')){
    annualLeaveBusy=true;const no=editNo,ticket=annualLeaveEditorToken;
@@ -8622,11 +8673,17 @@ $('mLeaveSave').onclick=async()=>{
  const no=editNo,ticket=annualLeaveEditorToken;
  if(normalizeNo($('mNo').value)!==no||$('mHire').value!==(annualLeaveData.hire_date||''))return alert('請先儲存工號或到職日修改，再登記特休。');
  const start=$('mLeaveDate').value,end=$('mLeaveEndDate').value,days=Number($('mLeaveDays').value),note=$('mLeaveNote').value.trim();
- if(!start||!end||end<start||end>todayISO()||!Number.isFinite(days)||days<=0||Math.abs(days*100-Math.round(days*100))>0.000001)return alert('請填正確的已休日期與天數（可填 0.5，最多兩位小數）；不可登記未來日期。');
+ const shift=$('mLeaveShift').value;
+ if(!shift)return alert('請先確認請假當時的班別。');
+ const dutyEnd=end?leaveAddDays(end,shift==='夜'?-1:0):'';
+ if(!start||!end||dutyEnd<start||dutyEnd>todayISO()||!Number.isFinite(days)||days<=0||Math.abs(days*100-Math.round(days*100))>0.000001)return alert('請填正確的已休日期與天數（可填 0.5，最多兩位小數）；不可登記未來日期。');
+ const span=Math.round((Date.parse(dutyEnd+'T00:00:00Z')-Date.parse(start+'T00:00:00Z'))/86400000)+1;
+ if(span>366||days>span)return alert('使用天數不可超過請假班次，跨年度請分筆登記。');
+ if(!annualLeavePinnedShift){for(let d=start;d<=dutyEnd;d=leaveAddDays(d,1)){const actual=leaveShiftAt(d);if(actual&&actual!==shift)return alert('這段期間有換班，請依換班日期分筆登記。');}}
  annualLeaveBusy=true;$('mLeaveSave').disabled=true;$('mLeaveStatus').textContent='儲存並重新計算中…';
  annualLeaveEditId=annualLeaveEditId||crypto.randomUUID();
  try{
-   const {error}=await db.from('employee_annual_leave_usage').upsert({id:annualLeaveEditId,employee_no:no,start_date:start,end_date:end,days,note},{onConflict:'id'});
+   const {error}=await db.from('employee_annual_leave_usage').upsert({id:annualLeaveEditId,employee_no:no,start_date:start,end_date:dutyEnd,display_end_date:end,applied_shift:shift,days,note},{onConflict:'id'});
    if(error)throw error;
    if(ticket===annualLeaveEditorToken)await loadAnnualLeaveEditor(no);
  }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='儲存未完成：'+error.message+'。請核對紀錄後再重試。';}
@@ -11005,6 +11062,32 @@ $('importBtn').onclick=async()=>{
    $('importBtn').disabled=false;
  }
 };
+
+
+// V135: keep top and bottom scroll positions in sync without fetching data.
+function setupTableTopScrollbars(){
+ document.querySelectorAll('.tablewrap').forEach(wrap=>{
+   const table=wrap.querySelector('table');if(!table||wrap.dataset.topScrollbar)return;
+   wrap.dataset.topScrollbar='ready';
+   const bar=document.createElement('div'),spacer=document.createElement('div');
+   bar.className='table-top-scroll';bar.hidden=true;bar.tabIndex=0;
+   bar.setAttribute('role','region');bar.setAttribute('aria-label','表格左右捲動，可拖曳或使用左右方向鍵');
+   bar.appendChild(spacer);wrap.before(bar);
+   bar.addEventListener('scroll',()=>{if(Math.abs(wrap.scrollLeft-bar.scrollLeft)>1)wrap.scrollLeft=bar.scrollLeft;},{passive:true});
+   wrap.addEventListener('scroll',()=>{if(Math.abs(bar.scrollLeft-wrap.scrollLeft)>1)bar.scrollLeft=wrap.scrollLeft;},{passive:true});
+   let frame=0;
+   const refresh=()=>{
+     cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{
+       const visible=wrap.clientWidth>0,overflow=wrap.scrollWidth>wrap.clientWidth+1;
+       bar.hidden=!(visible&&overflow);
+       if(!bar.hidden){bar.style.width=wrap.clientWidth+'px';spacer.style.width=wrap.scrollWidth+'px';bar.scrollLeft=wrap.scrollLeft;}
+     });
+   };
+   const observer=new ResizeObserver(refresh);observer.observe(wrap);observer.observe(table);
+   window.addEventListener('resize',refresh,{passive:true});refresh();
+ });
+}
+setupTableTopScrollbars();
 
 // V106：返廠日到期時改為人工確認，不再自動視為返廠。
 init();

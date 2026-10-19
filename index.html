@@ -5771,6 +5771,20 @@ body.change-manage-mode .change-manage-inline{
 .table-top-scroll::-webkit-scrollbar-thumb{background:#94a3b8;border:3px solid #eef2f5;border-radius:8px}
 .table-top-scroll:focus-visible{outline:2px solid #557b6b;outline-offset:2px}
 @media print{.table-top-scroll{display:none!important}}
+/* V137: aligned identity and metadata rows */
+#people .people-list-section tbody td{vertical-align:top;padding-top:14px;padding-bottom:14px}
+#people #peopleBody tr td{padding-top:14px;padding-bottom:14px}
+#people .people-primary{line-height:22px;min-height:22px}
+#people .people-identity{display:grid;grid-template-columns:5ch minmax(0,1fr);column-gap:10px;align-items:baseline}
+#people .people-identity .people-no{margin:0;white-space:nowrap}
+#people .people-secondary{margin-top:6px;line-height:22px;min-height:22px}
+#people .people-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:6px;min-height:22px;line-height:22px;font-size:12px;color:#64748b}
+#people .people-nationality{white-space:nowrap}
+#people .people-meta .person-inline-status{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:0;min-width:0}
+#people .people-meta .temp-badge{margin:0;min-height:22px;box-sizing:border-box;padding:2px 7px;font-size:11px;font-weight:500;line-height:16px;border-radius:5px;white-space:normal}
+#people .people-meta .person-inline-detail{flex-basis:100%;white-space:normal;font-size:11px;line-height:18px}
+#people .leave-balance{display:block;line-height:22px}
+#people .leave-hours{margin-top:6px;line-height:22px}
 </style>
 </head>
 <body>
@@ -7721,7 +7735,7 @@ function renderPeople(){
    let st=currentTempStatus(x);
    let rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
    return `<tr class="${rowClass} editable-person-row" data-person-no="${esc(x.employee_no)}" tabindex="0" role="button" aria-label="${isAdmin()?'編輯':'查看'} ${esc(x.employee_no)} ${esc(x.name)}" title="${isAdmin()?'點一下編輯人員':'點一下查看詳細資料'}">
-    <td><div class="people-primary"><span class="people-no">${esc(x.employee_no)}</span>${esc(x.name)}</div><div class="people-secondary">${esc(x.nationality||personType(x)||'—')}</div>${personInlineStatusHtml(x)}</td>
+    <td><div class="people-primary people-identity"><span class="people-no">${esc(x.employee_no)}</span><span>${esc(x.name)}</span></div><div class="people-meta"><span class="people-nationality">${esc(x.nationality||personType(x)||'—')}</span>${personInlineStatusHtml(x)}</div></td>
     <td><div class="people-primary">${esc(effectiveShift(x)||'—')}${effectiveShift(x)?'班':''}</div><div class="people-secondary">${esc(personGroup(x)||'—')}</div>${shiftPlanHintHtml(x)}</td>
     <td><div class="people-primary">${esc(x.job_title||'—')}</div><div class="people-secondary">${esc(x.level||'—')}</div></td>
     <td><div class="people-primary" style="white-space:nowrap">${esc(x.hire_date||'—')}</div><div class="people-secondary">${tenure(x.hire_date)}</div></td>

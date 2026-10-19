@@ -5792,6 +5792,9 @@ body.change-manage-mode .change-manage-inline{
 #mLeaveSection .person-editor-grid .field.full{grid-column:1/-1}
 #mLeaveSection>summary{gap:12px}
 @media(max-width:480px){#mLeaveSection .leave-date-row{gap:8px}#mLeaveSection .leave-date-row input{padding-left:7px;padding-right:7px;font-size:14px}}
+/* V139: one non-renewal summary */
+#contractKpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:540px){#contractKpis{gap:8px}#contractKpis .contract-stat-card{padding:12px 10px}}
 </style>
 </head>
 <body>
@@ -6361,7 +6364,7 @@ body.change-manage-mode .change-manage-inline{
  </div>
  <div class="section">
   <div class="filters" style="grid-template-columns:repeat(3,minmax(0,1fr))">
-   <div class="field"><label>處理狀態</label><select id="cRange"><option value="">全部</option><option value="pending100">100 天內待確認</option><option value="nonrenewal">不續約待離開</option><option value="leaving30">30 天內即將離開</option></select></div>
+   <div class="field"><label>處理狀態</label><select id="cRange"><option value="">全部</option><option value="pending100">100 天內待確認</option><option value="nonrenewal">不續約</option></select></div>
    <div class="field"><label>外籍類型</label><select id="cType"><option value="">全部</option><option>W</option><option>Z</option></select></div>
    <div class="field search"><label>搜尋</label><input id="cSearch" placeholder="工號／姓名／國籍／組別"></div>
   </div>
@@ -8354,8 +8357,8 @@ function contractRowsFiltered(){
 }
 function contractStateHtml(e){
  let s=contractDecisionState(e);
- if(s.leaving30)return `<span class="contract-state leaving">30 天內即將離開</span>${e.nonrenewal_note?`<div class="contract-note">${esc(e.nonrenewal_note)}</div>`:''}`;
- if(s.nonrenew)return `<span class="contract-state nonrenew">不續約・待離開</span>${e.nonrenewal_note?`<div class="contract-note">${esc(e.nonrenewal_note)}</div>`:''}`;
+ if(s.leaving30)return `<span class="contract-state leaving">不續約</span>${e.nonrenewal_note?`<div class="contract-note">${esc(e.nonrenewal_note)}</div>`:''}`;
+ if(s.nonrenew)return `<span class="contract-state nonrenew">不續約</span>${e.nonrenewal_note?`<div class="contract-note">${esc(e.nonrenewal_note)}</div>`:''}`;
  if(s.pending100)return `<span class="contract-state pending">100 天內待確認</span>`;
  if(s.expired)return `<span class="contract-state check">日期已過・請檢查</span>`;
  return `<span class="contract-state future">尚未進入確認期</span>`;
@@ -8368,8 +8371,7 @@ function renderContracts(){
  let k=[
    ['外籍合約',all.length,''],
    ['100天內待確認',states.filter(s=>s.pending100).length,'pending100'],
-   ['不續約待離開',states.filter(s=>s.nonrenew).length,'nonrenewal'],
-   ['30天內即將離開',states.filter(s=>s.leaving30).length,'leaving30']
+   ['不續約',states.filter(s=>s.nonrenew).length,'nonrenewal']
  ];
  $('contractKpis').innerHTML=k.map(x=>`<button type="button" class="contract-stat-card ${filter===x[2]?'active':''}" data-contract-filter="${x[2]}"><div class="label">${x[0]}</div><div class="num">${x[1]} <span>人</span></div></button>`).join('');
  $('contractKpis').querySelectorAll('[data-contract-filter]').forEach(card=>card.onclick=()=>{
@@ -8503,7 +8505,7 @@ async function exportContractExcel(){
  rows.forEach((e,i)=>{
    let s=contractDecisionState(e);
    let remain=s.expired?`已過 ${Math.abs(s.days)} 天`:s.days===0?'今天到期':`${s.days} 天`;
-   let status=s.leaving30?'30 天內即將離開':s.nonrenew?'不續約待離開':s.pending100?'100 天內待確認':s.expired?'日期已過・請檢查':'尚未進入確認期';
+   let status=s.nonrenew?'不續約':s.pending100?'100 天內待確認':s.expired?'日期已過・請檢查':'尚未進入確認期';
    ws.addRow([i+1,e.employee_no,e.name,e.nationality||'',e.employee_no[0],personGroup(e)||'-',effectiveShift(e)||'-',e.contract_end_date||'-',remain,status]);
  });
 

@@ -5785,6 +5785,13 @@ body.change-manage-mode .change-manage-inline{
 #people .people-meta .person-inline-detail{flex-basis:100%;white-space:normal;font-size:11px;line-height:18px}
 #people .leave-balance{display:block;line-height:22px}
 #people .leave-hours{margin-top:6px;line-height:22px}
+/* V138: paired leave dates, collapsed editor */
+#mLeaveSection .leave-date-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin:16px 0}
+#mLeaveSection .leave-date-row .field{min-width:0}
+#mLeaveSection .leave-date-row input{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+#mLeaveSection .person-editor-grid .field.full{grid-column:1/-1}
+#mLeaveSection>summary{gap:12px}
+@media(max-width:480px){#mLeaveSection .leave-date-row{gap:8px}#mLeaveSection .leave-date-row input{padding-left:7px;padding-right:7px;font-size:14px}}
 </style>
 </head>
 <body>
@@ -6411,22 +6418,27 @@ body.change-manage-mode .change-manage-inline{
      <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div><div class="field"><label>預計返廠／復職日</label><input id="mExpectedReturn" type="date"></div>
     </div><div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職但不列入目前在廠；支援台北港或東17也不列入目前在廠。</div></div>
    </section>
-   <section id="mLeaveSection" class="person-editor-section">
-    <div class="person-editor-section-head"><div><h3>特休與使用紀錄</h3><p>依到職日採週年制自動計算，以「天」登記；本區獨立儲存；1 天以 8 小時換算。</p></div></div>
+   <details id="mLeaveSection" class="person-editor-details">
+    <summary><span>特休與使用紀錄</span><span class="person-editor-summary-note">點開登記／查看</span></summary>
+    <div class="person-editor-details-body">
+    <p class="mini">依請假當時班別計算，以天登記；1 天＝8 小時，本區獨立儲存。</p>
     <p id="mLeaveSummary" style="font-weight:600" role="status"></p>
-    <div class="person-editor-grid">
-     <div class="field"><label>請假當時班別</label><select id="mLeaveShift"><option value="">請確認當時班別</option><option value="日">日班</option><option value="中">中班</option><option value="夜">晚班（跨日）</option></select><div id="mLeaveShiftHint" class="mini"></div></div>
+    <div class="leave-date-row">
      <div class="field"><label>使用開始日</label><input id="mLeaveDate" type="date"></div>
      <div class="field"><label>使用結束日</label><input id="mLeaveEndDate" type="date"></div>
+    </div>
+    <div class="person-editor-grid">
+     <div class="field"><label>請假當時班別</label><select id="mLeaveShift"><option value="">請確認當時班別</option><option value="日">日班</option><option value="中">中班</option><option value="夜">晚班（跨日）</option></select><div id="mLeaveShiftHint" class="mini"></div></div>
      <div class="field"><label>實際使用天數（可填 0.5）</label><input id="mLeaveDays" type="number" min="0.01" max="30" step="0.01"></div>
-     <div class="field"><label>備註</label><input id="mLeaveNote" maxlength="500"></div>
+     <div class="field full"><label>備註</label><input id="mLeaveNote" maxlength="500"></div>
     </div>
     <p class="mini">選開始日會自動帶入結束日與 1 天；日班同日、晚班至隔日為一班。修改結束日會重算天數；休息日與半天請手動調整。跨換班或特休週期請分筆登記。</p>
     <button id="mLeaveSave" class="btn" type="button">登記使用特休</button> <button id="mLeaveReset" class="btn" type="button">清空／新增一筆</button>
     <p id="mLeaveStatus" role="status" aria-live="polite"></p>
     <details><summary>本期使用紀錄／編輯</summary><div id="mLeaveHistory"></div></details>
     <details><summary>計算規則與注意事項</summary><p class="mini">滿半年 3 天；滿 1 年 7 天；滿 2 年 10 天；滿 3～4 年 14 天；滿 5～9 年 15 天；滿 10 年 16 天，之後每年加 1 天，上限 30 天。滿週年自動換期，半年 3 天與滿一年 7 天分開計算。以同一雇主連續年資為前提；留停、年資承認或公司採曆年制時需另外核對。到新一期自動重新計算法定特休，不遞延。畫面僅顯示本期；過期資料不顯示、不提醒、不做折薪管理。</p><a href="https://calcr2.mol.gov.tw/RestDays" target="_blank" rel="noopener">勞動部特休試算與規則</a></details>
-   </section>
+    </div>
+   </details>
    <section class="person-editor-section">
     <div class="person-editor-section-head"><div><h3>備註與紀錄</h3><p>需要留下的說明與異動紀錄放在最後。</p></div></div>
     <div class="field full"><label>備註</label><textarea id="mNote" rows="3"></textarea></div>
@@ -8744,6 +8756,8 @@ function openPerson(p=null,area=null){
  syncPersonSpecialActions(p);
  refreshChangePreview();
  $('personModal').classList.add('show');
+ $('mLeaveSection').open=false;
+ $('mLeaveSection').querySelectorAll('details').forEach(el=>el.open=false);
  $('mLeaveSection').classList.toggle('hidden',!/^Z/i.test(editNo||''));
  if(/^Z/i.test(editNo||''))void loadAnnualLeaveEditor(editNo);
  else{annualLeaveEditorToken++;annualLeaveData=null;}

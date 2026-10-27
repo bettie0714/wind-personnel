@@ -8391,7 +8391,7 @@ function renderContracts(){
      }else if(s.pending100){
        actions=`<div class="contract-actions"><button type="button" class="btn success" onclick="event.stopPropagation();renewContractThreeYears('${esc(e.employee_no)}')">續約 3 年</button><button type="button" class="btn soft-danger" onclick="event.stopPropagation();markContractNonrenewal('${esc(e.employee_no)}')">不續約</button></div>`;
      }else{
-       actions='<span class="mini">—</span>';
+       actions=`<div class="contract-actions"><button type="button" class="btn success" onclick="event.stopPropagation();renewContractThreeYears('${esc(e.employee_no)}')">直接續約 3 年</button></div>`;
      }
    }
    return `<tr class="${isAdmin()?'editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(e.employee_no)}')" title="點一下編輯這位人員"`:''}>

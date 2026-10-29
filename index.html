@@ -1,3 +1,4 @@
+<!-- V141：Z人員批次特休；整批預覽、逐人班別與餘額驗證、整批儲存。 -->
 <!-- V119：修正離職紀錄日期時同步 employees.resigned_at，避免主檔與歷史紀錄不同步 -->
 <!-- V118：人員操作介面分區；少用欄位漸進展開；轉調主要入口移至人員操作。 -->
 <!doctype html>
@@ -5795,6 +5796,13 @@ body.change-manage-mode .change-manage-inline{
 /* V139: one non-renewal summary */
 #contractKpis{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:540px){#contractKpis{gap:8px}#contractKpis .contract-stat-card{padding:12px 10px}}
+
+.batch-leave-dates{display:grid;grid-template-columns:1fr 1fr;gap:12px}.batch-leave-dates input,.batch-leave-dates select{min-width:0;width:100%}
+.batch-leave-people{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));max-height:34vh;overflow:auto;border:1px solid #e2e8f0;border-radius:10px}
+.batch-leave-person{display:flex;gap:10px;align-items:center;padding:12px;border-bottom:1px solid #edf0f4;cursor:pointer}.batch-leave-person input,#batchLeaveReview input[type=checkbox]{width:18px;height:18px;flex:none}.batch-leave-person small{display:block;color:#64748b;margin-top:4px}
+.batch-leave-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}.batch-leave-tools span{margin-right:auto}
+#batchLeaveReview th{position:sticky;top:0;background:#f3f6fa;z-index:1}#batchLeaveReview td{vertical-align:middle}#batchLeaveReview select{min-width:90px}
+
 </style>
 </head>
 <body>
@@ -6170,6 +6178,7 @@ body.change-manage-mode .change-manage-inline{
    </div>
    <div class="people-toolbar-actions">
     <button id="clearFilters" class="btn">清除篩選</button>
+    <button id="batchLeaveOpen" class="btn admin-only">批次登記特休</button>
     <button id="addBtn" class="btn primary admin-only">＋ 新增人員</button>
    </div>
   </div>
@@ -6485,6 +6494,26 @@ body.change-manage-mode .change-manage-inline{
   </div>
  </div>
 </div>
+
+<div id="batchLeaveModal" class="modalback"><div class="modal" style="max-width:1060px;width:96vw"><button id="batchLeaveClose" class="close" aria-label="關閉">×</button>
+<h2>批次登記特休</h2><p class="mini">僅管理員操作・僅 Z 人員。請只登記員工已確認使用的特休，颱風停班不會自動扣抵。</p>
+<fieldset id="batchLeaveFields" style="border:0;padding:0;margin:0;min-width:0">
+<div id="batchLeaveSetup">
+<div class="batch-leave-dates"><div class="field"><label for="batchLeaveStart">開始班次日期</label><input id="batchLeaveStart" type="date"></div><div class="field"><label for="batchLeaveEnd">最後班次日期</label><input id="batchLeaveEnd" type="date"></div></div>
+<p class="mini">日期都以「該班開始上班的日期」選擇。同一天＝1 班／1 天；晚班的實際結束日會自動加一天，下一步逐人顯示。連續日期包含休息日，請在預覽調整天數或分筆登記。</p>
+<div class="field"><label for="batchLeaveNote">共用備註（可留空）</label><input id="batchLeaveNote" maxlength="500" placeholder="例如：颱風期間，已確認使用特休"></div>
+<div class="batch-leave-dates" style="margin-top:16px"><div class="field"><label for="batchLeaveSearch">搜尋人員</label><input id="batchLeaveSearch" placeholder="工號、姓名，也可輸入 Z642 Z650"></div><div class="field"><label for="batchLeaveGroup">組別</label><select id="batchLeaveGroup"></select></div></div>
+<div class="batch-leave-tools"><span id="batchLeaveCount" class="mini"></span><button id="batchLeaveSelectVisible" class="btn" type="button">全選目前結果</button><button id="batchLeaveClear" class="btn" type="button">清空選取</button></div>
+<div id="batchLeavePeople" class="batch-leave-people"></div>
+<div class="modalfoot"><button id="batchLeavePreview" class="btn primary" type="button">下一步：核對扣除明細</button></div>
+</div>
+<div id="batchLeaveReview" class="hidden">
+<p class="mini">依請假日期的班別歷程計算。夜班顯示為「晚班」；沒有歷程時須自行確認。天數可個別修改，例如半天填 0.5。</p>
+<div class="tablewrap" style="max-height:45vh;overflow:auto"><table><thead><tr><th>登記</th><th>人員</th><th>班別</th><th>實際開始 ～ 結束</th><th>使用天數</th><th>核對結果</th></tr></thead><tbody id="batchLeaveReviewRows"></tbody></table></div>
+<p id="batchLeaveReviewNote" class="mini"></p><p id="batchLeaveTotals" style="font-weight:700"></p>
+<label style="display:flex;gap:8px;align-items:center"><input id="batchLeaveConsent" type="checkbox" style="width:auto">已確認勾選人員使用特休，日期與扣除天數正確</label>
+<div class="modalfoot"><button id="batchLeaveBack" class="btn" type="button">返回修改</button><button id="batchLeaveSave" class="btn primary" type="button" disabled>確認登記</button></div>
+</div></fieldset><p id="batchLeaveStatus" class="mini" role="status" aria-live="polite"></p></div></div>
 
 <div id="resignPickerModal" class="modalback"><div class="modal"><button id="resignPickerClose" class="close">×</button><h2>辦理離職</h2><p>請先選擇要辦理離職的人員，下一步才會進入確認畫面。</p><div class="formgrid">
  <div class="field full"><label>搜尋人員</label><input id="resignPickerSearch" placeholder="輸入工號、姓名或組別"></div>
@@ -8716,6 +8745,132 @@ $('mLeaveSave').onclick=async()=>{
    if(ticket===annualLeaveEditorToken)await loadAnnualLeaveEditor(no);
  }catch(error){if(ticket===annualLeaveEditorToken)$('mLeaveStatus').textContent='儲存未完成：'+error.message+'。請核對紀錄後再重試。';}
  finally{annualLeaveBusy=false;if(ticket===annualLeaveEditorToken)$('mLeaveSave').disabled=false;}
+};
+
+// V141：批次登記僅建立使用紀錄，不自動把颱風停班轉為特休。
+let batchLeaveSelected=new Set(),batchLeaveRows=[],batchLeaveBusy=false;
+function batchLeaveShiftAt(data,date){
+ const h=(data.shift_history||[]).filter(h=>h.effective_from<=date).sort((a,b)=>a.effective_from.localeCompare(b.effective_from)||Number(a.id)-Number(b.id)).pop();
+ return h?(h.pending_shift&&h.shift_effective_date&&h.shift_effective_date<=date?h.pending_shift:h.shift)||'':'';
+}
+function batchLeaveCheck(row,start,end){
+ const d=row.data,days=Number(row.days),span=Math.round((Date.parse(end+'T00:00:00Z')-Date.parse(start+'T00:00:00Z'))/86400000)+1;
+ if(!d?.found)return '找不到人員資料，請重新整理';
+ if(d.inactive)return '已離職，請改由個人頁核對';
+ if(!d.period?.start)return '尚未取得特休或缺少到職日';
+ if(start<d.period.start||end>d.period.end)return '跨期或非本期，請改由個人頁分筆登記';
+ if(!row.shift)return '請選擇請假當時的班別';
+ if(!start||!end||span<1||span>366||end>(d.today||todayISO()))return '請確認已休日期，區間最多366天';
+ if(!Number.isFinite(days)||days<=0||days>span||Math.abs(days*100-Math.round(days*100))>0.000001)return '天數須大於0，且不可超過班次（最多兩位小數）';
+ for(let date=start;date<=end;date=leaveAddDays(date,1)){
+   const shift=batchLeaveShiftAt(d,date);
+   if(shift&&shift!==row.shift)return '區間內有換班，請分筆登記';
+ }
+ if((d.history||[]).some(h=>!h.voided&&h.start_date<=end&&(h.duty_end_date||h.end_date)>=start))return '與既有特休日期重疊，請至個人頁編輯';
+ if(days>Number(d.remaining_days))return '剩餘特休不足';
+ return '';
+}
+function batchLeaveCandidates(){
+ const q=$('batchLeaveSearch').value.trim().toLowerCase(),group=$('batchLeaveGroup').value;
+ const tokens=q.split(/[\s,，、]+/).filter(Boolean);
+ return employees.filter(p=>/^Z\d{3}$/.test(p.employee_no)&&isActiveAsOf(p)&&!isOverseas(p)&&(!group||personGroup(p)===group)&&(!tokens.length||tokens.some(t=>(p.employee_no+' '+p.name+' '+personGroup(p)).toLowerCase().includes(t)))).sort((a,b)=>a.employee_no.localeCompare(b.employee_no));
+}
+function renderBatchLeaveCandidates(){
+ const list=batchLeaveCandidates();
+ $('batchLeavePeople').innerHTML=list.map(p=>`<label class="batch-leave-person"><input type="checkbox" data-batch-no="${esc(p.employee_no)}" ${batchLeaveSelected.has(p.employee_no)?'checked':''}><span><b>${esc(p.employee_no)}　${esc(p.name)}</b><small>${esc(personGroup(p))} · ${esc(effectiveShift(p)==='夜'?'晚班':effectiveShift(p)+'班')}</small></span></label>`).join('')||'<p class="mini">沒有符合條件的人員</p>';
+ $('batchLeaveCount').textContent=`已選 ${batchLeaveSelected.size} 人｜目前顯示 ${list.length} 人`;
+}
+function batchLeaveBusyState(busy){
+ batchLeaveBusy=busy;
+ $('batchLeaveFields').disabled=busy;
+ $('batchLeaveClose').disabled=busy;
+}
+function openBatchLeave(){
+ if(!isAdmin()||batchLeaveBusy)return;
+ batchLeaveSelected=new Set();batchLeaveRows=[];
+ $('batchLeaveSearch').value='';$('batchLeaveGroup').innerHTML='<option value="">全部組別</option>'+[...new Set(employees.filter(p=>/^Z\d{3}$/.test(p.employee_no)&&isActiveAsOf(p)).map(personGroup).filter(Boolean))].sort().map(g=>`<option value="${esc(g)}">${esc(g)}</option>`).join('');
+ $('batchLeaveStart').value=todayISO();$('batchLeaveEnd').value=todayISO();$('batchLeaveStart').max=todayISO();$('batchLeaveEnd').max=todayISO();$('batchLeaveNote').value='';
+ $('batchLeaveConsent').checked=false;$('batchLeaveStatus').textContent='';
+ $('batchLeaveSetup').classList.remove('hidden');$('batchLeaveReview').classList.add('hidden');
+ renderBatchLeaveCandidates();$('batchLeaveModal').classList.add('show');
+}
+function updateBatchLeaveSummary(){
+ const included=batchLeaveRows.filter(r=>r.include),start=$('batchLeaveStart').value,end=$('batchLeaveEnd').value;
+ let errors=0,total=0;
+ batchLeaveRows.forEach((r,i)=>{
+   const error=batchLeaveCheck(r,start,end);if(r.include){if(error)errors++;total+=Number(r.days)||0;}
+   const displayEnd=r.shift?leaveAddDays(end,r.shift==='夜'?1:0):end;
+   $('batchDate'+i).textContent=start+' ～ '+displayEnd;
+   $('batchResult'+i).textContent=error||`扣後 ${Math.round((Number(r.data.remaining_days)-Number(r.days))*100)/100} 天（${Math.round((Number(r.data.remaining_days)-Number(r.days))*800)/100} 小時）`;
+   $('batchResult'+i).style.color=error?'#b42318':'#356354';
+ });
+ $('batchLeaveTotals').textContent=`本次 ${included.length} 人，共 ${Math.round(total*100)/100} 天（${Math.round(total*800)/100} 小時）${errors?'｜'+errors+' 人需處理':''}`;
+ $('batchLeaveSave').disabled=!included.length||!!errors||!$('batchLeaveConsent').checked;
+ $('batchLeaveSave').textContent=`確認登記 ${included.length} 人`;
+}
+function renderBatchLeaveReview(){
+ $('batchLeaveReviewRows').innerHTML=batchLeaveRows.map((r,i)=>`<tr><td><input aria-label="登記 ${esc(r.no)}" type="checkbox" data-batch-include="${i}" ${r.include?'checked':''}></td><td><b>${esc(r.no)}</b><br>${esc(r.name)}</td><td><select aria-label="${esc(r.no)} 班別" data-batch-shift="${i}" ${r.known?'disabled':''}><option value="">請選班別</option>${['日','中','夜'].map(s=>`<option value="${s}" ${r.shift===s?'selected':''}>${s==='夜'?'晚':s}班</option>`).join('')}</select>${!r.known?'<div class="mini">歷程不足，請確認</div>':''}</td><td id="batchDate${i}"></td><td><input aria-label="${esc(r.no)} 使用天數" type="number" min="0.01" step="0.01" value="${r.days}" data-batch-days="${i}" style="width:85px"><div class="mini">餘額 ${esc(r.data?.remaining_days??'—')} 天</div></td><td id="batchResult${i}"></td></tr>`).join('');
+ updateBatchLeaveSummary();
+}
+$('batchLeaveOpen').onclick=openBatchLeave;
+$('batchLeaveClose').onclick=()=>{if(!batchLeaveBusy)$('batchLeaveModal').classList.remove('show');};
+$('batchLeaveSearch').oninput=$('batchLeaveGroup').onchange=renderBatchLeaveCandidates;
+$('batchLeaveStart').onchange=()=>{$('batchLeaveEnd').value=$('batchLeaveStart').value;};
+$('batchLeavePeople').onchange=e=>{const no=e.target.dataset.batchNo;if(!no)return;e.target.checked?batchLeaveSelected.add(no):batchLeaveSelected.delete(no);$('batchLeaveCount').textContent=`已選 ${batchLeaveSelected.size} 人｜目前顯示 ${batchLeaveCandidates().length} 人`;};
+$('batchLeaveSelectVisible').onclick=()=>{batchLeaveCandidates().forEach(p=>batchLeaveSelected.add(p.employee_no));renderBatchLeaveCandidates();};
+$('batchLeaveClear').onclick=()=>{batchLeaveSelected.clear();renderBatchLeaveCandidates();};
+$('batchLeaveBack').onclick=()=>{if(batchLeaveBusy)return;$('batchLeaveSetup').classList.remove('hidden');$('batchLeaveReview').classList.add('hidden');$('batchLeaveStatus').textContent='';};
+$('batchLeavePreview').onclick=async()=>{
+ if(batchLeaveBusy||!isAdmin())return;
+ const start=$('batchLeaveStart').value,end=$('batchLeaveEnd').value;
+ if(!start||!end||end<start||end>todayISO()||(Date.parse(end)-Date.parse(start))/86400000>=366)return alert('請填寫正確的已休日期，區間最多366天。');
+ const nos=[...batchLeaveSelected].sort();if(!nos.length||nos.length>200)return alert('請選擇1至200位人員。');
+ batchLeaveBusyState(true);$('batchLeaveStatus').textContent='正在整批核對餘額、班別與使用紀錄…';
+ try{
+   const {data,error}=await db.rpc('annual_leave_batch_snapshot',{p_employee_nos:nos});if(error)throw error;
+   const map=new Map((data||[]).map(d=>[d.employee_no,d]));
+   batchLeaveRows=nos.map(no=>{const d=map.get(no)||{found:false},shift=batchLeaveShiftAt(d,start);return {id:crypto.randomUUID(),no,name:employees.find(p=>p.employee_no===no)?.name||'',data:d,shift,known:!!shift,days:(Date.parse(end)-Date.parse(start))/86400000+1,include:true};});
+   $('batchLeaveConsent').checked=false;
+   $('batchLeaveSetup').classList.add('hidden');$('batchLeaveReview').classList.remove('hidden');
+   $('batchLeaveReviewNote').textContent='共用備註：'+($('batchLeaveNote').value.trim()||'未填寫');
+   renderBatchLeaveReview();$('batchLeaveStatus').textContent='請核對每位人員；有問題者可取消勾選，或返回修改日期。';
+ }catch(error){$('batchLeaveStatus').textContent='讀取失敗：'+error.message;}
+ finally{batchLeaveBusyState(false);}
+};
+$('batchLeaveReviewRows').oninput=e=>{
+ const el=e.target;
+ if(el.dataset.batchDays!==undefined)batchLeaveRows[Number(el.dataset.batchDays)].days=el.value;
+ else if(el.dataset.batchShift!==undefined)batchLeaveRows[Number(el.dataset.batchShift)].shift=el.value;
+ else if(el.dataset.batchInclude!==undefined)batchLeaveRows[Number(el.dataset.batchInclude)].include=el.checked;
+ else return;
+ updateBatchLeaveSummary();
+};
+$('batchLeaveConsent').onchange=updateBatchLeaveSummary;
+$('batchLeaveSave').onclick=async()=>{
+ if(batchLeaveBusy||!isAdmin()||!$('batchLeaveConsent').checked)return;
+ const start=$('batchLeaveStart').value,end=$('batchLeaveEnd').value,rows=batchLeaveRows.filter(r=>r.include);
+ if(!rows.length||rows.some(r=>batchLeaveCheck(r,start,end)))return;
+ const note=$('batchLeaveNote').value.trim();
+ const payload=rows.map(r=>({id:r.id,employee_no:r.no,start_date:start,end_date:end,display_end_date:leaveAddDays(end,r.shift==='夜'?1:0),applied_shift:r.shift,days:Number(r.days),note}));
+ batchLeaveBusyState(true);$('batchLeaveStatus').textContent=`正在整批儲存 ${rows.length} 人，請勿關閉…`;
+ let saved=false;
+ try{
+   const {error}=await db.from('employee_annual_leave_usage').insert(payload);
+   if(error)throw error;saved=true;
+ }catch(error){
+   // 回應遺失時以本批固定 UUID 核對，避免重試產生第二次扣除。
+   try{
+     const check=await db.from('employee_annual_leave_usage').select('id').in('id',payload.map(p=>p.id));
+     if(!check.error&&check.data?.length===payload.length)saved=true;
+   }catch(_checkError){}
+   if(!saved)$('batchLeaveStatus').textContent='儲存未確認：'+error.message+'。請返回重新預覽核對紀錄；若有重複、餘額或班別異動，整批不會新增。';
+ }
+ if(saved){
+   $('batchLeaveModal').classList.remove('show');batchLeaveSelected.clear();batchLeaveRows=[];
+   try{await loadAll();renderAll();alert(`已登記 ${rows.length} 人的特休，剩餘天數已更新；可至各人特休紀錄編輯或移除。`);}
+   catch(error){alert(`已成功登記 ${rows.length} 人，但畫面更新失敗，請重新整理；不要再次登記。`);}
+ }
+ batchLeaveBusyState(false);
 };
 
 function openPerson(p=null,area=null){

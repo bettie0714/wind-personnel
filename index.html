@@ -1,3 +1,4 @@
+<!-- V143：海外事業部增加年資，沿用總覽到職日期與年資算法。 -->
 <!-- V142：個人及批次特休班別可人工更正，保留人工確認標記，不更動排班。 -->
 <!-- V141：Z人員批次特休；整批預覽、逐人班別與餘額驗證、整批儲存。 -->
 <!-- V119：修正離職紀錄日期時同步 employees.resigned_at，避免主檔與歷史紀錄不同步 -->
@@ -6362,7 +6363,7 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="overseas" class="page">
  <div class="section"><div class="sectionhead"><div><h2>海外事業部</h2></div><button id="overseasAddBtn" class="btn primary admin-only">＋ 新增海外人員</button></div><div id="overseasKpis" class="overseas-kpis"></div></div>
- <div class="section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職日</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
+ <div class="section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職／年資</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
 </section>
 <section id="contracts" class="page">
  <div class="section">
@@ -8570,7 +8571,7 @@ function renderOverseas(){
   <td>${esc(x.job_title||'-')}</td>
   <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
   <td>${esc(x.nationality||'-')}</td>
-  <td>${esc(x.hire_date||'-')}</td>
+  <td><div class="people-primary" style="white-space:nowrap">${esc(x.hire_date||'—')}</div><div class="people-secondary">${tenure(x.hire_date)}</div></td>
  </tr>`}).join('')||`<tr><td colspan="8" class="empty">目前沒有海外事業部人員</td></tr>`;
 }
 

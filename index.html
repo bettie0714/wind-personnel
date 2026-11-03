@@ -1,3 +1,4 @@
+<!-- V144：海外人員列表與總覽共用四欄版型、字體、年資及人員操作。 -->
 <!-- V143：海外事業部增加年資，沿用總覽到職日期與年資算法。 -->
 <!-- V142：個人及批次特休班別可人工更正，保留人工確認標記，不更動排班。 -->
 <!-- V141：Z人員批次特休；整批預覽、逐人班別與餘額驗證、整批儲存。 -->
@@ -138,7 +139,7 @@
 .tablewrap tbody tr:nth-child(even) td{background:#fcfdff}
 .tablewrap tbody tr:hover td{background:#f3f7ff}
 #people .tablewrap,#overseas .tablewrap{max-height:68vh;overflow:auto}
-#people table{min-width:900px}
+:is(#people,#overseas) table{min-width:900px}
 @media(max-width:760px){
  .people-summary{gap:6px}
  .people-summary-chip{padding:6px 9px}
@@ -1123,10 +1124,10 @@ tr.leave-row td:first-child{box-shadow:inset 4px 0 0 #c0566f}
   border-radius:0;
   box-shadow:none;
 }
-#people table{
+:is(#people,#overseas) table{
   min-width:980px;
 }
-#people th{
+:is(#people,#overseas) th{
   background:#f8fafc;
   color:#64748b;
   font-size:11px;
@@ -1134,11 +1135,11 @@ tr.leave-row td:first-child{box-shadow:inset 4px 0 0 #c0566f}
   padding-top:12px;
   padding-bottom:12px;
 }
-#people td{
+:is(#people,#overseas) td{
   padding-top:12px;
   padding-bottom:12px;
 }
-#people tbody tr:last-child td{
+:is(#people,#overseas) tbody tr:last-child td{
   border-bottom:0;
 }
 .people-toolbar-actions{
@@ -1954,7 +1955,7 @@ body.change-manage-mode .change-manage-inline{
 #people{
   min-width:0;
 }
-#people .people-list-section{
+:is(#people,#overseas) .people-list-section{
   width:100%;
   min-width:0;
 }
@@ -1964,7 +1965,7 @@ body.change-manage-mode .change-manage-inline{
   box-sizing:border-box;
   overflow:auto;
 }
-#people table{
+:is(#people,#overseas) table{
   width:100%;
   min-width:980px;
 }
@@ -5746,17 +5747,17 @@ body.change-manage-mode .change-manage-inline{
 }
 
 /* V134: two-line personnel overview */
-#people .people-list-section table{width:100%;min-width:620px;table-layout:auto}
-#people .people-list-section th,#people .people-list-section td{padding:14px 20px;white-space:normal;vertical-align:middle}
-#people .people-list-section td:first-child{min-width:180px;max-width:300px;overflow-wrap:anywhere}
-#people .people-list-section th{white-space:nowrap}
-#people .people-primary{font-size:14px;font-weight:600;color:#243d36;line-height:1.5}
-#people .people-secondary{font-size:12px;color:#64748b;margin-top:4px;line-height:1.5}
-#people .people-no{font-variant-numeric:tabular-nums;margin-right:8px}
+:is(#people,#overseas) .people-list-section table{width:100%;min-width:620px;table-layout:auto}
+:is(#people,#overseas) .people-list-section th,:is(#people,#overseas) .people-list-section td{padding:14px 20px;white-space:normal;vertical-align:middle}
+:is(#people,#overseas) .people-list-section td:first-child{min-width:180px;max-width:300px;overflow-wrap:anywhere}
+:is(#people,#overseas) .people-list-section th{white-space:nowrap}
+:is(#people,#overseas) .people-primary{font-size:14px;font-weight:600;color:#243d36;line-height:1.5}
+:is(#people,#overseas) .people-secondary{font-size:12px;color:#64748b;margin-top:4px;line-height:1.5}
+:is(#people,#overseas) .people-no{font-variant-numeric:tabular-nums;margin-right:8px}
 #people .leave-balance{font-size:16px;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
 #people .leave-hours{display:block;font-size:12px;font-weight:400;color:#64748b;margin-top:4px}
-#people .editable-person-row{cursor:pointer}
-#people .editable-person-row:focus-visible{outline:2px solid #557b6b;outline-offset:-2px}
+:is(#people,#overseas) .editable-person-row{cursor:pointer}
+:is(#people,#overseas) .editable-person-row:focus-visible{outline:2px solid #557b6b;outline-offset:-2px}
 .person-read-dialog{border:1px solid #dce5e1;border-radius:18px;padding:24px;width:min(560px,calc(100vw - 40px));max-height:85vh;overflow:auto;color:#243d36;box-sizing:border-box}
 .person-read-dialog::backdrop{background:rgba(15,30,25,.35)}
 .person-read-dialog h2{margin:0 0 20px;font-size:20px}
@@ -5764,7 +5765,7 @@ body.change-manage-mode .change-manage-inline{
 .person-read-grid dt{font-size:12px;color:#64748b;margin-bottom:5px}
 .person-read-grid dd{margin:0;line-height:1.6;overflow-wrap:anywhere}
 .person-read-dialog form{text-align:right;margin-top:24px}
-@media(max-width:640px){#people .people-list-section th,#people .people-list-section td{padding:12px}.person-read-grid{gap:14px}}
+@media(max-width:640px){:is(#people,#overseas) .people-list-section th,:is(#people,#overseas) .people-list-section td{padding:12px}.person-read-grid{gap:14px}}
 /* V135: synchronized horizontal scrollbar above each table */
 .table-top-scroll{display:block;width:100%;max-width:100%;height:18px;overflow-x:scroll;overflow-y:hidden;box-sizing:border-box;margin:4px 0 8px;border-radius:8px;background:#eef2f5;scrollbar-color:#94a3b8 #eef2f5;scrollbar-width:auto}
 .table-top-scroll[hidden]{display:none!important}
@@ -5775,17 +5776,17 @@ body.change-manage-mode .change-manage-inline{
 .table-top-scroll:focus-visible{outline:2px solid #557b6b;outline-offset:2px}
 @media print{.table-top-scroll{display:none!important}}
 /* V137: aligned identity and metadata rows */
-#people .people-list-section tbody td{vertical-align:top;padding-top:14px;padding-bottom:14px}
+:is(#people,#overseas) .people-list-section tbody td{vertical-align:top;padding-top:14px;padding-bottom:14px}
 #people #peopleBody tr td{padding-top:14px;padding-bottom:14px}
-#people .people-primary{line-height:22px;min-height:22px}
-#people .people-identity{display:grid;grid-template-columns:5ch minmax(0,1fr);column-gap:10px;align-items:baseline}
-#people .people-identity .people-no{margin:0;white-space:nowrap}
-#people .people-secondary{margin-top:6px;line-height:22px;min-height:22px}
-#people .people-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:6px;min-height:22px;line-height:22px;font-size:12px;color:#64748b}
-#people .people-nationality{white-space:nowrap}
-#people .people-meta .person-inline-status{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:0;min-width:0}
-#people .people-meta .temp-badge{margin:0;min-height:22px;box-sizing:border-box;padding:2px 7px;font-size:11px;font-weight:500;line-height:16px;border-radius:5px;white-space:normal}
-#people .people-meta .person-inline-detail{flex-basis:100%;white-space:normal;font-size:11px;line-height:18px}
+:is(#people,#overseas) .people-primary{line-height:22px;min-height:22px}
+:is(#people,#overseas) .people-identity{display:grid;grid-template-columns:5ch minmax(0,1fr);column-gap:10px;align-items:baseline}
+:is(#people,#overseas) .people-identity .people-no{margin:0;white-space:nowrap}
+:is(#people,#overseas) .people-secondary{margin-top:6px;line-height:22px;min-height:22px}
+:is(#people,#overseas) .people-meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-top:6px;min-height:22px;line-height:22px;font-size:12px;color:#64748b}
+:is(#people,#overseas) .people-nationality{white-space:nowrap}
+:is(#people,#overseas) .people-meta .person-inline-status{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:0;min-width:0}
+:is(#people,#overseas) .people-meta .temp-badge{margin:0;min-height:22px;box-sizing:border-box;padding:2px 7px;font-size:11px;font-weight:500;line-height:16px;border-radius:5px;white-space:normal}
+:is(#people,#overseas) .people-meta .person-inline-detail{flex-basis:100%;white-space:normal;font-size:11px;line-height:18px}
 #people .leave-balance{display:block;line-height:22px}
 #people .leave-hours{margin-top:6px;line-height:22px}
 /* V138: paired leave dates, collapsed editor */
@@ -6363,7 +6364,7 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="overseas" class="page">
  <div class="section"><div class="sectionhead"><div><h2>海外事業部</h2></div><button id="overseasAddBtn" class="btn primary admin-only">＋ 新增海外人員</button></div><div id="overseasKpis" class="overseas-kpis"></div></div>
- <div class="section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>工號</th><th>姓名</th><th>班別</th><th>組別</th><th>職別</th><th>職級</th><th>籍別</th><th>到職／年資</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
+ <div class="section people-list-section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>人員</th><th>班別／組別</th><th>職務</th><th>到職／年資</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
 </section>
 <section id="contracts" class="page">
  <div class="section">
@@ -7758,6 +7759,18 @@ function peopleLeaveCell(person){
  const days=Number(data.remaining_days),hours=Math.round(days*800)/100;
  return `<span class="leave-balance" title="本期特休，依已登記使用紀錄計算">${days} 天<span class="leave-hours">（${hours} 小時）</span></span>`;
 }
+function personListRowHtml(x,showLeave=false){
+   let st=currentTempStatus(x);
+   let rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
+   return `<tr class="${rowClass} editable-person-row" data-person-no="${esc(x.employee_no)}" tabindex="0" role="button" aria-label="${isAdmin()?'編輯':'查看'} ${esc(x.employee_no)} ${esc(x.name)}" title="${isAdmin()?'點一下編輯人員':'點一下查看詳細資料'}">
+    <td><div class="people-primary people-identity"><span class="people-no">${esc(x.employee_no)}</span><span>${esc(x.name)}</span></div><div class="people-meta"><span class="people-nationality">${esc(x.nationality||personType(x)||'—')}</span>${personInlineStatusHtml(x)}</div></td>
+    <td><div class="people-primary">${esc(effectiveShift(x)||'—')}${effectiveShift(x)?'班':''}</div><div class="people-secondary">${esc(personGroup(x)||'—')}</div>${shiftPlanHintHtml(x)}</td>
+    <td><div class="people-primary">${esc(x.job_title||'—')}</div><div class="people-secondary">${esc(x.level||'—')}</div></td>
+    <td><div class="people-primary" style="white-space:nowrap">${esc(x.hire_date||'—')}</div><div class="people-secondary">${tenure(x.hire_date)}</div></td>
+    ${showLeave?`<td>${peopleLeaveCell(x)}</td>`:''}
+   </tr>`;
+
+}
 function renderPeople(){
  const showLeave=activeTypeFilter==='Z'&&!activePresenceFilter;
  $('peopleLeaveHead').classList.toggle('hidden',!showLeave);
@@ -7777,17 +7790,7 @@ function renderPeople(){
    ['建教生',student]
  ].map(x=>`<div class="people-summary-chip"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
 
- $('peopleBody').innerHTML=a.map(x=>{
-   let st=currentTempStatus(x);
-   let rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';
-   return `<tr class="${rowClass} editable-person-row" data-person-no="${esc(x.employee_no)}" tabindex="0" role="button" aria-label="${isAdmin()?'編輯':'查看'} ${esc(x.employee_no)} ${esc(x.name)}" title="${isAdmin()?'點一下編輯人員':'點一下查看詳細資料'}">
-    <td><div class="people-primary people-identity"><span class="people-no">${esc(x.employee_no)}</span><span>${esc(x.name)}</span></div><div class="people-meta"><span class="people-nationality">${esc(x.nationality||personType(x)||'—')}</span>${personInlineStatusHtml(x)}</div></td>
-    <td><div class="people-primary">${esc(effectiveShift(x)||'—')}${effectiveShift(x)?'班':''}</div><div class="people-secondary">${esc(personGroup(x)||'—')}</div>${shiftPlanHintHtml(x)}</td>
-    <td><div class="people-primary">${esc(x.job_title||'—')}</div><div class="people-secondary">${esc(x.level||'—')}</div></td>
-    <td><div class="people-primary" style="white-space:nowrap">${esc(x.hire_date||'—')}</div><div class="people-secondary">${tenure(x.hire_date)}</div></td>
-    ${showLeave?`<td>${peopleLeaveCell(x)}</td>`:''}
-   </tr>`;
- }).join('')||`<tr><td colspan="${showLeave?5:4}" class="empty">沒有符合條件的人員</td></tr>`;
+ $('peopleBody').innerHTML=a.map(x=>personListRowHtml(x,showLeave)).join('')||`<tr><td colspan="${showLeave?5:4}" class="empty">沒有符合條件的人員</td></tr>`;
 }
 function openPeopleRow(no){
  if(isAdmin()){editPerson(no);return;}
@@ -7798,7 +7801,9 @@ function openPeopleRow(no){
  $('personReadDialog').showModal();
 }
 $('peopleBody').addEventListener('click',event=>{const row=event.target.closest('[data-person-no]');if(row)openPeopleRow(row.dataset.personNo);});
+$('overseasBody').addEventListener('click',event=>{const row=event.target.closest('[data-person-no]');if(row)openPeopleRow(row.dataset.personNo);});
 $('peopleBody').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){const row=event.target.closest('[data-person-no]');if(row){event.preventDefault();openPeopleRow(row.dataset.personNo);}}});
+$('overseasBody').addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){const row=event.target.closest('[data-person-no]');if(row){event.preventDefault();openPeopleRow(row.dataset.personNo);}}});
 
 function monthKey(v=new Date()){
  if(typeof v==='string')return v.slice(0,7);
@@ -8563,16 +8568,7 @@ function renderOverseas(){
  ];
  $('overseasKpis').innerHTML=k.map(x=>`<div class="stat"><div class="label">${x[0]}</div><div class="num">${x[1]} <span style="font-size:14px;color:#64748b">人</span></div></div>`).join('');
  $('overseasCount').textContent=`共 ${a.length} 人`;
- $('overseasBody').innerHTML=a.map(x=>{let st=currentTempStatus(x),rowClass=x.status==='留停'?'leave-row':st==='支援'?'supporting-row':st==='返鄉'?'homeleave-row':st==='返校'?'school-row':'';return `<tr class="${rowClass}${isAdmin()?' editable-person-row':''}" ${isAdmin()?`onclick="editPerson('${esc(x.employee_no)}')" title="點一下編輯這位人員"`:''}>
-  <td><b>${esc(x.employee_no)}</b></td>
-  <td>${esc(x.name)}${(currentTempStatus(x)||x.status==='留停')?tempStatusHtml(x):''}</td>
-  <td>${esc(effectiveShift(x)||'-')}${shiftPlanHintHtml(x)}</td>
-  <td>${badge(personGroup(x)||'-')}</td>
-  <td>${esc(x.job_title||'-')}</td>
-  <td>${x.level?`<span class="badge ${x.level==='主管'?'orange':x.level==='學生'?'green':'blue'}">${esc(x.level)}</span>`:'-'}</td>
-  <td>${esc(x.nationality||'-')}</td>
-  <td><div class="people-primary" style="white-space:nowrap">${esc(x.hire_date||'—')}</div><div class="people-secondary">${tenure(x.hire_date)}</div></td>
- </tr>`}).join('')||`<tr><td colspan="8" class="empty">目前沒有海外事業部人員</td></tr>`;
+ $('overseasBody').innerHTML=a.map(x=>personListRowHtml(x)).join('')||`<tr><td colspan="4" class="empty">目前沒有海外事業部人員</td></tr>`;
 }
 
 ['fGroup','fShift','fJob','fNat','fLevel','fSearch'].forEach(id=>{

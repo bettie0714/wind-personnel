@@ -1,3 +1,4 @@
+<!-- V145：修正海外人數列貼邊，與列表欄位對齊。 -->
 <!-- V144：海外人員列表與總覽共用四欄版型、字體、年資及人員操作。 -->
 <!-- V143：海外事業部增加年資，沿用總覽到職日期與年資算法。 -->
 <!-- V142：個人及批次特休班別可人工更正，保留人工確認標記，不更動排班。 -->
@@ -5806,6 +5807,10 @@ body.change-manage-mode .change-manage-inline{
 .batch-leave-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}.batch-leave-tools span{margin-right:auto}
 #batchLeaveReview th{position:sticky;top:0;background:#f3f6fa;z-index:1}#batchLeaveReview td{vertical-align:middle}#batchLeaveReview select{min-width:90px}
 
+
+/* V145：人數列獨立留白，避免共用無內距表格樣式後貼邊。 */
+#overseas #overseasCount{box-sizing:border-box;margin:0;padding:16px 20px;font-size:13px;line-height:22px;color:#64748b;border-bottom:1px solid #e2e8f0}
+@media(max-width:640px){#overseas #overseasCount{padding:14px 12px}}
 </style>
 </head>
 <body>
@@ -6364,7 +6369,7 @@ body.change-manage-mode .change-manage-inline{
 
 <section id="overseas" class="page">
  <div class="section"><div class="sectionhead"><div><h2>海外事業部</h2></div><button id="overseasAddBtn" class="btn primary admin-only">＋ 新增海外人員</button></div><div id="overseasKpis" class="overseas-kpis"></div></div>
- <div class="section people-list-section"><div id="overseasCount" class="mini" style="margin-bottom:12px"></div><div class="tablewrap"><table><thead><tr><th>人員</th><th>班別／組別</th><th>職務</th><th>到職／年資</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
+ <div class="section people-list-section"><div id="overseasCount" class="mini"></div><div class="tablewrap"><table><thead><tr><th>人員</th><th>班別／組別</th><th>職務</th><th>到職／年資</th></tr></thead><tbody id="overseasBody"></tbody></table></div></div>
 </section>
 <section id="contracts" class="page">
  <div class="section">

@@ -8691,7 +8691,7 @@ function renderAnnualLeave(data){
  $('mLeaveSummary').textContent=summary;
  $('mLeaveStatus').textContent='依週年制與已登記紀錄計算；導入前已休假也請補登，否則餘額會偏高。';
  const rows=(data.history||[]).filter(row=>row.period_start===p?.start&&!row.voided);
- $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天${row.applied_shift?'（'+esc(row.applied_shift==='夜'?'晚班':row.applied_shift+'班')+'）':''}${row.shift_override?' · 人工確認班別':''}</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(row.note):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">移除</button>`:''}</div>`).join(''):'尚無使用紀錄。';
+ $('mLeaveHistory').innerHTML=rows.length?rows.map(row=>`<div style="padding:10px 0;border-bottom:1px solid #e2e8f0"><strong>${esc(row.start_date)}${row.end_date!==row.start_date?' ～ '+esc(row.end_date):''}｜${esc(row.days)} 天${row.applied_shift?'（'+esc(row.applied_shift==='夜'?'晚班':row.applied_shift+'班')+'）':''}${row.shift_override?' · 人工確認班別':''}</strong><div class="mini">扣抵期間 ${esc(row.period_start)} ～ ${esc(row.period_end)}${row.note?'｜'+esc(String(row.note).replace(/^(LINE 私訊特休)[｜|]\s*[a-f0-9]{12}$/i,'$1')):''}</div>${!row.voided?`<button type="button" class="btn" data-leave-edit="${esc(row.id)}">編輯</button> <button type="button" class="btn" data-leave-void="${esc(row.id)}">移除</button>`:''}</div>`).join(''):'尚無使用紀錄。';
  $('mLeaveSave').disabled=!data.hire_date||!!data.inactive;
 }
 async function loadAnnualLeaveEditor(no,keepForm=false){

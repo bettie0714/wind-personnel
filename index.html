@@ -6382,7 +6382,7 @@ body.change-manage-mode .change-manage-inline{
  <div class="section">
   <div class="filters" style="grid-template-columns:repeat(3,minmax(0,1fr))">
    <div class="field"><label>處理狀態</label><select id="cRange"><option value="">全部</option><option value="pending100">100 天內待確認</option><option value="nonrenewal">不續約</option></select></div>
-   <div class="field"><label>外籍類型</label><select id="cType"><option value="">全部</option><option>W</option><option>Z</option></select></div>
+   <div class="field"><label>外籍類型</label><select id="cType"><option value="Z">Z 人員</option></select></div>
    <div class="field search"><label>搜尋</label><input id="cSearch" placeholder="工號／姓名／國籍／組別"></div>
   </div>
  </div>
@@ -8382,7 +8382,7 @@ function contractRowsFiltered(){
  let range=$('cRange')?.value||'';
  let typ=$('cType')?.value||'';
  let all=employees
-   .filter(e=>isActiveAsOf(e)&&/^[WZ]/.test(normalizeNo(e.employee_no))&&cmap.has(normalizeNo(e.employee_no)))
+   .filter(e=>isActiveAsOf(e)&&/^Z/.test(normalizeNo(e.employee_no))&&cmap.has(normalizeNo(e.employee_no)))
    .map(e=>({...e,...cmap.get(normalizeNo(e.employee_no)),employee_no:normalizeNo(e.employee_no)}));
 
  let rows=all.filter(e=>{
@@ -8451,6 +8451,7 @@ function renderContracts(){
 window.renewContractThreeYears=async no=>{
  if(!isAdmin())return;
  no=normalizeNo(no);
+ if(!/^Z/.test(no))return alert('W 人員僅記錄合約到期日，不需續約確認。');
  let c=contracts.find(x=>normalizeNo(x.employee_no)===no),p=employees.find(x=>normalizeNo(x.employee_no)===no);
  if(!c||!p)return alert('找不到這筆外籍合約資料。');
  let oldEnd=String(c.contract_end_date||'').slice(0,10),newEnd=contractAddYearsClamped(oldEnd,3);
@@ -8479,6 +8480,7 @@ window.renewContractThreeYears=async no=>{
 window.markContractNonrenewal=async no=>{
  if(!isAdmin())return;
  no=normalizeNo(no);
+ if(!/^Z/.test(no))return alert('W 人員僅記錄合約到期日，不需續約確認。');
  let c=contracts.find(x=>normalizeNo(x.employee_no)===no),p=employees.find(x=>normalizeNo(x.employee_no)===no);
  if(!c||!p)return alert('找不到這筆外籍合約資料。');
  let end=String(c.contract_end_date||'').slice(0,10);
@@ -8504,6 +8506,7 @@ window.markContractNonrenewal=async no=>{
 window.clearContractNonrenewal=async no=>{
  if(!isAdmin())return;
  no=normalizeNo(no);
+ if(!/^Z/.test(no))return alert('W 人員僅記錄合約到期日，不需續約確認。');
  let c=contracts.find(x=>normalizeNo(x.employee_no)===no),p=employees.find(x=>normalizeNo(x.employee_no)===no);
  if(!c||!p)return alert('找不到這筆外籍合約資料。');
  if(!confirm(`確定取消 ${no}｜${p.name} 的「不續約」標記？\n取消後會重新回到 100 天內待確認。`))return;

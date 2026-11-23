@@ -6483,6 +6483,7 @@ body.change-manage-mode .change-manage-inline{
   <p id="returnConfirmQuestion" class="return-confirm-question"></p>
   <p id="returnConfirmHint">確認後才會把人員改回在廠；若尚未返廠，可更新下一次預計返廠日；若確定不再返廠，可直接辦理離職。</p>
 
+  <div class="field"><label for="returnActualDate">實際返廠／復職日</label><input id="returnActualDate" type="date"></div>
   <div id="returnDelayBlock" class="return-delay-block hidden">
    <div class="field">
     <label>新的預計返廠／復職日 *</label>
@@ -7086,7 +7087,19 @@ async function loadAll(){
  selectedChangeIds=new Set([...selectedChangeIds].filter(id=>changes.some(c=>String(c.id)===String(id))));
  populateFilters();
  renderAll();
- setTimeout(maybeAutoPromptReturnConfirm,180);
+ const params=new URLSearchParams(location.search);
+ const requested=params.get('returnNo');
+ if(requested&&isAdmin()){
+   const candidate=dueReturnCandidates().find(p=>p.employee_no===requested&&p.expected_return_date===params.get('due'));
+   const action=params.get('returnAction');
+   const url=new URL(location.href);
+   for(const key of ['returnNo','due','returnAction'])url.searchParams.delete(key);
+   history.replaceState(null,'',url);
+   if(candidate){
+     openReturnConfirm(requested);
+     if(action==='delay')$('returnNotBackBtn').click();
+   }else alert('這筆返廠事項已處理或日期已變更。');
+ }else setTimeout(maybeAutoPromptReturnConfirm,180);
 }
 function showPage(id){if(id!=='changes'&&changeManageMode){changeManageMode=false;selectedChangeIds.clear();document.body.classList.remove('change-manage-mode');}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));let m={dashboard:['人員總覽','快速掌握目前在職人力'],people:['人員名單','搜尋與檢視目前人員'],changes:['人員變動','月份比較、增減明細與異動紀錄'],admin:['管理後台','Excel 匯入與人員維護'],overseas:['海外事業部','獨立檢視與管理'],contracts:['外籍合約續約管理','100 天確認續約；不續約者 30 天前再次提醒']};$('pageTitle').textContent=m[id][0];$('pageSub').textContent=m[id][1];renderAll()}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{if(b.dataset.page==='admin'&&!isAdmin())return;showPage(b.dataset.page)});
@@ -7330,6 +7343,9 @@ function openReturnConfirm(no=null){
    <strong>${esc(p.employee_no)}｜${esc(p.name||'')}</strong>
    <span>原預計 ${esc(returnDateLabel(due))} 返廠上班${overdue?'（已超過預計日期）':''}</span>
    <span class="return-confirm-status-chip">目前狀態：${esc(returnStateLabel(p))}</span>`;
+ $('returnActualDate').min=String(p.temporary_start_date||'').slice(0,10);
+ $('returnActualDate').max=todayISO();
+ $('returnActualDate').value=due||todayISO();
  $('returnConfirmQuestion').textContent=`${p.employee_no} 有回來上班了嗎？`;
  $('returnDelayBlock').classList.add('hidden');
  $('returnNextDate').value='';
@@ -7425,6 +7441,8 @@ $('returnConfirmedBtn').onclick=async()=>{
  let oldTemp=String(p.temporary_status||'').trim();
  let oldDue=String(p.expected_return_date||'').slice(0,10);
  let wasLeave=p.status==='留停';
+ const actual=$('returnActualDate').value;
+ if(!actual||actual>todayISO()||actual<String(p.temporary_start_date||'').slice(0,10))return alert('請核對實際返廠日。');
  $('returnConfirmedBtn').disabled=true;
  try{
    let payload={
@@ -7450,7 +7468,7 @@ $('returnConfirmedBtn').onclick=async()=>{
      old_group:p.group_name||null,
      new_group:p.group_name||null,
      detail:detailParts.join('｜'),
-     change_date:todayISO(),
+     change_date:actual,
      created_by:user.id
    });
    if(changeError)console.error('返廠確認紀錄寫入失敗：',changeError);

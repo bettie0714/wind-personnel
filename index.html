@@ -6437,6 +6437,8 @@ body.change-manage-mode .change-manage-inline{
      <div class="field" id="mSupportLocationField"><label>支援地點</label><select id="mSupportLocation"><option value="">請選擇</option><option>台北港</option><option>東17</option><option>製造部</option></select></div>
      <div class="field"><label id="mTempStartLabel">開始日</label><input id="mTempStart" type="date"></div><div class="field"><label>預計返廠／復職日</label><input id="mExpectedReturn" type="date"></div>
     </div><div class="temp-fields-note">返校不列入在職總人數；返鄉仍屬在職但不列入目前在廠；支援台北港或東17也不列入目前在廠。</div></div>
+    <button type="button" class="btn hidden" id="mEndSupport">結束支援</button>
+    <div class="field hidden" id="mReturnDateField"><label for="mActualReturn">實際返廠日</label><input id="mActualReturn" type="date"></div>
    </section>
    <details id="mLeaveSection" class="person-editor-details">
     <summary><span>特休與使用紀錄</span><span class="person-editor-summary-note">點開登記／查看</span></summary>
@@ -8960,6 +8962,18 @@ function syncIdentityFromEmployeeNo({fromUser=false}={}){
 function syncTempFields(){
  let st=$('mTempStatus').value;
  let isLeave=$('mStatus').value==='留停';
+ const saved=employees.find(row=>row.employee_no===editNo);
+ const ending=saved?.temporary_status==='支援'&&!st;
+ $('mEndSupport').classList.toggle('hidden',saved?.temporary_status!=='支援'||st!=='支援');
+ $('mReturnDateField').classList.toggle('hidden',!ending);
+ if(ending){
+   const today=todayISO();
+   const due=String(saved.expected_return_date||'').slice(0,10);
+   const field=$('mActualReturn');
+   field.min=String(saved.temporary_start_date||'').slice(0,10);
+   field.max=today;
+   if(!field.value)field.value=due && due<=today ? due : today;
+ }else $('mActualReturn').value='';
  $('mTempStartLabel').textContent=st==='返校'?'返校日':st==='返鄉'?'返鄉日':st==='支援'?'開始支援日':isLeave?'留停開始日':'開始日';
  let enabled=!!st||isLeave;
  $('mTempStart').disabled=!enabled;
@@ -8972,6 +8986,11 @@ function syncTempFields(){
  if(!enabled){$('mTempStart').value='';$('mExpectedReturn').value='';}
  refreshChangePreview();
 }
+$('mEndSupport').onclick=()=>{
+ $('mTempStatus').value='';
+ syncTempFields();
+ $('mActualReturn').focus();
+};
 $('mTempStatus').addEventListener('change',syncTempFields);
 $('mStatus').addEventListener('change',syncTempFields);
 $('mLevel').addEventListener('change',()=>{syncSupervisorGroupState();refreshChangePreview();});
@@ -9111,6 +9130,12 @@ function refreshChangePreview(){
    ? `本次變更：${previewText}`
    : '目前沒有欄位變更；即使開啟「記錄」，儲存時也不會產生空白紀錄。';
 
+ const endingSupport=old?.temporary_status==='支援'&&!draft.temporary_status;
+ $('mLogChange').disabled=endingSupport;
+ if(endingSupport){
+   $('mLogChange').checked=true;
+   return;
+ }
  if(!logChoiceTouched){
    if(!old)$('mLogChange').checked=true;
    else $('mLogChange').checked=importantChange(old,draft,diffs);
@@ -9128,6 +9153,10 @@ $('personSave').onclick=async()=>{
 
  let old=employees.find(x=>x.employee_no===editNo);
  let oldNo=old?.employee_no||null;
+ const endingSupport=old?.temporary_status==='支援'&&!draft.temporary_status;
+ const returnDay=endingSupport?$('mActualReturn').value:'';
+ if(endingSupport&&(!returnDay||returnDay>todayISO()||returnDay<String(old.temporary_start_date||'').slice(0,10)))return alert('請填寫支援開始日至今天之間的實際返廠日。');
+
  let tempStatus=draft.temporary_status,tempStart=draft.temporary_start_date,expectedReturn=draft.expected_return_date;
  let pendingShift=draft.pending_shift,shiftEffectiveDate=draft.shift_effective_date;
 
@@ -9203,7 +9232,7 @@ $('personSave').onclick=async()=>{
    await db.from('foreign_contracts').delete().eq('employee_no',no)
  }
 
- if(diffs.length && $('mLogChange').checked){
+ if(diffs.length && (endingSupport||$('mLogChange').checked)){
    let type=old?'修改':'新增';
    let oldTemp=String(old?.temporary_status||'');
    let newTemp=String(payload.temporary_status||'');
@@ -9231,7 +9260,7 @@ $('personSave').onclick=async()=>{
      detail:diffs.join('｜'),
      // V114：新進人員若已填到職日，異動紀錄以真正到職日為準。
      // 先建檔不代表已經到職，避免月報提前出現新增人力。
-     change_date:!old?(payload.hire_date||todayISO()):todayISO(),
+     change_date:returnDay||(!old?(payload.hire_date||todayISO()):todayISO()),
      created_by:user.id
    });
    if(changeError)alert('人員資料已儲存，但異動紀錄寫入失敗：'+changeError.message);
